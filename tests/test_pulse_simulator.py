@@ -30,7 +30,7 @@ class GenerateReadingsTests(unittest.TestCase):
             },
         )
         self.assertEqual(readings[0]["schema_version"], 1)
-        self.assertEqual(readings[0]["timestamp"], "2026-01-01T00:00:00.250Z")
+        self.assertEqual(readings[0]["timestamp"], "2026-01-01T00:00:00.250000Z")
 
     def test_zero_pulses_emits_no_readings(self):
         self.assertEqual(list(generate_readings("lab-1", 0)), [])
