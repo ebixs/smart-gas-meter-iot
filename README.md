@@ -21,7 +21,7 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Hardware BOM](hardware/BOM-draft.md)
+[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Hardware BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py)
 
 </div>
 
@@ -63,9 +63,10 @@ The project is being developed as a practical engineering portfolio: from circui
 
 ### Development roadmap
 
-- [ ] Define requirements and system interfaces
-- [ ] Select components and prepare a documented BOM
-- [ ] Design a low-voltage pulse simulator and input protection
+- [x] Draft initial requirements and system interfaces ([document](docs/requirements.md))
+- [x] Prepare a preliminary component shortlist and BOM ([draft](hardware/BOM-draft.md); exact parts still pending)
+- [x] Specify simulator acceptance tests and add a software telemetry fixture ([spec](hardware/pulse-simulator-spec.md), [code](simulator/pulse_simulator.py))
+- [ ] Finalize component selection, pulse limits, and low-voltage input protection
 - [ ] Create schematic and custom PCB layout
 - [ ] Review 3D board assembly and enclosure clearances
 - [ ] Implement firmware and local event logging
@@ -114,9 +115,10 @@ The project is being developed as a practical engineering portfolio: from circui
 
 ### نقشه راه توسعه
 
-- [ ] تدوین نیازمندی‌ها و رابط‌های بین بخش‌ها
-- [ ] انتخاب قطعات و تهیه فهرست مستند BOM
-- [ ] طراحی شبیه‌ساز پالس کم‌ولتاژ و حفاظت ورودی
+- [x] تدوین اولیه نیازمندی‌ها و رابط‌های سیستم ([مستند](docs/requirements.md))
+- [x] تهیه پیش‌نویس فهرست قطعات BOM ([پیش‌نویس](hardware/BOM-draft.md)؛ انتخاب نهایی قطعات باقی است)
+- [x] تعریف آزمون‌های شبیه‌ساز و افزودن ابزار نرم‌افزاری داده مصنوعی ([مشخصات](hardware/pulse-simulator-spec.md)، [کد](simulator/pulse_simulator.py))
+- [ ] نهایی‌کردن قطعات، محدودیت پالس و حفاظت ورودی کم‌ولتاژ
 - [ ] ترسیم شماتیک و طراحی برد اختصاصی PCB
 - [ ] بررسی سه‌بعدی جانمایی قطعات و ابعاد محفظه
 - [ ] پیاده‌سازی فریم‌ور و ثبت رویدادها
