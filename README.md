@@ -66,6 +66,7 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] Draft initial requirements and system interfaces ([document](docs/requirements.md))
 - [x] Prepare a preliminary component shortlist and BOM ([draft](hardware/BOM-draft.md); exact parts still pending)
 - [x] Specify simulator acceptance tests and add a software telemetry fixture ([spec](hardware/pulse-simulator-spec.md), [code](simulator/pulse_simulator.py))
+- [x] Add four unit tests for the software simulator and a GitHub Actions CI workflow ([tests](tests/test_pulse_simulator.py), [workflow](.github/workflows/tests.yml)); unit tests passed locally
 - [ ] Finalize component selection, pulse limits, and low-voltage input protection
 - [ ] Create schematic and custom PCB layout
 - [ ] Review 3D board assembly and enclosure clearances
@@ -118,6 +119,7 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] تدوین اولیه نیازمندی‌ها و رابط‌های سیستم ([مستند](docs/requirements.md))
 - [x] تهیه پیش‌نویس فهرست قطعات BOM ([پیش‌نویس](hardware/BOM-draft.md)؛ انتخاب نهایی قطعات باقی است)
 - [x] تعریف آزمون‌های شبیه‌ساز و افزودن ابزار نرم‌افزاری داده مصنوعی ([مشخصات](hardware/pulse-simulator-spec.md)، [کد](simulator/pulse_simulator.py))
+- [x] افزودن چهار آزمون واحد برای شبیه‌ساز نرم‌افزاری و گردش CI در GitHub Actions ([آزمون‌ها](tests/test_pulse_simulator.py)، [گردش‌کار](.github/workflows/tests.yml))؛ آزمون‌ها در محیط محلی با موفقیت اجرا شدند
 - [ ] نهایی‌کردن قطعات، محدودیت پالس و حفاظت ورودی کم‌ولتاژ
 - [ ] ترسیم شماتیک و طراحی برد اختصاصی PCB
 - [ ] بررسی سه‌بعدی جانمایی قطعات و ابعاد محفظه
@@ -211,23 +213,23 @@ The diagram represents the **planned architecture**. Interfaces and component ch
 
 ### 🇬🇧 English
 
-The original version of this project was built as a prototype in **1396 in the Solar Hijri calendar (2017–2018)** for **Iran Gas Company** in **Shahrekord, Chaharmahal and Bakhtiari Province, Iran**. The project has now been revisited and its concept and documentation are being updated using current technical knowledge, with a broader focus on embedded systems, custom PCB design, IoT connectivity, data services, and automated reporting.
+In **1396 SH (2017–2018)**, **I personally designed and built the original smart gas meter prototype** for **Iran Gas Company** in **Shahrekord, Chaharmahal and Bakhtiari Province, Iran**. Today, I am revisiting and upgrading **the same original project** using my current technical knowledge and modern engineering practices. The goal is to improve its hardware design, software architecture, telemetry, data management, and analytical capabilities while preserving the original project's foundation.
 
 The current repository describes this updated development effort. The historical prototype should not be confused with the new implementation: hardware, firmware, and software features are marked as planned until they are implemented and tested in this repository.
 
 ### 🇮🇷 فارسی
 
-نسخه اولیه این پروژه در سال **۱۳۹۶ شمسی**، به‌عنوان یک نمونه اولیه برای **شرکت گاز ایران** در **شهرکرد، استان چهارمحال و بختیاری** ساخته شد.
+من در سال **۱۳۹۶ شمسی (۲۰۱۷–۲۰۱۸ میلادی)**، نسخهٔ اولیهٔ کنتور هوشمند گاز را **شخصاً طراحی و ساختم**؛ این نمونه برای **شرکت گاز ایران** در **شهرکرد، استان چهارمحال و بختیاری** ساخته شد.
 
-اکنون این پروژه با تکیه بر دانش فنی روز بازبینی و به‌روزرسانی شده است. در نسخه جدید، طراحی سیستم‌های نهفته، طراحی برد الکترونیکی اختصاصی (PCB)، ارتباطات اینترنت اشیا، پردازش داده و تولید خودکار گزارش‌ها با رویکردی توسعه‌پذیرتر دنبال می‌شوند.
+اکنون در حال بازبینی و به‌روزرسانی **همان پروژهٔ اولیه** با دانش فنی امروز و روش‌های مهندسی جدید هستم. هدف، ارتقای طراحی سخت‌افزار، معماری نرم‌افزار، ارسال داده، مدیریت اطلاعات و قابلیت‌های تحلیل داده، با حفظ پایهٔ اصلی پروژه است.
 
 این مخزن، مسیر توسعه و به‌روزرسانی فعلی پروژه را مستند می‌کند. نمونه تاریخی سال ۱۳۹۶ را نباید با پیاده‌سازی جدید اشتباه گرفت؛ قابلیت‌های سخت‌افزاری و نرم‌افزاری جدید تا زمان پیاده‌سازی و آزمون، به‌عنوان قابلیت تکمیل‌شده معرفی نمی‌شوند.
 
 ### 🇩🇪 Deutsch
 
-Die ursprüngliche Version dieses Projekts wurde **1396 nach dem iranischen Sonnenkalender (2017–2018)** als Prototyp für die **Iran Gas Company** in **Shahrekord, Provinz Chaharmahal und Bakhtiari, Iran**, gebaut.
+Im Jahr **1396 SH (2017–2018)** habe **ich den ursprünglichen Prototyp des intelligenten Gaszählers persönlich entworfen und gebaut** – für die **Iran Gas Company** in **Shahrekord, Provinz Chaharmahal und Bakhtiari, Iran**.
 
-Nun wird das Projekt auf Grundlage des heutigen technischen Wissens überarbeitet und aktualisiert. Die neue Entwicklungsrichtung umfasst Embedded-Systeme, ein kundenspezifisches PCB-Design, IoT-Konnektivität, Datenverarbeitung und automatisierte Berichte.
+Heute überarbeite und erweitere ich **dasselbe ursprüngliche Projekt** mit meinem aktuellen technischen Wissen und modernen Engineering-Methoden. Ziel ist es, Hardwaredesign, Softwarearchitektur, Telemetrie, Datenverwaltung und Analysefunktionen weiterzuentwickeln und dabei die ursprüngliche Grundlage des Projekts zu erhalten.
 
 Dieses Repository dokumentiert die aktuelle Weiterentwicklung. Der historische Prototyp ist von der neuen Implementierung zu unterscheiden: Neue Hardware- und Softwarefunktionen gelten erst dann als umgesetzt, wenn sie in diesem Repository implementiert und getestet wurden.
 
