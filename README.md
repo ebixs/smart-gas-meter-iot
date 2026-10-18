@@ -21,7 +21,7 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Hardware BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py)
+[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py)
 
 </div>
 
@@ -68,8 +68,9 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] Specify simulator acceptance tests and add a software telemetry fixture ([spec](hardware/pulse-simulator-spec.md), [code](simulator/pulse_simulator.py))
 - [x] Add unit tests for the software simulator and a GitHub Actions CI workflow ([tests](tests/test_pulse_simulator.py), [workflow](.github/workflows/tests.yml)); local test run passed
 - [x] Define a versioned telemetry contract and JSON Schema ([documentation](docs/telemetry-contract.md), [schema](schemas/telemetry.schema.json))
-- [ ] Finalize component selection, pulse limits, and low-voltage input protection
-- [ ] Create schematic and custom PCB layout
+- [x] Define the first custom-board architecture, candidate MCU module, power block, lab-only pulse input, pin map, and preliminary BOM ([design baseline](hardware/board-v0.1-design.md), [BOM](hardware/BOM-board-v0.1.md)); CAD and validation are still pending
+- [ ] Verify exact footprints and power-stage component values against current datasheets
+- [ ] Create KiCad schematic and custom PCB layout
 - [ ] Review 3D board assembly and enclosure clearances
 - [ ] Implement firmware and local event logging
 - [ ] Build the Python API and database schema
@@ -122,8 +123,9 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] تعریف آزمون‌های شبیه‌ساز و افزودن ابزار نرم‌افزاری داده مصنوعی ([مشخصات](hardware/pulse-simulator-spec.md)، [کد](simulator/pulse_simulator.py))
 - [x] افزودن آزمون‌های واحد برای شبیه‌ساز نرم‌افزاری و گردش CI در GitHub Actions ([آزمون‌ها](tests/test_pulse_simulator.py)، [گردش‌کار](.github/workflows/tests.yml))؛ اجرای محلی آزمون‌ها موفق بود
 - [x] تعریف قرارداد نسخه‌دار داده و JSON Schema ([مستند](docs/telemetry-contract.md)، [طرح JSON](schemas/telemetry.schema.json))
-- [ ] نهایی‌کردن قطعات، محدودیت پالس و حفاظت ورودی کم‌ولتاژ
-- [ ] ترسیم شماتیک و طراحی برد اختصاصی PCB
+- [x] تعریف معماری اولیه برد اختصاصی، ماژول میکروکنترلر پیشنهادی، بخش تغذیه، ورودی پالس آزمایشگاهی، نگاشت پایه‌ها و BOM اولیه ([مبنای طراحی](hardware/board-v0.1-design.md)، [فهرست قطعات](hardware/BOM-board-v0.1.md))؛ طراحی CAD و اعتبارسنجی هنوز انجام نشده است
+- [ ] بررسی فوت‌پرینت‌ها و مقادیر قطعات تغذیه با دیتاشیت‌های رسمی
+- [ ] ترسیم شماتیک در KiCad و طراحی PCB اختصاصی
 - [ ] بررسی سه‌بعدی جانمایی قطعات و ابعاد محفظه
 - [ ] پیاده‌سازی فریم‌ور و ثبت رویدادها
 - [ ] توسعه API پایتون و ساختار پایگاه داده
