@@ -14,6 +14,24 @@ class GenerateReadingsTests(unittest.TestCase):
         self.assertEqual([r["uptime_ms"] for r in readings], [250, 500, 750])
         self.assertTrue(all(r["input_mode"] == "simulated" for r in readings))
 
+    def test_records_match_telemetry_contract_fields(self):
+        start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        readings = list(generate_readings("lab-1", 1, 250, start))
+        self.assertEqual(
+            set(readings[0]),
+            {
+                "schema_version",
+                "device_id",
+                "sequence",
+                "timestamp",
+                "uptime_ms",
+                "pulse_count_total",
+                "input_mode",
+            },
+        )
+        self.assertEqual(readings[0]["schema_version"], 1)
+        self.assertEqual(readings[0]["timestamp"], "2026-01-01T00:00:00.250Z")
+
     def test_zero_pulses_emits_no_readings(self):
         self.assertEqual(list(generate_readings("lab-1", 0)), [])
 
