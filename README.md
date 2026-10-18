@@ -205,6 +205,34 @@ The diagram represents the **planned architecture**. Interfaces and component ch
 - Any future real-world deployment would require qualified engineering review, applicable certification, and compliance with local regulations.
 - Protect device credentials, validate incoming data, and design for communication failures and safe recovery.
 
+## Project History / سابقه پروژه / Projektgeschichte
+
+<a id="project-history"></a>
+
+### 🇬🇧 English
+
+The original version of this project was built as a prototype in **1396 in the Solar Hijri calendar (2017–2018)** for **Iran Gas Company** in **Shahrekord, Chaharmahal and Bakhtiari Province, Iran**. The project has now been revisited and its concept and documentation are being updated using current technical knowledge, with a broader focus on embedded systems, custom PCB design, IoT connectivity, data services, and automated reporting.
+
+The current repository describes this updated development effort. The historical prototype should not be confused with the new implementation: hardware, firmware, and software features are marked as planned until they are implemented and tested in this repository.
+
+### 🇮🇷 فارسی
+
+نسخه اولیه این پروژه در سال **۱۳۹۶ شمسی**، به‌عنوان یک نمونه اولیه برای **شرکت گاز ایران** در **شهرکرد، استان چهارمحال و بختیاری** ساخته شد.
+
+اکنون این پروژه با تکیه بر دانش فنی روز بازبینی و به‌روزرسانی شده است. در نسخه جدید، طراحی سیستم‌های نهفته، طراحی برد الکترونیکی اختصاصی (PCB)، ارتباطات اینترنت اشیا، پردازش داده و تولید خودکار گزارش‌ها با رویکردی توسعه‌پذیرتر دنبال می‌شوند.
+
+این مخزن، مسیر توسعه و به‌روزرسانی فعلی پروژه را مستند می‌کند. نمونه تاریخی سال ۱۳۹۶ را نباید با پیاده‌سازی جدید اشتباه گرفت؛ قابلیت‌های سخت‌افزاری و نرم‌افزاری جدید تا زمان پیاده‌سازی و آزمون، به‌عنوان قابلیت تکمیل‌شده معرفی نمی‌شوند.
+
+### 🇩🇪 Deutsch
+
+Die ursprüngliche Version dieses Projekts wurde **1396 nach dem iranischen Sonnenkalender (2017–2018)** als Prototyp für die **Iran Gas Company** in **Shahrekord, Provinz Chaharmahal und Bakhtiari, Iran**, gebaut.
+
+Nun wird das Projekt auf Grundlage des heutigen technischen Wissens überarbeitet und aktualisiert. Die neue Entwicklungsrichtung umfasst Embedded-Systeme, ein kundenspezifisches PCB-Design, IoT-Konnektivität, Datenverarbeitung und automatisierte Berichte.
+
+Dieses Repository dokumentiert die aktuelle Weiterentwicklung. Der historische Prototyp ist von der neuen Implementierung zu unterscheiden: Neue Hardware- und Softwarefunktionen gelten erst dann als umgesetzt, wenn sie in diesem Repository implementiert und getestet wurden.
+
+---
+
 ## Contributing
 
 Issues and pull requests are welcome for documentation, simulation, firmware architecture, backend services, testing, and hardware design.
