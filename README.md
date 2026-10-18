@@ -21,6 +21,8 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
+[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Hardware BOM](hardware/BOM-draft.md)
+
 </div>
 
 ---
