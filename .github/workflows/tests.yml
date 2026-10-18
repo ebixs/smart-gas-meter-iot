@@ -1,0 +1,25 @@
+name: Python tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  simulator-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Smoke-test simulator CLI
+        run: |
+          python simulator/pulse_simulator.py --device-id ci-lab --pulses 3 --interval-ms 250 > /tmp/readings.jsonl
+          python -c "import json; rows=[json.loads(line) for line in open('/tmp/readings.jsonl', encoding='utf-8')]; assert len(rows)==3; assert [r['pulse_count_total'] for r in rows]==[1,2,3]; assert all(r['input_mode']=='simulated' for r in rows)"
