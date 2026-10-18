@@ -21,7 +21,7 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Hardware BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py)
+[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Hardware BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py)
 
 </div>
 
@@ -66,7 +66,8 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] Draft initial requirements and system interfaces ([document](docs/requirements.md))
 - [x] Prepare a preliminary component shortlist and BOM ([draft](hardware/BOM-draft.md); exact parts still pending)
 - [x] Specify simulator acceptance tests and add a software telemetry fixture ([spec](hardware/pulse-simulator-spec.md), [code](simulator/pulse_simulator.py))
-- [x] Add four unit tests for the software simulator and a GitHub Actions CI workflow ([tests](tests/test_pulse_simulator.py), [workflow](.github/workflows/tests.yml)); unit tests passed locally
+- [x] Add unit tests for the software simulator and a GitHub Actions CI workflow ([tests](tests/test_pulse_simulator.py), [workflow](.github/workflows/tests.yml)); local test run passed
+- [x] Define a versioned telemetry contract and JSON Schema ([documentation](docs/telemetry-contract.md), [schema](schemas/telemetry.schema.json))
 - [ ] Finalize component selection, pulse limits, and low-voltage input protection
 - [ ] Create schematic and custom PCB layout
 - [ ] Review 3D board assembly and enclosure clearances
@@ -119,7 +120,8 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] تدوین اولیه نیازمندی‌ها و رابط‌های سیستم ([مستند](docs/requirements.md))
 - [x] تهیه پیش‌نویس فهرست قطعات BOM ([پیش‌نویس](hardware/BOM-draft.md)؛ انتخاب نهایی قطعات باقی است)
 - [x] تعریف آزمون‌های شبیه‌ساز و افزودن ابزار نرم‌افزاری داده مصنوعی ([مشخصات](hardware/pulse-simulator-spec.md)، [کد](simulator/pulse_simulator.py))
-- [x] افزودن چهار آزمون واحد برای شبیه‌ساز نرم‌افزاری و گردش CI در GitHub Actions ([آزمون‌ها](tests/test_pulse_simulator.py)، [گردش‌کار](.github/workflows/tests.yml))؛ آزمون‌ها در محیط محلی با موفقیت اجرا شدند
+- [x] افزودن آزمون‌های واحد برای شبیه‌ساز نرم‌افزاری و گردش CI در GitHub Actions ([آزمون‌ها](tests/test_pulse_simulator.py)، [گردش‌کار](.github/workflows/tests.yml))؛ اجرای محلی آزمون‌ها موفق بود
+- [x] تعریف قرارداد نسخه‌دار داده و JSON Schema ([مستند](docs/telemetry-contract.md)، [طرح JSON](schemas/telemetry.schema.json))
 - [ ] نهایی‌کردن قطعات، محدودیت پالس و حفاظت ورودی کم‌ولتاژ
 - [ ] ترسیم شماتیک و طراحی برد اختصاصی PCB
 - [ ] بررسی سه‌بعدی جانمایی قطعات و ابعاد محفظه
