@@ -33,6 +33,11 @@ class TelemetryApiTests(unittest.TestCase):
             "input_mode": "simulated",
         }
 
+    def test_dashboard_is_served(self):
+        response = self.client.get("/dashboard")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("synthetic telemetry only", response.text)
+
     def test_health_is_explicitly_lab_only(self):
         response = self.client.get("/health")
         self.assertEqual(response.status_code, 200)
