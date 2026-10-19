@@ -14,7 +14,7 @@ export SGM_API_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(3
 uvicorn backend.app:app --reload
 ```
 
-Open `http://127.0.0.1:8000/dashboard` for the lab dashboard or `http://127.0.0.1:8000/docs` for the interactive API documentation. The default database is `data/telemetry.sqlite3`; set `SGM_DATABASE_PATH` to change it.
+Open `http://127.0.0.1:8000/dashboard` for the lab dashboard or `http://127.0.0.1:8000/docs` for the interactive API documentation. In a second terminal, send a short synthetic test batch with `python simulator/push_to_api.py --device-id lab-run-001 --pulses 5`; it reads the bearer token from `SGM_API_TOKEN`. Use a new device ID for a fresh sequence-1 test run. The default database is `data/telemetry.sqlite3`; set `SGM_DATABASE_PATH` to change it.
 
 ## Endpoints
 
