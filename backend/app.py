@@ -15,21 +15,21 @@ from pathlib import Path
 from typing import Iterator, Literal
 
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
 
 DB_PATH = Path(os.environ.get("SGM_DATABASE_PATH", "data/telemetry.sqlite3"))
 app = FastAPI(title="Smart Gas Meter IoT Lab API", version="0.1.0")
 
 
 class TelemetryReading(BaseModel):
-    model_config = ConfigDict(extra="forbid", strict=True)
+    model_config = ConfigDict(extra="forbid")
 
     schema_version: Literal[1]
     device_id: str = Field(min_length=1, max_length=128)
-    sequence: int = Field(ge=1)
+    sequence: StrictInt = Field(ge=1)
     timestamp: datetime
-    uptime_ms: int = Field(ge=0)
-    pulse_count_total: int = Field(ge=1)
+    uptime_ms: StrictInt = Field(ge=0)
+    pulse_count_total: StrictInt = Field(ge=1)
     input_mode: Literal["simulated"]
 
     @field_validator("device_id")
