@@ -14,7 +14,7 @@ export SGM_API_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(3
 uvicorn backend.app:app --reload
 ```
 
-Open `http://127.0.0.1:8000/docs` for the interactive API documentation. The default database is `data/telemetry.sqlite3`; set `SGM_DATABASE_PATH` to change it.
+Open `http://127.0.0.1:8000/dashboard` for the lab dashboard or `http://127.0.0.1:8000/docs` for the interactive API documentation. The default database is `data/telemetry.sqlite3`; set `SGM_DATABASE_PATH` to change it.
 
 ## Endpoints
 
