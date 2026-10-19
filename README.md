@@ -67,7 +67,7 @@ The project is being developed as a practical engineering portfolio: from circui
 - [ ] Complete BOM with exact parts, footprints and approved alternates.
 - [ ] Run and review electrical-rule and design-rule checks.
 - [ ] Export and inspect Gerbers, drill, assembly and pick-and-place files.
-- [x] Add a development-only FastAPI + SQLite ingestion API with duplicate-safe records and pulse-delta reporting.\n- [ ] Add device authentication, production database hardening, firmware, billing and analytics.
+- [x] Add a development-only FastAPI + SQLite ingestion API with duplicate-safe records, bearer-token protection and pulse-delta reporting.\n- [ ] Add per-device identity/credentials, production database hardening, firmware, billing and analytics.
 - [ ] Run recorded low-voltage bench tests and later region-specific radio validation.
 - [ ] Complete qualified safety, metrology, EMC, radio, cybersecurity and regulatory reviews.
 
@@ -100,7 +100,7 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] تدوین نیازمندی‌ها، معماری و قرارداد داده.
 - [x] ساخت شبیه‌ساز نرم‌افزاری و آزمون‌های خودکار.
 - [x] مستندسازی تصمیم‌های اولیه برد، رابط مودم، نقاط تست و معیارهای آماده‌سازی ساخت.
-- [x] افزودن API آزمایشی FastAPI و SQLite برای ثبت داده مصنوعی، جلوگیری از تکرار و گزارش اختلاف شمارنده پالس.\n- [ ] افزودن احراز هویت دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.\n- [ ] ساخت شماتیک واقعی KiCad و بررسی ERC.
+- [x] افزودن API آزمایشی FastAPI و SQLite با توکن دسترسی، جلوگیری از تکرار و گزارش اختلاف شمارنده پالس.\n- [ ] افزودن هویت و اعتبارنامه مستقل برای هر دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.\n- [ ] ساخت شماتیک واقعی KiCad و بررسی ERC.
 - [ ] طراحی و مسیریابی PCB و بررسی DRC.
 - [ ] استخراج نمای سه‌بعدی مونتاژ و انفجاری از مدل واقعی PCB.
 - [ ] تکمیل BOM، فوت‌پرینت‌ها و قطعات جایگزین.
@@ -117,7 +117,7 @@ The project is being developed as a practical engineering portfolio: from circui
 
 Smart Gas Meter IoT is a modular engineering prototype for simulated pulse acquisition, cellular telemetry, data analysis and draft billing. The repository documents the intended design and separates documented proposals from implemented and verified hardware.
 
-The current baseline proposes an ESP32-S3 controller, a modular cellular interface and a larger test-friendly PCB. A development-only FastAPI + SQLite service now accepts synthetic telemetry and rejects conflicting duplicate sequences. It is not production-secure. Native KiCad files, a routed PCB, CAD-derived 3D views and manufacturing outputs are not yet available or validated. Only isolated low-voltage laboratory tests using synthetic pulses are in scope at this stage.
+The current baseline proposes an ESP32-S3 controller, a modular cellular interface and a larger test-friendly PCB. A development-only FastAPI + SQLite service now accepts synthetic telemetry, requires a shared bearer token, and rejects conflicting duplicate sequences. It is not production-secure and does not yet provide per-device credentials. Native KiCad files, a routed PCB, CAD-derived 3D views and manufacturing outputs are not yet available or validated. Only isolated low-voltage laboratory tests using synthetic pulses are in scope at this stage.
 
 ---
 
