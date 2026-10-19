@@ -64,12 +64,12 @@ class TelemetryApiTests(unittest.TestCase):
     def test_latest_and_pulse_delta_report(self):
         self.client.post(
             "/api/v1/readings",
-            json=self.reading(1, 10, "2026-01-01T00:00:01Z"),
+            json=self.reading(1, 10, "2026-01-01T00:00:00Z"),
             headers=self.headers,
         )
         self.client.post(
             "/api/v1/readings",
-            json=self.reading(2, 14, "2026-01-01T00:00:02Z"),
+            json=self.reading(2, 14, "2026-01-01T00:00:01Z"),
             headers=self.headers,
         )
         latest = self.client.get("/api/v1/devices/lab-1/latest", headers=self.headers)
