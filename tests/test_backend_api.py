@@ -90,6 +90,31 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertIsNone(report.json()["consumption_volume"])
         self.assertIn("not a bill", report.json()["note"])
 
+    def test_accepts_out_of_order_retry_when_counters_remain_monotonic(self):
+        newer = self.reading(2, 20, "2026-01-01T00:00:02Z")
+        older = self.reading(1, 10, "2026-01-01T00:00:01Z")
+        self.assertEqual(
+            self.client.post("/api/v1/readings", json=newer, headers=self.headers).status_code,
+            201,
+        )
+        self.assertEqual(
+            self.client.post("/api/v1/readings", json=older, headers=self.headers).status_code,
+            201,
+        )
+
+    def test_rejects_decreasing_cumulative_pulse_count(self):
+        self.client.post(
+            "/api/v1/readings",
+            json=self.reading(1, 10, "2026-01-01T00:00:01Z"),
+            headers=self.headers,
+        )
+        response = self.client.post(
+            "/api/v1/readings",
+            json=self.reading(2, 9, "2026-01-01T00:00:02Z"),
+            headers=self.headers,
+        )
+        self.assertEqual(response.status_code, 409)
+
     def test_ingestion_requires_bearer_token(self):
         response = self.client.post("/api/v1/readings", json=self.reading())
         self.assertEqual(response.status_code, 401)
