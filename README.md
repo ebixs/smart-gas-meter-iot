@@ -21,7 +21,7 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py)
+[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
 
 </div>
 
@@ -98,7 +98,7 @@ The project is being developed as a practical engineering portfolio: from circui
 ### نقشه راه
 
 - [x] تدوین نیازمندی‌ها، معماری و قرارداد داده.
-- [x] ساخت شبیه‌ساز نرم‌افزاری و آزمون‌های خودکار.
+- [x] ساخت شبیه‌ساز نرم‌افزاری، ابزار ارسال داده مصنوعی به API و آزمون‌های خودکار.
 - [x] مستندسازی تصمیم‌های اولیه برد، رابط مودم، نقاط تست و معیارهای آماده‌سازی ساخت.
 - [x] افزودن API آزمایشی FastAPI و SQLite با توکن دسترسی، جلوگیری از تکرار، گزارش اختلاف شمارنده پالس و داشبورد محلی (`/dashboard`).\n- [ ] افزودن هویت و اعتبارنامه مستقل برای هر دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.\n- [ ] ساخت شماتیک واقعی KiCad و بررسی ERC.
 - [ ] طراحی و مسیریابی PCB و بررسی DRC.
