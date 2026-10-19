@@ -1,8 +1,8 @@
-"""Minimal development API for synthetic lab telemetry.
+"""Development API for synthetic lab telemetry; not production-hardened.
 
-Not production-secure: no device authentication, TLS termination, rate limiting,
-or metrology certification is provided here. Bind only to a trusted local lab
-environment until those controls are implemented and reviewed.
+Data endpoints require a shared development bearer token. Per-device identity,
+TLS deployment, rate limiting, and metrology certification are not provided.
+Bind only to a trusted local lab environment until controls are reviewed.
 """
 from __future__ import annotations
 
@@ -209,8 +209,9 @@ def consumption_report(
         "end": end_text,
         "reading_count": len(records),
         "initial_pulse_count": initial,
+        "baseline_source": "last_reading_before_start" if baseline else "first_reading_in_range",
         "final_pulse_count": final,
         "pulse_delta": delta,
         "consumption_volume": None,
-        "note": "Pulse delta only. Volume requires a verified meter-specific pulse constant; this report is not a bill.",
+        "note": "Pulse delta only. If baseline_source is first_reading_in_range, pulses before the first in-range reading are not counted. Volume requires a verified meter-specific pulse constant; this report is not a bill.",
     }
