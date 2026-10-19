@@ -144,6 +144,19 @@ class TelemetryApiTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 409)
 
+    def test_rejects_timestamp_that_conflicts_with_sequence_order(self):
+        self.client.post(
+            "/api/v1/readings",
+            json=self.reading(2, 20, "2026-01-01T00:00:02Z"),
+            headers=self.headers,
+        )
+        response = self.client.post(
+            "/api/v1/readings",
+            json=self.reading(1, 10, "2026-01-01T00:00:03Z"),
+            headers=self.headers,
+        )
+        self.assertEqual(response.status_code, 409)
+
     def test_ingestion_requires_bearer_token(self):
         response = self.client.post("/api/v1/readings", json=self.reading())
         self.assertEqual(response.status_code, 401)
