@@ -27,7 +27,7 @@ Open `http://127.0.0.1:8000/dashboard` for the lab dashboard or `http://127.0.0.
 
 The unique key is `(device_id, sequence)`. Re-sending the same payload is idempotent; sending a different payload for an already-used sequence returns HTTP 409. This supports retry-safe delivery from an offline queue while preserving duplicate conflict detection. Delayed records may arrive out of order, but the API checks neighboring sequence numbers so cumulative pulse count and uptime cannot move backwards as sequence increases.
 
-The report only calculates a pulse-counter delta. It deliberately returns `consumption_volume: null` because a verified meter-specific pulse constant has not been provided. Do not use the result as an invoice or as evidence of actual gas volume.
+The report only calculates a pulse-counter delta. It returns `baseline_source` so consumers can tell whether the baseline came from the last reading before the range or the first reading inside it. When there is no pre-range reading, pulses before the first in-range sample cannot be counted. It deliberately returns `consumption_volume: null` because a verified meter-specific pulse constant has not been provided. Do not use the result as an invoice or as evidence of actual gas volume.
 
 ## Important security limitation
 
