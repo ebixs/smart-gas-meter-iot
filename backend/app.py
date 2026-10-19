@@ -104,7 +104,7 @@ def health() -> dict[str, str]:
 @app.post("/api/v1/readings", status_code=201)
 def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_token)) -> dict[str, object]:
     payload = reading.model_dump(mode="json")
-    payload["timestamp"] = reading.timestamp.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    payload["timestamp"] = reading.timestamp.astimezone(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
     payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     with connection() as db:
         existing = db.execute(
@@ -156,8 +156,8 @@ def consumption_report(
     end_utc = end.astimezone(timezone.utc)
     if end_utc <= start_utc:
         raise HTTPException(status_code=422, detail="end must be after start")
-    start_text = start_utc.isoformat().replace("+00:00", "Z")
-    end_text = end_utc.isoformat().replace("+00:00", "Z")
+    start_text = start_utc.isoformat(timespec="microseconds").replace("+00:00", "Z")
+    end_text = end_utc.isoformat(timespec="microseconds").replace("+00:00", "Z")
     with connection() as db:
         baseline = db.execute(
             """SELECT pulse_count_total FROM readings
