@@ -90,6 +90,35 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertIsNone(report.json()["consumption_volume"])
         self.assertIn("not a bill", report.json()["note"])
 
+    def test_report_discloses_missing_pre_range_baseline(self):
+        self.client.post(
+            "/api/v1/readings",
+            json=self.reading(1, 10, "2026-01-01T00:00:01Z"),
+            headers=self.headers,
+        )
+        self.client.post(
+            "/api/v1/readings",
+            json=self.reading(2, 15, "2026-01-01T00:00:02Z"),
+            headers=self.headers,
+        )
+        response = self.client.get(
+            "/api/v1/reports/consumption",
+            headers=self.headers,
+            params={
+                "device_id": "lab-1",
+                "start": "2026-01-01T00:00:00Z",
+                "end": "2026-01-01T00:00:03Z",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["baseline_source"], "first_reading_in_range")
+        self.assertEqual(response.json()["pulse_delta"], 5)
+        self.assertIn("not counted", response.json()["note"])
+
+    def test_latest_endpoint_requires_bearer_token(self):
+        response = self.client.get("/api/v1/devices/lab-1/latest")
+        self.assertEqual(response.status_code, 401)
+
     def test_accepts_out_of_order_retry_when_counters_remain_monotonic(self):
         newer = self.reading(2, 20, "2026-01-01T00:00:02Z")
         older = self.reading(1, 10, "2026-01-01T00:00:01Z")
