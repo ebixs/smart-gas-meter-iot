@@ -10,6 +10,7 @@ Use Python 3.12 or newer in a virtual environment:
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt "httpx>=0.27,<1"
+export SGM_API_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
 uvicorn backend.app:app --reload
 ```
 
@@ -18,9 +19,9 @@ Open `http://127.0.0.1:8000/docs` for the interactive API documentation. The def
 ## Endpoints
 
 - `GET /health` — reports that this is a synthetic lab API.
-- `POST /api/v1/readings` — validates and stores a synthetic telemetry record.
-- `GET /api/v1/devices/{device_id}/latest` — returns the highest-sequence record for a device.
-- `GET /api/v1/reports/consumption?device_id=lab-1&start=2026-01-01T00:00:00Z&end=2026-01-02T00:00:00Z` — returns pulse delta, not gas volume.
+- `POST /api/v1/readings` — validates and stores a synthetic telemetry record (requires `Authorization: Bearer $SGM_API_TOKEN`).
+- `GET /api/v1/devices/{device_id}/latest` — returns the highest-sequence record for a device (requires the bearer token).
+- `GET /api/v1/reports/consumption?device_id=lab-1&start=2026-01-01T00:00:00Z&end=2026-01-02T00:00:00Z` — returns pulse delta, not gas volume (requires the bearer token).
 
 ## Data integrity behavior
 
@@ -30,6 +31,6 @@ The report only calculates a pulse-counter delta. It deliberately returns `consu
 
 ## Important security limitation
 
-**Development-only, not production-ready.** This API currently has no device authentication, authorization, TLS configuration, rate limiting, retention controls, or audited production database setup. Do not expose it to the public internet or connect it to an operational meter. Before deployment, implement and review device identity and credential provisioning, authenticated transport, authorization, input/rate limits, key rotation, database migrations/backups, observability, and threat modeling.
+**Development-only, not production-ready.** This API currently uses one shared bearer token for development; it does not provide per-device identities or credential provisioning. It also lacks TLS configuration, rate limiting, retention controls, or an audited production database setup. Do not expose it to the public internet or connect it to an operational meter. Before deployment, implement and review device identity and credential provisioning, authenticated transport, authorization, input/rate limits, key rotation, database migrations/backups, observability, and threat modeling.
 
 All records are restricted to `input_mode: simulated`. This API does not validate physical electronics, certify metrology, detect leaks, or establish regulatory compliance.
