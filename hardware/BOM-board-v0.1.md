@@ -12,7 +12,7 @@
 | C4 | 1 | 100 nF bootstrap capacitor | Place between BST and SW as specified by regulator datasheet |
 | C5+ | As required | Local 100 nF and bulk decoupling capacitors | Confirm against Espressif module recommendations and rail transient tests |
 | J1 | 1 | USB-C receptacle, USB 2.0 device | Exact footprint TBD |
-| RCC1, RCC2 | 2 | USB-C CC pull-down resistors | Select according to USB Type-C device/sink requirements |
+| RCC1, RCC2 | 2 | 5.1 kΩ, 1% resistors | USB-C CC1/CC2 Rd pull-downs for device/sink role; verify connector implementation |
 | U3 | 1 | Low-capacitance USB 2.0 ESD protector | Select package/capacitance and confirm line mapping |
 | J2 | 1 | 2-pin test connector | PULSE_IN and GND only; lab use |
 | SW1 | 1 | Momentary normally-open push button | BOOT to GND |
@@ -25,6 +25,12 @@
 | TP1–TP6 | 6 | Test points | VBUS, 3V3, GND, EN, PULSE_IN, spare/debug |
 | J3 | 1 | Expansion header | GND, 3V3, I2C, reserved UART |
 | PCB | 1 | 2-layer FR-4 candidate | Stack-up and impedance guidance from board house; copper/widths to be calculated |
+
+## Related engineering drafts
+
+- [Pin/net connection draft](board-v0.1-netlist-draft.csv)
+- [PCB layout and release checklist](board-v0.1-layout-checklist.md)
+- [Bring-up and acceptance test plan](board-v0.1-bringup-test-plan.md)
 
 ## Exclusions for v0.1
 
