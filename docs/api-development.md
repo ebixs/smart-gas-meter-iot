@@ -25,7 +25,7 @@ Open `http://127.0.0.1:8000/dashboard` for the lab dashboard or `http://127.0.0.
 
 ## Data integrity behavior
 
-The unique key is `(device_id, sequence)`. Re-sending the same payload is idempotent; sending a different payload for an already-used sequence returns HTTP 409. This supports retry-safe delivery from an offline queue while preserving duplicate conflict detection.
+The unique key is `(device_id, sequence)`. Re-sending the same payload is idempotent; sending a different payload for an already-used sequence returns HTTP 409. This supports retry-safe delivery from an offline queue while preserving duplicate conflict detection. Delayed records may arrive out of order, but the API checks neighboring sequence numbers so cumulative pulse count and uptime cannot move backwards as sequence increases.
 
 The report only calculates a pulse-counter delta. It deliberately returns `consumption_volume: null` because a verified meter-specific pulse constant has not been provided. Do not use the result as an invoice or as evidence of actual gas volume.
 
