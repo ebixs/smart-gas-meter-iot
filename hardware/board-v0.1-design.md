@@ -122,6 +122,13 @@ Do not release manufacturing files until these checks are complete:
 - [ ] Test bounce, slow edges, minimum pulse width, and maximum intended rate.
 - [ ] Record board revision, component substitutions, test setup, and results.
 
-## 7. What is still open
+## 7. Companion engineering drafts
+
+- [Preliminary pin/net connection table](board-v0.1-netlist-draft.csv) — planning aid, not a native CAD netlist.
+- [PCB layout and release checklist](board-v0.1-layout-checklist.md).
+- [Bring-up and acceptance test plan](board-v0.1-bringup-test-plan.md).
+- [Preliminary BOM](BOM-board-v0.1.md).
+
+## 8. What is still open
 
 This document is a circuit-design baseline, not a completed CAD design. The next engineering deliverable is the actual KiCad schematic and footprints, followed by PCB placement/routing, ERC/DRC, and manufacturing outputs. Do not order boards from this document alone.
