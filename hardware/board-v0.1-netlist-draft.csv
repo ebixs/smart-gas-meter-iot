@@ -1,0 +1,38 @@
+Ref,Block,Signal/Pin,Net,Connection/Requirement,Status
+J1,USB-C,VBUS,VBUS_5V,USB-C bus power input; never connect directly to 3V3,Proposed
+J1,USB-C,GND,GND,Common low-voltage ground,Proposed
+J1,USB-C,CC1,USB_CC1,5.1kΩ Rd to GND; device/sink role only,Proposed
+J1,USB-C,CC2,USB_CC2,5.1kΩ Rd to GND; device/sink role only,Proposed
+J1,USB-C,D+,USB_D+,Route to ESP32-S3 GPIO20; low-capacitance ESD near connector,Proposed
+J1,USB-C,D-,USB_D-,Route to ESP32-S3 GPIO19; low-capacitance ESD near connector,Proposed
+U2,Power,Input,VBUS_5V,AP63203 input; use datasheet-recommended input capacitor and layout,Proposed
+U2,Power,Output,3V3,Fixed 3.3V output to module and low-voltage peripherals,Proposed
+U2,Power,Ground,GND,Power return; short high-current loops,Proposed
+U1,ESP32-S3 module,3V3,3V3,Supply from regulator after transient/current budget check,Proposed
+U1,ESP32-S3 module,GND,GND,Continuous ground reference,Proposed
+U1,ESP32-S3 module,GPIO19,USB_D-,Native USB D-; verify exact module datasheet,Proposed
+U1,ESP32-S3 module,GPIO20,USB_D+,Native USB D+; verify exact module datasheet,Proposed
+U1,ESP32-S3 module,GPIO4,PULSE_IN,Lab-only input; 10kΩ pull-up to 3V3 and 1kΩ series resistor,Proposed
+U1,ESP32-S3 module,GPIO5,STATUS_LED,Drive LED through calculated current-limiting resistor,Proposed
+U1,ESP32-S3 module,GPIO6,I2C_SDA,Optional 3.3V expansion; pull-ups only if not already on peripheral,Proposed
+U1,ESP32-S3 module,GPIO7,I2C_SCL,Optional 3.3V expansion; pull-ups only if not already on peripheral,Proposed
+U1,ESP32-S3 module,GPIO17,MODEM_UART_TX,Reserved header only; modem not populated,Proposed
+U1,ESP32-S3 module,GPIO18,MODEM_UART_RX,Reserved header only; modem not populated,Proposed
+SW1,BOOT button,Contact A,GPIO0,Normally open momentary switch to GND; validate boot behavior,Proposed
+SW1,BOOT button,Contact B,GND,Button return,Proposed
+SW2,RESET button,Contact A,EN,Reset/enable network must follow Espressif reference circuit,Proposed
+SW2,RESET button,Contact B,GND,Reset button return,Proposed
+J2,Pulse test header,Pin 1,PULSE_IN,Dry contact or 3.3V logic only; no external supply,Proposed
+J2,Pulse test header,Pin 2,GND,Test ground,Proposed
+J3,Expansion header,1,GND,Low-voltage lab expansion only,Proposed
+J3,Expansion header,2,3V3,Regulated 3.3V; load budget must be documented,Proposed
+J3,Expansion header,3,I2C_SDA,GPIO6,Proposed
+J3,Expansion header,4,I2C_SCL,GPIO7,Proposed
+J3,Expansion header,5,MODEM_UART_TX,GPIO17 reserved,Proposed
+J3,Expansion header,6,MODEM_UART_RX,GPIO18 reserved,Proposed
+TP1,Test point,Pad,VBUS_5V,Input rail measurement,Proposed
+TP2,Test point,Pad,3V3,Regulator output measurement,Proposed
+TP3,Test point,Pad,GND,Ground reference,Proposed
+TP4,Test point,Pad,EN,Reset/enable diagnostic,Proposed
+TP5,Test point,Pad,PULSE_IN,Pulse waveform diagnostic,Proposed
+TP6,Test point,Pad,USB_D+,Debug only; avoid probing USB pair in normal use,Proposed
