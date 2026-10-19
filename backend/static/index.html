@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Smart Gas Meter IoT · Lab Dashboard</title>
+  <style>
+    :root { color-scheme: light; --ink:#142b3b; --muted:#5d6d79; --line:#d8e1e6; --bg:#f3f7f8; --accent:#087f8c; --soft:#e5f4f3; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.5 system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--ink); }
+    main { max-width:960px; margin:0 auto; padding:28px 18px 48px; }
+    header { margin-bottom:24px; }
+    h1 { margin:0 0 6px; font-size:clamp(1.6rem,4vw,2.3rem); letter-spacing:-.03em; }
+    h2 { font-size:1.1rem; margin:0 0 14px; }
+    p { margin:6px 0; color:var(--muted); }
+    .notice { background:#fff8e5; border:1px solid #ebd69a; border-radius:12px; padding:12px 14px; color:#5f4b16; margin:18px 0; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+    section { background:white; border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:0 3px 12px #142b3b08; }
+    label { display:block; font-size:.88rem; font-weight:650; margin:12px 0 5px; }
+    input { width:100%; border:1px solid #b9c9d1; border-radius:9px; padding:10px 11px; font:inherit; color:var(--ink); background:#fff; }
+    button { margin-top:12px; border:0; border-radius:9px; padding:10px 14px; background:var(--accent); color:white; font:inherit; font-weight:650; cursor:pointer; }
+    button.secondary { background:var(--soft); color:#07545c; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; background:#f6f9fa; border:1px solid var(--line); border-radius:9px; padding:12px; min-height:68px; font-size:.85rem; }
+    .status { min-height:24px; font-size:.9rem; color:var(--muted); }
+    footer { margin-top:20px; font-size:.85rem; color:var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Smart Gas Meter IoT</h1>
+    <p>Laboratory dashboard · synthetic telemetry only</p>
+  </header>
+  <div class="notice"><strong>Prototype warning:</strong> this dashboard displays simulated pulse counters, not verified gas volume. Do not connect it to an operational meter or use the report as a bill.</div>
+  <section>
+    <h2>Local API connection</h2>
+    <label for="token">Development bearer token</label>
+    <input id="token" type="password" autocomplete="off" placeholder="Paste SGM_API_TOKEN">
+    <label for="device">Device ID</label>
+    <input id="device" value="sgm-lab-001">
+    <p>The token stays in this page's memory and is not saved to browser storage.</p>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  </section>
+  <div class="grid" style="margin-top:16px">
+    <section>
+      <h2>Latest reading</h2>
+      <button id="latestBtn">Load latest reading</button>
+      <pre id="latest">No data loaded.</pre>
+    </section>
+    <section>
+      <h2>Pulse delta report</h2>
+      <label for="start">Start (UTC, ISO 8601)</label>
+      <input id="start" value="2026-01-01T00:00:00Z">
+      <label for="end">End (UTC, ISO 8601)</label>
+      <input id="end" value="2026-01-02T00:00:00Z">
+      <button id="reportBtn">Calculate pulse delta</button>
+      <pre id="report">No report loaded.</pre>
+    </section>
+  </div>
+  <footer>Development interface only. Use a trusted local network, a temporary development token, and synthetic data. API authentication is currently a shared bearer token, not per-device identity.</footer>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  const token = () => $('token').value.trim();
+  const device = () => $('device').value.trim();
+  const headers = () => ({ 'Authorization': 'Bearer ' + token(), 'Accept': 'application/json' });
+  async function api(path) {
+    if (!token()) throw new Error('Enter the development bearer token first.');
+    const response = await fetch(path, { headers: headers() });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.detail || ('HTTP ' + response.status));
+    return body;
+  }
+  async function run(button, output, task) {
+    $('status').textContent = 'Working…';
+    $(button).disabled = true;
+    try {
+      const result = await task();
+      $(output).textContent = JSON.stringify(result, null, 2);
+      $('status').textContent = 'Request completed.';
+    } catch (error) {
+      $(output).textContent = error.message;
+      $('status').textContent = 'Request failed.';
+    } finally {
+      $(button).disabled = false;
+    }
+  }
+  $('latestBtn').addEventListener('click', () => run('latestBtn', 'latest', () =>
+    api('/api/v1/devices/' + encodeURIComponent(device()) + '/latest')));
+  $('reportBtn').addEventListener('click', () => run('reportBtn', 'report', () => {
+    const query = new URLSearchParams({device_id: device(), start: $('start').value.trim(), end: $('end').value.trim()});
+    return api('/api/v1/reports/consumption?' + query.toString());
+  }));
+</script>
+</body>
+</html>
