@@ -119,30 +119,32 @@ def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_toke
                 )
             return {"accepted": True, "duplicate": True, "device_id": reading.device_id, "sequence": reading.sequence}
         previous = db.execute(
-            """SELECT sequence, uptime_ms, pulse_count_total FROM readings
+            """SELECT sequence, timestamp, uptime_ms, pulse_count_total FROM readings
                WHERE device_id=? AND sequence < ? ORDER BY sequence DESC LIMIT 1""",
             (reading.device_id, reading.sequence),
         ).fetchone()
         following = db.execute(
-            """SELECT sequence, uptime_ms, pulse_count_total FROM readings
+            """SELECT sequence, timestamp, uptime_ms, pulse_count_total FROM readings
                WHERE device_id=? AND sequence > ? ORDER BY sequence ASC LIMIT 1""",
             (reading.device_id, reading.sequence),
         ).fetchone()
         if previous and (
-            reading.uptime_ms < previous["uptime_ms"]
+            payload["timestamp"] < previous["timestamp"]
+            or reading.uptime_ms < previous["uptime_ms"]
             or reading.pulse_count_total < previous["pulse_count_total"]
         ):
             raise HTTPException(
                 status_code=409,
-                detail="uptime and cumulative pulse count must not decrease by sequence",
+                detail="timestamp, uptime and cumulative pulse count must not decrease by sequence",
             )
         if following and (
-            reading.uptime_ms > following["uptime_ms"]
+            payload["timestamp"] > following["timestamp"]
+            or reading.uptime_ms > following["uptime_ms"]
             or reading.pulse_count_total > following["pulse_count_total"]
         ):
             raise HTTPException(
                 status_code=409,
-                detail="record conflicts with a later sequence's uptime or pulse count",
+                detail="record conflicts with a later sequence's timestamp, uptime or pulse count",
             )
         db.execute(
             """INSERT INTO readings
