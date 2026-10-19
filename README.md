@@ -67,7 +67,8 @@ The project is being developed as a practical engineering portfolio: from circui
 - [ ] Complete BOM with exact parts, footprints and approved alternates.
 - [ ] Run and review electrical-rule and design-rule checks.
 - [ ] Export and inspect Gerbers, drill, assembly and pick-and-place files.
-- [x] Add a development-only FastAPI + SQLite ingestion API with duplicate-safe records, bearer-token protection, pulse-delta reporting and a local dashboard (`/dashboard`).\n- [ ] Add per-device identity/credentials, production database hardening, firmware, billing and analytics.
+- [x] Add a development-only FastAPI + SQLite ingestion API with duplicate-safe records, bearer-token protection, pulse-delta reporting and a local dashboard (`/dashboard`).
+- [ ] Add per-device identity/credentials, production database hardening, firmware, billing and analytics.
 - [ ] Run recorded low-voltage bench tests and later region-specific radio validation.
 - [ ] Complete qualified safety, metrology, EMC, radio, cybersecurity and regulatory reviews.
 
@@ -100,7 +101,8 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] تدوین نیازمندی‌ها، معماری و قرارداد داده.
 - [x] ساخت شبیه‌ساز نرم‌افزاری، ابزار ارسال داده مصنوعی به API و آزمون‌های خودکار.
 - [x] مستندسازی تصمیم‌های اولیه برد، رابط مودم، نقاط تست و معیارهای آماده‌سازی ساخت.
-- [x] افزودن API آزمایشی FastAPI و SQLite با توکن دسترسی، جلوگیری از تکرار، گزارش اختلاف شمارنده پالس و داشبورد محلی (`/dashboard`).\n- [ ] افزودن هویت و اعتبارنامه مستقل برای هر دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.\n- [ ] ساخت شماتیک واقعی KiCad و بررسی ERC.
+- [x] افزودن API آزمایشی FastAPI و SQLite با توکن دسترسی، جلوگیری از تکرار، گزارش اختلاف شمارنده پالس و داشبورد محلی (`/dashboard`).
+- [ ] افزودن هویت و اعتبارنامه مستقل برای هر دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.\n- [ ] ساخت شماتیک واقعی KiCad و بررسی ERC.
 - [ ] طراحی و مسیریابی PCB و بررسی DRC.
 - [ ] استخراج نمای سه‌بعدی مونتاژ و انفجاری از مدل واقعی PCB.
 - [ ] تکمیل BOM، فوت‌پرینت‌ها و قطعات جایگزین.
