@@ -8,16 +8,20 @@ from __future__ import annotations
 
 import json
 import os
+import secrets
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterator, Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
 
 DB_PATH = Path(os.environ.get("SGM_DATABASE_PATH", "data/telemetry.sqlite3"))
+API_TOKEN = os.environ.get("SGM_API_TOKEN", "")
+bearer_scheme = HTTPBearer(auto_error=False)
 app = FastAPI(title="Smart Gas Meter IoT Lab API", version="0.1.0")
 
 
@@ -75,13 +79,24 @@ def row_to_dict(row: sqlite3.Row) -> dict[str, object]:
     return json.loads(row["payload_json"])
 
 
+def require_api_token(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+) -> None:
+    if not API_TOKEN:
+        raise HTTPException(status_code=503, detail="API token is not configured")
+    if credentials is None or credentials.scheme.lower() != "bearer":
+        raise HTTPException(status_code=401, detail="Bearer token required")
+    if not secrets.compare_digest(credentials.credentials, API_TOKEN):
+        raise HTTPException(status_code=401, detail="Invalid bearer token")
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "mode": "synthetic-lab-only"}
 
 
 @app.post("/api/v1/readings", status_code=201)
-def ingest_reading(reading: TelemetryReading) -> dict[str, object]:
+def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_token)) -> dict[str, object]:
     payload = reading.model_dump(mode="json")
     payload["timestamp"] = reading.timestamp.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
@@ -111,7 +126,7 @@ def ingest_reading(reading: TelemetryReading) -> dict[str, object]:
 
 
 @app.get("/api/v1/devices/{device_id}/latest")
-def latest_reading(device_id: str) -> dict[str, object]:
+def latest_reading(device_id: str, _: None = Depends(require_api_token)) -> dict[str, object]:
     with connection() as db:
         row = db.execute(
             "SELECT payload_json FROM readings WHERE device_id=? ORDER BY sequence DESC LIMIT 1",
@@ -127,6 +142,7 @@ def consumption_report(
     device_id: str = Query(min_length=1, max_length=128),
     start: datetime = Query(),
     end: datetime = Query(),
+    _: None = Depends(require_api_token),
 ) -> dict[str, object]:
     if start.tzinfo is None or end.tzinfo is None:
         raise HTTPException(status_code=422, detail="start and end must include a timezone")
