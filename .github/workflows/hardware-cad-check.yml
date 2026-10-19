@@ -1,0 +1,52 @@
+name: Hardware CAD checks
+
+on:
+  push:
+    paths:
+      - "hardware/kicad/**"
+      - ".github/workflows/hardware-cad-check.yml"
+  pull_request:
+    paths:
+      - "hardware/kicad/**"
+      - ".github/workflows/hardware-cad-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cad-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect native KiCad project
+        id: detect
+        shell: bash
+        run: |
+          if find hardware/kicad -maxdepth 1 -type f \( -name '*.kicad_sch' -o -name '*.kicad_pcb' \) 2>/dev/null | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install KiCad CLI
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y kicad
+      - name: Report CAD status
+        shell: bash
+        run: |
+          if [ "${{ steps.detect.outputs.present }}" != "true" ]; then
+            echo "::warning::No native KiCad schematic/PCB files exist yet. Documentation and draft netlist are not manufacturing CAD."
+            exit 0
+          fi
+          kicad-cli version
+          find hardware/kicad -maxdepth 1 -type f -name '*.kicad_sch' -print0 | while IFS= read -r -d '' file; do
+            echo "Found schematic: $file"
+            kicad-cli sch export svg "$file" -o /tmp/schematic-preview/
+          done
+          find hardware/kicad -maxdepth 1 -type f -name '*.kicad_pcb' -print0 | while IFS= read -r -d '' file; do
+            echo "Found PCB: $file"
+            kicad-cli pcb export gerbers "$file" -o /tmp/gerbers/
+            kicad-cli pcb export drill "$file" -o /tmp/drill/
+          done
