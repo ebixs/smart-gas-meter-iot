@@ -23,7 +23,7 @@ jobs:
         id: detect
         shell: bash
         run: |
-          if find hardware/kicad -maxdepth 1 -type f \( -name '*.kicad_sch' -o -name '*.kicad_pcb' \) 2>/dev/null | grep -q .; then
+          if find hardware/kicad -maxdepth 1 -type f \\( -name '*.kicad_sch' -o -name '*.kicad_pcb' \\) 2>/dev/null | grep -q .; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
@@ -33,21 +33,37 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y kicad
-      - name: Report CAD status
+      - name: Run ERC, DRC and exports
+        if: steps.detect.outputs.present == 'true'
         shell: bash
         run: |
-          if [ "${{ steps.detect.outputs.present }}" != "true" ]; then
-            echo "::warning::No native KiCad schematic/PCB files exist yet. Documentation and draft netlist are not manufacturing CAD."
-            exit 0
-          fi
+          set -euo pipefail
           kicad-cli version
-          mkdir -p /tmp/schematic-preview /tmp/gerbers /tmp/drill
-          find hardware/kicad -maxdepth 1 -type f -name '*.kicad_sch' -print0 | while IFS= read -r -d '' file; do
-            echo "Found schematic: $file"
-            kicad-cli sch export svg "$file" -o /tmp/schematic-preview/
-          done
-          find hardware/kicad -maxdepth 1 -type f -name '*.kicad_pcb' -print0 | while IFS= read -r -d '' file; do
-            echo "Found PCB: $file"
-            kicad-cli pcb export gerbers "$file" -o /tmp/gerbers/
-            kicad-cli pcb export drill "$file" -o /tmp/drill/
-          done
+          mkdir -p /tmp/schematic-preview /tmp/gerbers /tmp/drill /tmp/cad-reports
+          while IFS= read -r -d '' file; do
+            base="$(basename "$file" .kicad_sch)"
+            echo "Running ERC: $file"
+            kicad-cli sch erc --exit-code-violations --output "/tmp/cad-reports/$base-erc.rpt" "$file"
+            kicad-cli sch export svg "$file" --output "/tmp/schematic-preview/"
+          done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_sch' -print0)
+          while IFS= read -r -d '' file; do
+            base="$(basename "$file" .kicad_pcb)"
+            echo "Running DRC: $file"
+            kicad-cli pcb drc --exit-code-violations --output "/tmp/cad-reports/$base-drc.rpt" "$file"
+            kicad-cli pcb export gerbers "$file" --output "/tmp/gerbers/"
+            kicad-cli pcb export drill "$file" --output "/tmp/drill/"
+          done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_pcb' -print0)
+      - name: Upload CAD reports and exports
+        if: always() && steps.detect.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: kicad-validation-${{ github.run_id }}
+          path: |
+            /tmp/cad-reports/
+            /tmp/schematic-preview/
+            /tmp/gerbers/
+            /tmp/drill/
+          if-no-files-found: warn
+      - name: Report CAD status
+        if: steps.detect.outputs.present != 'true'
+        run: echo "::warning::No native KiCad schematic/PCB files exist yet. Documentation and draft netlist are not manufacturing CAD."
