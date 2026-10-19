@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Iterator, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
 
@@ -88,6 +89,11 @@ def require_api_token(
         raise HTTPException(status_code=401, detail="Bearer token required")
     if not secrets.compare_digest(credentials.credentials, API_TOKEN):
         raise HTTPException(status_code=401, detail="Invalid bearer token")
+
+
+@app.get("/dashboard", include_in_schema=False)
+def dashboard() -> FileResponse:
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 
 @app.get("/health")
