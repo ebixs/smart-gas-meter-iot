@@ -56,10 +56,7 @@ for path in schematics:
             continue
 
     definitions = len(re.findall(r'\(symbol\s+"[^"]+"', lib_block))
-    placed_block_count = len(re.findall(
-        r"\(symbol\s*\n\s*\(lib_id\s+\\"[^\\"]+\\"",
-        text
-    ))
+    placed_block_count = len(re.findall(r'\\(lib_id\\s+"[^"]+"', text))
     if definitions == 0 or placed_block_count == 0:
         print(f"BLOCKED: {path} is not yet a pin-level electrical schematic.")
         print(f"  embedded library symbol definitions: {definitions}")
