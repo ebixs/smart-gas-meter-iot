@@ -55,7 +55,7 @@ for path in schematics:
             failed = True
             continue
 
-    definitions = len(re.findall(r"\(symbol\s+\\"[^\\"]+\\"", lib_block))
+    definitions = len(re.findall(r'\(symbol\s+"[^"]+"', lib_block))
     placed_block_count = len(re.findall(
         r"\(symbol\s*\n\s*\(lib_id\s+\\"[^\\"]+\\"",
         text
