@@ -23,7 +23,7 @@ class KiCadStructureGateTests(unittest.TestCase):
             '(kicad_sch (version 20250114) (lib_symbols) (text "block diagram"))'
         )
         self.assertEqual(result, 2)
-        self.assertIn("not yet a pin-level electrical schematic", output)
+        self.assertIn("has no embedded lib_symbols section", output)
 
     def test_library_symbol_without_placed_instance_is_blocked(self):
         source = (
