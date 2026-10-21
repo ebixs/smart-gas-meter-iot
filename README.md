@@ -21,7 +21,7 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
+[3D Concept View](hardware/visualization/smart-gas-meter-exploded.html) · [Visual Design Notes](hardware/visualization/README.md) · [Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
 
 </div>
 
@@ -62,7 +62,7 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] Add unit tests for the simulator and GitHub Actions CI workflow.
 - [x] Define the versioned telemetry contract and JSON Schema.
 - [x] Document the initial controller/board concept, cellular interface, product architecture, pinout proposal and release gates.
-- [ ] Create and verify native KiCad schematic.
+- [x] Add a standalone interactive isometric concept illustration (not CAD-derived or fabrication-ready).\n- [ ] Create and verify native KiCad schematic.
 - [ ] Create and verify routed KiCad PCB and actual 3D assembly/exploded views.
 - [ ] Complete BOM with exact parts, footprints and approved alternates.
 - [ ] Run and review electrical-rule and design-rule checks.
