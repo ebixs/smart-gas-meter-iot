@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Gas Meter IoT — Visual Engineering Gallery</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121f33;--line:#2a3e59;--cyan:#6de0d0;--text:#edf4ff;--muted:#a8bad0}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172b43,var(--bg) 60%);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+main{max-width:1100px;margin:auto;padding:32px 20px 56px}header{padding:20px 0 26px;border-bottom:1px solid var(--line)}.eyebrow{color:var(--cyan);letter-spacing:.12em;text-transform:uppercase;font-size:.76rem;font-weight:700}h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.08;margin:.5rem 0}p{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:24px 0}.card{background:linear-gradient(145deg,#162740,#101a2b);border:1px solid var(--line);border-radius:16px;padding:20px}.card h2{font-size:1.1rem;margin:.3rem 0}.tag{display:inline-block;color:#071923;background:var(--cyan);font-size:.72rem;font-weight:800;padding:4px 8px;border-radius:999px}.stage{border:1px solid var(--line);border-radius:18px;background:#0d1828;padding:12px;overflow:hidden}svg{width:100%;height:auto;display:block}.part{cursor:pointer;transition:opacity .2s,filter .2s}.part:hover,.part:focus{filter:drop-shadow(0 0 8px #6de0d0);outline:none}.muted{opacity:.28}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.controls button{background:#1a2c44;color:var(--text);border:1px solid #3a5575;border-radius:9px;padding:9px 12px;cursor:pointer}.controls button[aria-pressed=true]{background:var(--cyan);color:#071923;border-color:var(--cyan)}.note{border-left:3px solid #e7b766;padding:12px 15px;background:#241f18;border-radius:0 10px 10px 0;color:#f5dfb5}.footer{font-size:.85rem;border-top:1px solid var(--line);padding-top:16px;margin-top:24px}
+</style></head>
+<body><main>
+<header><div class="eyebrow">Engineering concept · Rev 0.1</div><h1>Smart Gas Meter IoT</h1><p>Interactive visual overview of a low-voltage laboratory prototype. Select a subsystem to highlight it in the concept drawing.</p></header>
+<div class="grid">
+<section class="card"><span class="tag">01 · CONTROL</span><h2>ESP32-S3 controller</h2><p>Candidate module for pulse acquisition, local processing, status indication and telemetry. Exact design remains subject to native schematic review.</p></section>
+<section class="card"><span class="tag">02 · POWER</span><h2>Protected low-voltage supply</h2><p>USB-C input, protection and a regulated 3.3 V rail are planned. Final components and thermal checks are not yet frozen.</p></section>
+<section class="card"><span class="tag">03 · CONNECTIVITY</span><h2>Cellular daughterboard</h2><p>Modem interface is modular. Select the actual modem only after target operator, bands, power peaks and certification needs are known.</p></section>
+</div>
+<div class="stage"><svg viewBox="0 0 900 540" role="img" aria-label="Conceptual exploded assembly drawing of an IoT meter controller, enclosure, PCB and modem module">
+<defs><linearGradient id="board" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#3cb9a8"/><stop offset="1" stop-color="#176c72"/></linearGradient><linearGradient id="case" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#b9c9d9" stop-opacity=".92"/><stop offset="1" stop-color="#536d87" stop-opacity=".82"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#000" flood-opacity=".4"/></filter></defs>
+<g stroke="#55728e" stroke-dasharray="6 7" stroke-width="2" opacity=".7"><path d="M250 118L250 192"/><path d="M440 118L440 210"/><path d="M640 140L640 215"/><path d="M250 340L250 405"/><path d="M440 340L440 405"/></g>
+<g class="part" data-part="enclosure" tabindex="0" role="button" aria-label="Enclosure concept">
+<path d="M115 88 L520 36 L783 135 L376 193 Z" fill="url(#case)" stroke="#d6e4f2" stroke-width="2" filter="url(#shadow)"/>
+<path d="M115 88 L115 111 L376 217 L376 193 Z" fill="#526a82"/><path d="M376 193L783 135L783 158L376 217Z" fill="#7189a2"/>
+<path d="M154 91L519 47L742 132L377 181Z" fill="#101d2e" stroke="#8da7c0"/>
+<text x="445" y="93" fill="#dce9f7" font-size="17" text-anchor="middle">ENCLOSURE / COVER</text></g>
+<g class="part" data-part="controller" tabindex="0" role="button" aria-label="Controller PCB">
+<path d="M142 256L514 205L750 294L378 346Z" fill="url(#board)" stroke="#8af0df" stroke-width="2" filter="url(#shadow)"/>
+<path d="M142 256L142 276L378 369L378 346Z" fill="#15565d"/><path d="M378 346L750 294L750 314L378 369Z" fill="#1c7378"/>
+<g stroke="#b5fff2" stroke-width="2" opacity=".8" fill="none"><path d="M218 273L330 301L330 327"/><path d="M270 252L390 280L390 310"/><path d="M460 238L460 279L520 294"/><path d="M555 253L610 274L610 296"/></g>
+<rect x="315" y="256" width="90" height="46" rx="5" fill="#172638" stroke="#d2e6f4" stroke-width="2" transform="rotate(13 360 279)"/><text x="360" y="283" fill="#e9f4ff" font-size="11" text-anchor="middle" transform="rotate(13 360 279)">ESP32-S3</text>
+<rect x="484" y="254" width="78" height="30" rx="4" fill="#263b50" stroke="#9fb5c8" transform="rotate(13 523 269)"/><text x="522" y="273" fill="#e9f4ff" font-size="10" text-anchor="middle" transform="rotate(13 522 269)">POWER</text>
+<text x="435" y="333" fill="#eafffb" font-size="16" text-anchor="middle">MAIN PCB · CONCEPT ONLY</text></g>
+<g class="part" data-part="modem" tabindex="0" role="button" aria-label="Cellular modem module">
+<path d="M510 112L646 94L724 124L588 144Z" fill="#45617c" stroke="#b4cbe0" stroke-width="2"/><path d="M510 112L510 137L588 168L588 144Z" fill="#263f58"/><path d="M588 144L724 124L724 148L588 168Z" fill="#36516b"/>
+<rect x="552" y="112" width="70" height="22" rx="3" fill="#0d1725" stroke="#8da7c0" transform="rotate(-8 587 123)"/><text x="587" y="128" fill="#e8f3ff" font-size="10" text-anchor="middle" transform="rotate(-8 587 123)">CELLULAR</text></g>
+<g class="part" data-part="pulse" tabindex="0" role="button" aria-label="Synthetic pulse input fixture">
+<rect x="82" y="400" width="210" height="72" rx="10" fill="#182a40" stroke="#6de0d0" stroke-width="2"/><circle cx="112" cy="436" r="11" fill="#6de0d0"/><path d="M140 436h18v-14h17v28h17v-14h17" fill="none" stroke="#6de0d0" stroke-width="3"/><text x="187" y="459" fill="#eaf4ff" font-size="12" text-anchor="middle">PULSE SIMULATOR</text></g>
+<path d="M293 436C350 436 332 369 400 350" stroke="#6de0d0" stroke-width="2" stroke-dasharray="5 5" fill="none"/>
+<g fill="#dce8f6" font-size="13"><text x="112" y="55">A · Cover</text><text x="625" y="80">B · Modem interface</text><text x="610" y="400">C · Main PCB</text></g>
+</svg></div>
+<div class="controls" role="group" aria-label="Highlight subsystem"><button data-filter="all" aria-pressed="true">Show all</button><button data-filter="enclosure" aria-pressed="false">Enclosure</button><button data-filter="controller" aria-pressed="false">Controller PCB</button><button data-filter="modem" aria-pressed="false">Cellular</button><button data-filter="pulse" aria-pressed="false">Pulse fixture</button></div>
+<p id="status" aria-live="polite">All conceptual subsystems are visible.</p>
+<div class="note"><strong>Safety boundary:</strong> this is an illustrative engineering concept, not a CAD-derived assembly, approved circuit, calibrated meter, or fabrication package. Test only with synthetic pulses and isolated low-voltage bench power. Never connect this prototype to a live gas line or operational meter.</div>
+<div class="footer"><a href="https://github.com/ebixs/smart-gas-meter-iot" style="color:var(--cyan)">Repository</a> · Design status: conceptual illustration; native KiCad schematic and PCB validation remain separate engineering gates.</div>
+</main><script>
+const parts=[...document.querySelectorAll('[data-part]')],buttons=[...document.querySelectorAll('[data-filter]')],status=document.querySelector('#status');
+function select(key){parts.forEach(p=>p.classList.toggle('muted',key!=='all'&&p.dataset.part!==key));buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===key)));status.textContent=key==='all'?'All conceptual subsystems are visible.':'Highlighted subsystem: '+key+'. Other components are dimmed for clarity.'}
+buttons.forEach(b=>b.addEventListener('click',()=>select(b.dataset.filter)));parts.forEach(p=>{p.addEventListener('click',()=>select(p.dataset.part));p.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(p.dataset.part)}})});
+</script></body></html>
