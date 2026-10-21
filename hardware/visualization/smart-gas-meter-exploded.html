@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Gas Meter IoT — Isometric concept</title>
+<style>
+:root{color-scheme:dark;--bg:#091521;--panel:#102334;--line:#274357;--text:#e8f2f7;--muted:#93aebe;--mint:#69e0ba;--gold:#f3bd69}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 10%,#173349 0,#091521 68%);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif;color:var(--text)}
+main{max-width:1240px;margin:auto;padding:28px 22px 42px}.top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mint)}h1{font-size:clamp(25px,4vw,42px);line-height:1.1;margin:8px 0 10px;letter-spacing:-.04em}.sub{max-width:690px;color:var(--muted);margin:0}.pill{border:1px solid #35576c;border-radius:99px;padding:7px 11px;color:#b7d4e1;font-size:11px;white-space:nowrap}
+.stage{border:1px solid #244357;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0b1c2a,#10293a 60%,#0a1b28);box-shadow:0 24px 80px #0005}.toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:13px 16px;border-bottom:1px solid #244357;background:#0c2030}.toolbar button{appearance:none;border:1px solid #35566b;background:#122d40;color:#e7f4f7;border-radius:9px;padding:8px 12px;font:inherit;font-size:12px;cursor:pointer}.toolbar button:hover,.toolbar button[aria-pressed=true]{border-color:var(--mint);color:var(--mint)}.hint{margin-left:auto;color:var(--muted);font-size:11px}
+svg{display:block;width:100%;height:auto;min-height:350px;touch-action:pan-y}.caption{display:flex;justify-content:space-between;gap:18px;padding:14px 17px;border-top:1px solid #244357;color:var(--muted);font-size:12px}.caption strong{color:#dbeaf0}.legend{display:flex;gap:15px;flex-wrap:wrap}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.note{border:1px solid #244357;background:#0e2231;border-radius:13px;padding:15px}.note h2{font-size:13px;margin:0 0 6px}.note p{color:var(--muted);font-size:12px;margin:0}.foot{color:#7894a5;font-size:11px;margin-top:16px;max-width:1000px}
+@media(max-width:700px){main{padding:18px 12px 28px}.top{display:block}.pill{display:inline-block;margin-top:12px}.notes{grid-template-columns:1fr}.hint{width:100%;margin-left:0}.caption{display:block}.legend{margin-top:8px}svg{min-height:260px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+<div><div class="eyebrow">Engineering concept · Rev 0.2</div><h1>Smart Gas Meter IoT</h1><p class="sub">An exploded isometric view of the proposed low-voltage telemetry carrier: pulse input protection, compute, power, service access and a region-dependent cellular interface.</p></div>
+<div class="pill">CONCEPT MODEL · NOT FOR FABRICATION</div>
+</header>
+<section class="stage" aria-label="Interactive isometric concept illustration">
+<div class="toolbar">
+<button id="explode" aria-pressed="false">Exploded view</button>
+<button id="rotate">Rotate view</button>
+<button id="motion" aria-pressed="true">Pause motion</button>
+<span class="hint">Select a control · illustration only</span>
+</div>
+<svg id="scene" viewBox="0 0 1000 650" role="img" aria-labelledby="svgtitle svgdesc">
+<title id="svgtitle">Isometric smart gas meter IoT circuit concept</title>
+<desc id="svgdesc">A layered circuit board with microcontroller, power converter, USB-C connector, protected pulse input and a reserved cellular modem interface, with signal traces and callouts.</desc>
+<defs>
+<linearGradient id="boardTop" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#286b67"/><stop offset="1" stop-color="#123f45"/></linearGradient>
+<linearGradient id="chip" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#405667"/><stop offset="1" stop-color="#172a39"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7e6e8"/><stop offset=".5" stop-color="#7e9ca8"/><stop offset="1" stop-color="#405e6c"/></linearGradient>
+<filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur stdDeviation="9"/></filter>
+</defs>
+<g id="world">
+<ellipse cx="506" cy="500" rx="340" ry="54" fill="#000" opacity=".35" filter="url(#shadow)"/>
+<g id="baseLayer">
+<!-- PCB solid slab -->
+<path d="M170 300 L500 135 L835 305 L505 480 Z" fill="#0a272e" stroke="#4f9b8b" stroke-width="2"/>
+<path d="M170 300 L170 325 L505 505 L505 480 Z" fill="#123d43" stroke="#2c776e"/>
+<path d="M505 480 L835 305 L835 330 L505 505 Z" fill="#0c333b" stroke="#2c776e"/>
+<path d="M188 300 L500 145 L817 306 L505 468 Z" fill="url(#boardTop)" stroke="#70b9a4" stroke-width="1.5"/>
+<!-- copper traces -->
+<g fill="none" stroke="#b4a06b" stroke-width="2" opacity=".8">
+<path d="M240 303 L324 345 L390 311 L456 346 L510 319"/>
+<path d="M255 268 L320 235 L383 267 L441 237 L490 260"/>
+<path d="M535 211 L590 240 L649 209 L707 238 L758 212"/>
+<path d="M528 375 L583 347 L637 375 L695 344 L752 371"/>
+<path d="M305 382 L352 405 L400 380 L449 407"/>
+<path d="M625 280 L667 302 L713 279 L761 303"/>
+</g>
+<!-- mounting rings and holes -->
+<g fill="#091d26" stroke="#a3c5b8" stroke-width="2">
+<ellipse cx="215" cy="300" rx="10" ry="5"/><ellipse cx="500" cy="158" rx="10" ry="5"/><ellipse cx="790" cy="307" rx="10" ry="5"/><ellipse cx="505" cy="451" rx="10" ry="5"/>
+</g>
+<!-- connector pads -->
+<g fill="#d7b873"><rect x="227" y="317" width="13" height="4" rx="1" transform="rotate(28 227 317)"/><rect x="240" y="324" width="13" height="4" rx="1" transform="rotate(28 240 324)"/><rect x="253" y="331" width="13" height="4" rx="1" transform="rotate(28 253 331)"/><rect x="266" y="338" width="13" height="4" rx="1" transform="rotate(28 266 338)"/></g>
+</g>
+<g id="raisedParts">
+<!-- ESP32 module, multi-layer -->
+<g id="mcu">
+<path d="M405 265 L500 217 L591 263 L496 313 Z" fill="#0a1924" stroke="#7893a3" stroke-width="2"/>
+<path d="M405 258 L500 210 L591 256 L496 306 Z" fill="#213b4b" stroke="#91aab5"/>
+<path d="M416 254 L500 212 L580 254 L496 296 Z" fill="url(#chip)" stroke="#b1c5cb"/>
+<path d="M425 251 L500 215 L570 252 L496 288 Z" fill="#1a2b3b" stroke="#516d7c"/>
+<path d="M436 249 L500 218 L559 249 L496 280 Z" fill="#101f2d" stroke="#66818e"/>
+<g fill="#d5c59b">
+<rect x="425" y="257" width="6" height="18" rx="1" transform="rotate(-27 425 257)"/><rect x="440" y="264" width="6" height="18" rx="1" transform="rotate(-27 440 264)"/><rect x="455" y="271" width="6" height="18" rx="1" transform="rotate(-27 455 271)"/><rect x="470" y="278" width="6" height="18" rx="1" transform="rotate(-27 470 278)"/>
+<rect x="524" y="274" width="6" height="18" rx="1" transform="rotate(27 524 274)"/><rect x="539" y="266" width="6" height="18" rx="1" transform="rotate(27 539 266)"/><rect x="554" y="259" width="6" height="18" rx="1" transform="rotate(27 554 259)"/>
+</g>
+<text x="496" y="253" fill="#d8e7ed" font-size="11" text-anchor="middle" font-weight="700" transform="rotate(-1 496 253)">ESP32-S3</text><text x="496" y="267" fill="#80a8b5" font-size="8" text-anchor="middle">WROOM · N8 candidate</text>
+</g>
+<!-- power converter -->
+<g id="power">
+<path d="M300 260 L354 233 L399 256 L345 284 Z" fill="#0a1b26" stroke="#73909d" stroke-width="1.5"/>
+<path d="M300 253 L354 226 L399 249 L345 277 Z" fill="#253c4b" stroke="#b1c5cb"/>
+<rect x="330" y="238" width="27" height="19" rx="3" fill="#0d1822" stroke="#758d99" transform="rotate(-27 330 238)"/>
+<g fill="#b8c6cb"><rect x="307" y="250" width="9" height="6" transform="rotate(28 307 250)"/><rect x="319" y="257" width="9" height="6" transform="rotate(28 319 257)"/><rect x="371" y="243" width="10" height="6" transform="rotate(28 371 243)"/></g>
+<text x="350" y="247" fill="#e0edf0" font-size="7" text-anchor="middle" transform="rotate(-27 350 247)">3V3 BUCK</text>
+</g>
+<!-- protected pulse input -->
+<g id="pulse">
+<path d="M247 344 L293 321 L333 341 L287 365 Z" fill="#091d26" stroke="#9fc5b6"/>
+<path d="M247 337 L293 314 L333 334 L287 358 Z" fill="#314b53" stroke="#b6d0c8"/>
+<rect x="269" y="326" width="17" height="10" rx="2" fill="#111f29" stroke="#b7c9c9" transform="rotate(-27 269 326)"/>
+<g fill="#d8bf83"><circle cx="257" cy="337" r="2"/><circle cx="323" cy="337" r="2"/><circle cx="287" cy="352" r="2"/></g>
+<text x="289" y="339" font-size="8" fill="#e4eff0" text-anchor="middle" transform="rotate(-27 289 339)">PULSE IN</text>
+</g>
+<!-- USB-C connector -->
+<g id="usb">
+<path d="M200 289 L245 266 L278 283 L233 307 Z" fill="#1c2b37" stroke="#7e9ca8"/>
+<path d="M200 281 L245 258 L278 275 L233 299 Z" fill="url(#metal)" stroke="#d5e4e6"/>
+<path d="M208 281 L245 262 L269 275 L232 294 Z" fill="#233b49" stroke="#c0d2d6"/>
+<path d="M215 281 L245 267 L262 276 L232 291 Z" fill="#071723" stroke="#7a9aa7"/>
+<text x="238" y="278" font-size="7" fill="#e8f2f4" text-anchor="middle" transform="rotate(-27 238 278)">USB-C</text>
+</g>
+<!-- modem mezzanine interface -->
+<g id="modem">
+<path d="M589 300 L674 257 L759 300 L674 344 Z" fill="#091923" stroke="#85a8ad" stroke-width="2"/>
+<path d="M589 292 L674 249 L759 292 L674 336 Z" fill="#23434b" stroke="#8cc9b7" stroke-dasharray="4 3"/>
+<path d="M602 292 L674 256 L746 292 L674 328 Z" fill="#142d3a" stroke="#7d9aa5"/>
+<g fill="#d7bc7b">
+<circle cx="620" cy="292" r="3"/><circle cx="634" cy="285" r="3"/><circle cx="648" cy="278" r="3"/><circle cx="662" cy="271" r="3"/><circle cx="686" cy="271" r="3"/><circle cx="700" cy="278" r="3"/><circle cx="714" cy="285" r="3"/><circle cx="728" cy="292" r="3"/>
+<circle cx="620" cy="301" r="3"/><circle cx="634" cy="308" r="3"/><circle cx="648" cy="315" r="3"/><circle cx="662" cy="322" r="3"/><circle cx="686" cy="322" r="3"/><circle cx="700" cy="315" r="3"/><circle cx="714" cy="308" r="3"/><circle cx="728" cy="301" r="3"/>
+</g>
+<text x="674" y="293" fill="#dcecf0" font-size="9" text-anchor="middle">CELLULAR</text><text x="674" y="304" fill="#93b9c1" font-size="7" text-anchor="middle">DAUGHTERBOARD</text>
+</g>
+<!-- passives, many purposefully placed -->
+<g fill="#c5d2ce" stroke="#e2d5a7" stroke-width="1">
+<path d="M376 318 l13 -7 10 5 -13 7z"/><path d="M394 327 l13 -7 10 5 -13 7z"/><path d="M418 330 l13 -7 10 5 -13 7z"/><path d="M549 322 l13 -7 10 5 -13 7z"/><path d="M568 331 l13 -7 10 5 -13 7z"/>
+<path d="M457 192 l13 -7 10 5 -13 7z"/><path d="M477 182 l13 -7 10 5 -13 7z"/><path d="M518 191 l13 -7 10 5 -13 7z"/><path d="M539 201 l13 -7 10 5 -13 7z"/>
+<path d="M350 369 l13 -7 10 5 -13 7z"/><path d="M372 380 l13 -7 10 5 -13 7z"/><path d="M395 391 l13 -7 10 5 -13 7z"/><path d="M583 365 l13 -7 10 5 -13 7z"/><path d="M606 376 l13 -7 10 5 -13 7z"/><path d="M628 386 l13 -7 10 5 -13 7z"/>
+</g>
+<!-- debug header and test pads -->
+<g fill="#d8b978" stroke="#7e693f" stroke-width="1">
+<circle cx="448" cy="350" r="4"/><circle cx="461" cy="357" r="4"/><circle cx="474" cy="364" r="4"/><circle cx="487" cy="371" r="4"/><circle cx="500" cy="378" r="4"/>
+<circle cx="533" cy="340" r="3"/><circle cx="544" cy="346" r="3"/><circle cx="555" cy="352" r="3"/>
+</g>
+<!-- status LED -->
+<g id="led"><path d="M718 350 l16 -8 13 7 -16 8z" fill="#0b1c27" stroke="#9eb5b5"/><path d="M722 348 l9 -5 8 4 -9 5z" fill="#71e4b9" stroke="#c7ffe9"/><circle cx="731" cy="347" r="13" fill="#66e7bc" opacity=".12"/></g>
+<!-- mounting standoffs -->
+<g fill="#1b2e3a" stroke="#b6c8c8" stroke-width="1.5"><path d="M205 303 l10 -5 10 5 v15 l-10 5 -10 -5z"/><path d="M490 158 l10 -5 10 5 v15 l-10 5 -10 -5z"/><path d="M780 307 l10 -5 10 5 v15 l-10 5 -10 -5z"/><path d="M495 451 l10 -5 10 5 v15 l-10 5 -10 -5z"/></g>
+</g>
+<!-- callout leaders -->
+<g fill="none" stroke="#77bda9" stroke-width="1.2" stroke-dasharray="3 4" opacity=".95">
+<path d="M290 329 L205 390 L95 390"/><path d="M495 220 L495 128 L570 128"/><path d="M350 237 L325 175 L210 175"/><path d="M675 258 L745 200 L845 200"/><path d="M240 278 L200 235 L95 235"/><path d="M730 348 L785 400 L880 400"/>
+</g>
+<g fill="#dcecf0" font-size="12" font-weight="600">
+<text x="62" y="382">Protected pulse input</text><text x="575" y="123">Compute module</text><text x="130" y="169">5 V → 3.3 V power</text><text x="850" y="194">Cellular interface</text><text x="60" y="229">USB-C service</text><text x="885" y="395" text-anchor="end">Status LED</text>
+</g>
+<g fill="#8ca9b6" font-size="10">
+<text x="62" y="401">Synthetic input only</text><text x="575" y="142">ESP32-S3 candidate</text><text x="130" y="188">Buck converter candidate</text><text x="850" y="217">SKU TBD by region/operator</text><text x="60" y="248">Power / programming</text><text x="885" y="419" text-anchor="end">Firmware heartbeat</text>
+</g>
+<!-- animated signal pulse -->
+<g id="signal"><path d="M286 344 L353 380 L415 348 L495 389 L563 354 L674 306" fill="none" stroke="#6de4bb" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="5 12" opacity=".95"><animate attributeName="stroke-dashoffset" from="0" to="-68" dur="2.8s" repeatCount="indefinite"/></path><circle cx="495" cy="389" r="5" fill="#79f1c9"><animate attributeName="r" values="4;7;4" dur="1.8s" repeatCount="indefinite"/></circle></g>
+<!-- scale / title plaque -->
+<g transform="translate(730 505)"><path d="M0 0 L130 -30 L188 0 L58 31 Z" fill="#112b3a" stroke="#426678"/><text x="92" y="0" fill="#c6dce4" font-size="9" text-anchor="middle" transform="rotate(-13 92 0)">SGM · REV 0.2 CONCEPT</text></g>
+</g>
+</svg>
+<div class="caption"><div><strong>Signal path:</strong> synthetic pulse → protected input → MCU → cellular interface → backend</div><div class="legend"><span><i class="dot" style="background:#69e0ba"></i>signal</span><span><i class="dot" style="background:#d7bc7b"></i>contacts</span><span><i class="dot" style="background:#405667"></i>modules</span></div></div>
+</section>
+<section class="notes">
+<article class="note"><h2>01 · Compute</h2><p>ESP32-S3-WROOM-1-N8 is a candidate baseline, pending footprint, antenna keepout and datasheet review.</p></article>
+<article class="note"><h2>02 · Power & input</h2><p>USB-C and protected pulse-conditioning are shown conceptually. Values and exact protection topology still require schematic design and validation.</p></article>
+<article class="note"><h2>03 · Cellular</h2><p>The daughterboard footprint is reserved; modem SKU, antenna, RF clearance and peak-current budget depend on deployment requirements.</p></article>
+</section>
+<p class="foot">Engineering safety note: this visual is not a pin-level schematic, routed PCB, enclosure CAD, or manufacturing output. Use only a low-voltage bench setup with synthetic pulse signals. Never connect this prototype to live gas equipment. The diagram does not implement valve control and cannot certify a leak or tampering event.</p>
+</main>
+<script>
+const world=document.getElementById('world'), explode=document.getElementById('explode'), rotate=document.getElementById('rotate'), motion=document.getElementById('motion'), signal=document.querySelector('#signal animate'), parts=document.getElementById('raisedParts');
+let isExploded=false, angle=0, isPaused=false;
+explode.addEventListener('click',()=>{isExploded=!isExploded;explode.setAttribute('aria-pressed',String(isExploded));explode.textContent=isExploded?'Assembled view':'Exploded view';parts.style.transition='transform .7s cubic-bezier(.2,.8,.2,1)';parts.style.transform=isExploded?'translate(0,-34px)':'translate(0,0)';document.getElementById('mcu').style.transition='transform .7s';document.getElementById('mcu').style.transform=isExploded?'translate(0,-23px)':'translate(0,0)';document.getElementById('modem').style.transition='transform .7s';document.getElementById('modem').style.transform=isExploded?'translate(25px,-45px)':'translate(0,0)';document.getElementById('power').style.transition='transform .7s';document.getElementById('power').style.transform=isExploded?'translate(-20px,-27px)':'translate(0,0)';document.getElementById('pulse').style.transition='transform .7s';document.getElementById('pulse').style.transform=isExploded?'translate(-20px,-24px)':'translate(0,0)';});
+rotate.addEventListener('click',()=>{angle=(angle+1)%4;world.style.transition='transform .55s ease';world.style.transform=['translate(0,0) rotate(0deg)','translate(8px,-3px) rotate(.7deg)','translate(-5px,2px) rotate(-.7deg)','translate(0,0) rotate(0deg)'][angle];});
+motion.addEventListener('click',()=>{isPaused=!isPaused;motion.setAttribute('aria-pressed',String(!isPaused));motion.textContent=isPaused?'Resume motion':'Pause motion';document.getElementById('signal').style.display=isPaused?'none':'block';});
+</script>
+</body>
+</html>
