@@ -5,7 +5,7 @@
   (paper "A4")
 
   (title_block
-    (title "ESP32-S3 Dev Board")
+    (title "Smart Gas Meter IoT — ESP32-S3 carrier draft")
     (rev "1.2.0")
   )
 
@@ -2608,7 +2608,7 @@
     (property "Reference" "U1" (at 94.615 22.86 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "smart_gas_meter_iot" (at 94.615 25.4 0)
+    (property "Value" "ESP32-S3-WROOM-1" (at 94.615 25.4 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Espressif:ESP32-S3-WROOM-1" (at 95.25 101.6 0)
