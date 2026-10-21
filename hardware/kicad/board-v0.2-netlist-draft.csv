@@ -1,0 +1,43 @@
+Ref,Value,Pin,Net,Footprint_Candidate,Population,Notes
+J1,USB_C_Receptacle, A4/A9/B4/B9,VBUS_5V,Connector_USB:USB_C_Receptacle_USB2.0_16P,Fit,Use exact connector datasheet before footprint freeze
+J1,USB_C_Receptacle,A5,CC1,Connector_USB:USB_C_Receptacle_USB2.0_16P,Fit,CC1 sink Rd required
+J1,USB_C_Receptacle,B5,CC2,Connector_USB:USB_C_Receptacle_USB2.0_16P,Fit,CC2 sink Rd required
+J1,USB_C_Receptacle,A6/B6,USB_D+,Connector_USB:USB_C_Receptacle_USB2.0_16P,Fit,Verify connector pin numbering
+J1,USB_C_Receptacle,A7/B7,USB_D-,Connector_USB:USB_C_Receptacle_USB2.0_16P,Fit,Verify connector pin numbering
+J1,USB_C_Receptacle,A1/A12/B1/B12,GND,Connector_USB:USB_C_Receptacle_USB2.0_16P,Fit,Ground pins
+RCC1,5.1k 1%,1,CC1,Resistor_SMD:R_0603_1608Metric,Fit,USB-C sink pull-down
+RCC1,5.1k 1%,2,GND,Resistor_SMD:R_0603_1608Metric,Fit,USB-C sink pull-down
+RCC2,5.1k 1%,1,CC2,Resistor_SMD:R_0603_1608Metric,Fit,USB-C sink pull-down
+RCC2,5.1k 1%,2,GND,Resistor_SMD:R_0603_1608Metric,Fit,USB-C sink pull-down
+U1,ESP32-S3-WROOM-1-N8,USB_D-,GPIO19_USB_D-,Espressif:ESP32-S3-WROOM-1,Fit,Check exact module datasheet and symbol pin mapping
+U1,ESP32-S3-WROOM-1-N8,USB_D+,GPIO20_USB_D+,Espressif:ESP32-S3-WROOM-1,Fit,Check exact module datasheet and symbol pin mapping
+U1,ESP32-S3-WROOM-1-N8,GPIO4,PULSE_IN,Espressif:ESP32-S3-WROOM-1,Fit,Lab synthetic 3.3V pulse only
+U1,ESP32-S3-WROOM-1-N8,GPIO5,STATUS_LED,Espressif:ESP32-S3-WROOM-1,Fit,GPIO allocation provisional
+U1,ESP32-S3-WROOM-1-N8,GPIO6,I2C_SDA,Espressif:ESP32-S3-WROOM-1,Fit,Optional expansion
+U1,ESP32-S3-WROOM-1-N8,GPIO7,I2C_SCL,Espressif:ESP32-S3-WROOM-1,Fit,Optional expansion
+U1,ESP32-S3-WROOM-1-N8,GPIO17,MODEM_UART_TX,Espressif:ESP32-S3-WROOM-1,Reserved,Modem interface future only
+U1,ESP32-S3-WROOM-1-N8,GPIO18,MODEM_UART_RX,Espressif:ESP32-S3-WROOM-1,Reserved,Modem interface future only
+U1,ESP32-S3-WROOM-1-N8,EN,MCU_EN,Espressif:ESP32-S3-WROOM-1,Fit,Use Espressif reference EN circuit
+U1,ESP32-S3-WROOM-1-N8,GPIO0,BOOT_N,Espressif:ESP32-S3-WROOM-1,Fit,Strapping pin; verify startup behavior
+U1,ESP32-S3-WROOM-1-N8,3V3,3V3_LOGIC,Espressif:ESP32-S3-WROOM-1,Fit,Verify decoupling and transient load
+U1,ESP32-S3-WROOM-1-N8,GND,GND,Espressif:ESP32-S3-WROOM-1,Fit,Continuous reference plane
+J2,Lab_Pulse_2Pin,1,PULSE_IN,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Fit,Only synthetic logic input
+J2,Lab_Pulse_2Pin,2,GND,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical,Fit,No supply pin on connector
+RPU1,10k,1,3V3_LOGIC,Resistor_SMD:R_0603_1608Metric,Fit,Pulse input pull-up
+RPU1,10k,2,PULSE_IN,Resistor_SMD:R_0603_1608Metric,Fit,Pulse input pull-up
+RS1,1k,1,PULSE_IN,Resistor_SMD:R_0603_1608Metric,Fit,Place near MCU input pin
+RS1,1k,2,PULSE_MCU,Resistor_SMD:R_0603_1608Metric,Fit,Series protection to MCU
+SW1,BOOT_Pushbutton,1,BOOT_N,Button_Switch_SMD:SW_SPST_TL3301,Fit,BOOT to GND when pressed
+SW1,BOOT_Pushbutton,2,GND,Button_Switch_SMD:SW_SPST_TL3301,Fit,Verify footprint before freeze
+SW2,RESET_Pushbutton,1,MCU_EN,Button_Switch_SMD:SW_SPST_TL3301,Fit,Reset network per datasheet
+SW2,RESET_Pushbutton,2,GND,Button_Switch_SMD:SW_SPST_TL3301,Fit,Verify footprint before freeze
+D1,Status_LED,1,STATUS_LED,LED_SMD:LED_0603_1608Metric,Fit,Check symbol polarity
+D1,Status_LED,2,GND,LED_SMD:LED_0603_1608Metric,Fit,Check symbol polarity
+RLED1,1k candidate,1,GPIO5_STATUS,Resistor_SMD:R_0603_1608Metric,Fit,Calculate final current after LED selection
+RLED1,1k candidate,2,STATUS_LED,Resistor_SMD:R_0603_1608Metric,Fit,Series resistor
+J3,Debug_Header_1x06,1,GND,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,Fit,Low-voltage bench only
+J3,Debug_Header_1x06,2,3V3_LOGIC,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,Fit,No external powering without backfeed review
+J3,Debug_Header_1x06,3,PULSE_IN,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,Fit,Lab signal
+J3,Debug_Header_1x06,4,I2C_SDA,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,Reserved,Optional expansion
+J3,Debug_Header_1x06,5,I2C_SCL,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,Reserved,Optional expansion
+J3,Debug_Header_1x06,6,GND,Connector_PinHeader_2.54mm:PinHeader_1x06_P2.54mm_Vertical,Fit,Ground return
