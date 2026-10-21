@@ -31,9 +31,12 @@ jobs:
       - name: Reject graphical-only schematic drafts
         if: steps.detect.outputs.present == 'true'
         run: python3 hardware/kicad/check_schematic_structure.py
-      - name: Install KiCad CLI
+      - name: Install KiCad 9 CLI
         if: steps.detect.outputs.present == 'true'
         run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository --yes ppa:kicad/kicad-9.0-releases
           sudo apt-get update
           sudo apt-get install -y kicad
       - name: Run ERC, DRC and exports
