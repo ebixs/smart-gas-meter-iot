@@ -6,7 +6,11 @@
 
   (title_block
     (title "Smart Gas Meter IoT — ESP32-S3 carrier draft")
-    (rev "1.2.0")
+    (date "2026-10-21")
+    (rev "0.2-reference-derived")
+    (company "Smart Gas Meter IoT")
+    (comment 1 "ENGINEERING DRAFT — ERC and electrical review required")
+    (comment 2 "LOW-VOLTAGE LAB ONLY — synthetic pulse input; never connect to gas line")
   )
 
   (lib_symbols
