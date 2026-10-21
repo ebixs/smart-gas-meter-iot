@@ -155,3 +155,11 @@ In 1396 SH (2017–2018), the project owner personally designed and built an ori
 ## License
 
 No license has been selected yet. Until a license is added, the repository should not be assumed to grant permission to reuse, modify or distribute its contents.
+
+
+### v0.2 hardware design drafts
+- [Candidate pin-to-net map (CSV)](hardware/kicad/board-v0.2-netlist-draft.csv)
+- [PCB placement and routing plan](hardware/kicad/board-v0.2-layout-plan.md)
+- [Native KiCad delivery gate](hardware/kicad/NATIVE_CAD_DELIVERY_GATE.md)
+
+These are engineering drafts, not a completed electrical schematic, routed PCB, or fabrication package. ERC/DRC and component-level verification remain release gates.
