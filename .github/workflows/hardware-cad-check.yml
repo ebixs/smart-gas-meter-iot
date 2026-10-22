@@ -45,12 +45,13 @@ jobs:
         run: |
           set -euo pipefail
           kicad-cli version
-          mkdir -p /tmp/schematic-preview /tmp/gerbers /tmp/drill /tmp/cad-reports
+          mkdir -p /tmp/schematic-preview /tmp/netlists /tmp/gerbers /tmp/drill /tmp/cad-reports
           while IFS= read -r -d '' file; do
             base="$(basename "$file" .kicad_sch)"
             echo "Running ERC: $file"
             kicad-cli sch erc --exit-code-violations --output "/tmp/cad-reports/$base-erc.rpt" "$file"
             kicad-cli sch export svg "$file" --output "/tmp/schematic-preview/"
+            kicad-cli sch export netlist "$file" --output "/tmp/netlists/$base.net"
           done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_sch' -print0)
           while IFS= read -r -d '' file; do
             base="$(basename "$file" .kicad_pcb)"
@@ -67,6 +68,7 @@ jobs:
           path: |
             /tmp/cad-reports/
             /tmp/schematic-preview/
+            /tmp/netlists/
             /tmp/gerbers/
             /tmp/drill/
           if-no-files-found: warn
