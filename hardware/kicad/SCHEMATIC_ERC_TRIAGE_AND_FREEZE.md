@@ -9,6 +9,25 @@
 - The workflow now continues after ERC/DRC errors and uploads diagnostic artifacts. The 2026-10-23 run confirms schematic structure check passed and the artifact upload succeeded; the overall CAD job still fails because ERC reports violations. Python simulator/API tests passed in [run 39962389242](https://github.com/ebixs/smart-gas-meter-iot/actions/runs/39962389242).
 - No DRC result is evidence of a valid board unless a native `.kicad_pcb` file exists and the DRC step runs.
 
+
+## Findings from the 2026-10-23 ERC artifact
+
+The downloaded report confirms these are electrical design issues, not just library warnings:
+
+- **Power-output conflicts:** the ESP32 dev-board connector symbols J1/J2 and programmer/USB connector symbols J3/J4 use pin electrical types that KiCad interprets as power outputs. Several are connected together, producing explicit pin-to-pin errors.
+- **Power-net short:** the report says **both +5V and GND are attached to the same items** and +5V wins in the generated netlist. Treat this as a blocking short until the connector symbols and wiring are rebuilt and verified.
+- **Regulator conflict:** U2 (AMS1117-3.3) output is tied to another power-output pin on the 3V3 rail. The proposed architecture previously called for a buck regulator, so the schematic and BOM are not yet aligned.
+- **Legacy footprint/symbol libraries:** the report references missing `Espressif`, `esp32-dev-boards`, `$74th`, and standard-library tables. Resolve these with a project-local KiCad library table or standard symbols/footprints before layout.
+- **Generated netlist exists** in the run artifact, but it is not acceptable for PCB work while the power-net conflict remains.
+
+### Corrective action order
+
+1. Remove the legacy dev-board connector symbols from the intended module-based circuit, or replace them with verified connector symbols whose pin numbers and electrical types match their datasheets.
+2. Rebuild USB-C and programming headers from exact, reviewed pin maps; do not preserve the current J3/J4 symbols by merely silencing ERC.
+3. Remove the +5V/GND net collision and inspect the exported netlist to confirm those nets are separate.
+4. Decide and document one regulator topology; update schematic, footprints, BOM and layout plan together.
+5. Add/resolve library tables, rerun ERC, then manually inspect the report and netlist before starting PCB placement.
+
 ## Required review sequence
 
 1. Open the generated ERC report and group all findings by rule and reference designator.
