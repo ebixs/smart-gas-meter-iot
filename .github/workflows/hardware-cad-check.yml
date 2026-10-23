@@ -23,12 +23,12 @@ jobs:
         id: detect
         shell: bash
         run: |
-          if find hardware/kicad -maxdepth 1 -type f \\( -name '*.kicad_sch' -o -name '*.kicad_pcb' \\) 2>/dev/null | grep -q .; then
+          if find hardware/kicad -maxdepth 1 -type f \( -name '*.kicad_sch' -o -name '*.kicad_pcb' \) 2>/dev/null | grep -q .; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: Reject graphical-only schematic drafts
+      - name: Check native schematic structure
         if: steps.detect.outputs.present == 'true'
         run: python3 hardware/kicad/check_schematic_structure.py
       - name: Install KiCad 9 CLI
