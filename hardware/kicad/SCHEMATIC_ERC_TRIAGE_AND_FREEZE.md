@@ -28,6 +28,18 @@ The downloaded report confirms these are electrical design issues, not just libr
 4. Decide and document one regulator topology; update schematic, footprints, BOM and layout plan together.
 5. Add/resolve library tables, rerun ERC, then manually inspect the report and netlist before starting PCB placement.
 
+
+## Netlist-level blocking findings (artifact inspected)
+
+The exported `smart_gas_meter_iot.net` was inspected in addition to the ERC summary. It confirms that the current draft must not be used to generate a PCB:
+
+- Net `+5V` contains **both pins of C4 and both pins of C5**, meaning these capacitors are shorted by the current connectivity; it also contains U1 GND pins and U2 GND/VI, and J2/J3/J4 pins marked GND. The netlist's `+5V` name is therefore misleading because distinct intended nets have merged.
+- Net `+3V3` contains both the intended module supply and regulator output, plus the old dev-board connector J1 pin 2. That duplicates the module power interface and causes a power-output conflict with U2.
+- The schematic currently includes both the module U1 (ESP32-S3-WROOM-1) and legacy dev-board header symbols J1/J2. Those should not coexist as if they were separate board-level supply sources in the carrier design.
+- The legacy USB/programming symbols have incorrect electrical pin classifications for connectors (GND/VCC marked power-output), and their current connectivity joins +5V and GND.
+
+**Decision:** do not patch this by changing ERC pin types alone. The schematic connectivity needs a controlled rebuild around one architecture: module-only carrier board, one documented power path, separate USB VBUS / +5V / 3V3 / GND nets, correctly mapped USB-C connector and CC resistors, and a low-voltage synthetic pulse input. Keep the existing draft as historical evidence until the rebuilt sheet passes ERC and its netlist is reviewed.
+
 ## Required review sequence
 
 1. Open the generated ERC report and group all findings by rule and reference designator.
