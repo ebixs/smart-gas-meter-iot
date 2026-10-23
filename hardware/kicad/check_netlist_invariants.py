@@ -11,7 +11,7 @@ from collections import defaultdict
 from pathlib import Path
 
 NET_RE = re.compile(r'\(net\s+\(code\s+"[^"]+"\)\s+\(name\s+"([^"]+)"\).*?(?=\n\s*\(net\s+\(code|\n\s*\)\s*\)\s*\Z)', re.S)
-NODE_RE = re.compile(r'\(node\s+\(ref\s+"([^"]+)"\)\s+\(pin\s+"([^"]+)"\)(.*?)(?=\n\s*\(node|\n\s*\))', re.S)
+NODE_RE = re.compile(r'\(node\s+\(ref\s+"([^"]+)"\)\s+\(pin\s+"([^"]+)"\)(.*?)\)', re.S)
 
 def main() -> int:
     path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("hardware/kicad/netlist.net")
