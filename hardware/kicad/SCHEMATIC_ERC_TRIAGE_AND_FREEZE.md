@@ -5,7 +5,7 @@
 ## Current CI evidence
 - Native schematic parses and netlist export is attempted by KiCad CLI.
 - Latest hardware-CAD run on 2026-10-23: [run 39962389116](https://github.com/ebixs/smart-gas-meter-iot/actions/runs/39962389116). Its diagnostic artifact is [kicad-validation-39962389116](https://github.com/ebixs/smart-gas-meter-iot/actions/runs/39962389116/artifacts/12505237688).
-- KiCad 9.0.9 reported **65 ERC violations** and returned exit code 5.
+- KiCad 9.0.9 reported **65 ERC messages: 5 errors and 60 warnings** and returned exit code 5.
 - The workflow now continues after ERC/DRC errors and uploads diagnostic artifacts. The 2026-10-23 run confirms schematic structure check passed and the artifact upload succeeded; the overall CAD job still fails because ERC reports violations. Python simulator/API tests passed in [run 39962389242](https://github.com/ebixs/smart-gas-meter-iot/actions/runs/39962389242).
 - No DRC result is evidence of a valid board unless a native `.kicad_pcb` file exists and the DRC step runs.
 
