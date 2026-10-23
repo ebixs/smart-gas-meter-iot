@@ -96,8 +96,17 @@ jobs:
               failed=1
             fi
           done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_pcb' -print0)
+          while IFS= read -r -d '' file; do
+            echo "Checking exported netlist invariants: $file"
+            python3 hardware/kicad/check_netlist_invariants.py "$file"
+            rc=$?
+            if [ "$rc" -ne 0 ]; then
+              echo "Netlist invariant check failed (exit $rc): $file"
+              failed=1
+            fi
+          done < <(find /tmp/netlists -maxdepth 1 -type f -name '*.net' -print0)
           if [ "$failed" -ne 0 ]; then
-            echo "::error::One or more CAD checks/exports failed. Review uploaded reports; ERC/DRC violations are not suppressed."
+            echo "::error::One or more CAD checks/exports/netlist invariants failed. Review uploaded reports; ERC/DRC violations are not suppressed."
             exit 1
           fi
       - name: Upload CAD reports and exports
