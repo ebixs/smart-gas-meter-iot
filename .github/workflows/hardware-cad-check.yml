@@ -23,7 +23,7 @@ jobs:
         id: detect
         shell: bash
         run: |
-          if find hardware/kicad -maxdepth 1 -type f \( -name '*.kicad_sch' -o -name '*.kicad_pcb' \) 2>/dev/null | grep -q .; then
+          if find hardware/kicad -maxdepth 1 -type f \\( -name '*.kicad_sch' -o -name '*.kicad_pcb' \\) 2>/dev/null | grep -q .; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
@@ -43,23 +43,52 @@ jobs:
         if: steps.detect.outputs.present == 'true'
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
           kicad-cli version
           mkdir -p /tmp/schematic-preview /tmp/netlists /tmp/gerbers /tmp/drill /tmp/cad-reports
+          failed=0
           while IFS= read -r -d '' file; do
             base="$(basename "$file" .kicad_sch)"
             echo "Running ERC: $file"
-            kicad-cli sch erc --exit-code-violations --output "/tmp/cad-reports/$base-erc.rpt" "$file"
-            kicad-cli sch export svg "$file" --output "/tmp/schematic-preview/"
-            kicad-cli sch export netlist "$file" --output "/tmp/netlists/$base.net"
+            if kicad-cli sch erc --exit-code-violations --output "/tmp/cad-reports/$base-erc.rpt" "$file"; then
+              echo "ERC passed: $file"
+            else
+              rc=$?
+              echo "ERC failed (exit $rc): $file"
+              failed=1
+            fi
+            if ! kicad-cli sch export svg "$file" --output "/tmp/schematic-preview/"; then
+              echo "Schematic SVG export failed: $file"
+              failed=1
+            fi
+            if ! kicad-cli sch export netlist "$file" --output "/tmp/netlists/$base.net"; then
+              echo "Netlist export failed: $file"
+              failed=1
+            fi
           done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_sch' -print0)
           while IFS= read -r -d '' file; do
             base="$(basename "$file" .kicad_pcb)"
             echo "Running DRC: $file"
-            kicad-cli pcb drc --exit-code-violations --output "/tmp/cad-reports/$base-drc.rpt" "$file"
-            kicad-cli pcb export gerbers "$file" --output "/tmp/gerbers/"
-            kicad-cli pcb export drill "$file" --output "/tmp/drill/"
+            if kicad-cli pcb drc --exit-code-violations --output "/tmp/cad-reports/$base-drc.rpt" "$file"; then
+              echo "DRC passed: $file"
+            else
+              rc=$?
+              echo "DRC failed (exit $rc): $file"
+              failed=1
+            fi
+            if ! kicad-cli pcb export gerbers "$file" --output "/tmp/gerbers/"; then
+              echo "Gerber export failed: $file"
+              failed=1
+            fi
+            if ! kicad-cli pcb export drill "$file" --output "/tmp/drill/"; then
+              echo "Drill export failed: $file"
+              failed=1
+            fi
           done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_pcb' -print0)
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::One or more CAD checks failed. Review the uploaded reports; this workflow does not suppress ERC/DRC violations."
+            exit 1
+          fi
       - name: Upload CAD reports and exports
         if: always() && steps.detect.outputs.present == 'true'
         uses: actions/upload-artifact@v4
