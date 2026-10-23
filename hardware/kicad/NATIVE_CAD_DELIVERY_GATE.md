@@ -1,19 +1,30 @@
 # Native KiCad delivery gate
 
-The current `smart_gas_meter_iot.kicad_sch` is a graphical block concept, not a native electrical schematic. The existing CI intentionally rejects it. This hold point remains until the native schematic has embedded symbol definitions, placed pin-level symbols, explicit wires/labels and an ERC review.
+**Current status: engineering draft; not fabrication-ready.**
+
+The repository contains a native KiCad S-expression schematic at `smart_gas_meter_iot.kicad_sch`. It has embedded symbol definitions and placed symbol instances, but the last recorded ERC run reported 65 violations. The presence of a native file does not establish electrical correctness.
 
 ## Current deliverables
 - `SCHEMATIC_IMPLEMENTATION_PLAN.md`: design scope and proposed signal map.
-- `board-v0.2-netlist-draft.csv`: proposed pin/net mapping for a low-voltage lab prototype.
-- `board-v0.2-layout-plan.md`: PCB placement and routing constraints.
+- `SCHEMATIC_ERC_TRIAGE_AND_FREEZE.md`: required ERC and design freeze review.
+- `board-v0.2-netlist-draft.csv`: proposed pin/net mapping; it is not a netlist exported from a verified design.
+- `board-v0.2-layout-plan.md`: placement and routing constraints.
 - `../BOM-board-v0.1.md`: candidate-only BOM.
 
 ## Outstanding technical decisions
-1. Final power stage and exact regulator BOM/footprints, validated against current datasheet.
-2. Exact USB-C connector and ESD protector.
-3. Verify module pin numbers and symbol against the selected ESP32-S3-WROOM-1-N8 datasheet.
-4. Freeze board outline and mounting holes.
-5. Choose cellular modem only after deployment country/operator/bands and peak-current budget are known.
+1. Correct all unintended ERC findings and verify the module symbol pin mapping against the ESP32-S3-WROOM-1-N8 datasheet.
+2. Select exact USB-C connector, ESD and VBUS protection parts.
+3. Verify regulator, inductor, capacitor ratings, thermal limits and footprints against datasheets.
+4. Freeze board outline, mounting holes, stack-up and fabrication constraints.
+5. Select cellular modem only after target country/operator/bands and peak-current budget are known.
+6. Validate every footprint pad mapping and 3D model against manufacturer drawings.
 
 ## Release criteria
-A deliverable may be called a native schematic only after KiCad opens it as an electrical schematic and ERC has been run. A deliverable may be called a routed PCB only after the board file exists and DRC is run. Gerbers must not be described as manufacturing-ready before review.
+- A native schematic opens in KiCad and its exported netlist is reviewed.
+- ERC has zero unintended violations; no blanket exclusions or disabled checks.
+- A native PCB is built from the reviewed netlist, not manually guessed from the draft CSV.
+- DRC has zero unintended violations and antenna keep-out, USB routing, power loops and clearances are reviewed.
+- Gerbers are generated only as review artifacts until all electrical, mechanical and bench checks pass.
+
+## Safety boundary
+Bench prototype only. Use a current-limited low-voltage supply and synthetic 3.3 V pulse source. Never connect to a live gas meter, gas line, valve, utility wiring, or unknown field signal. No valve actuation is included. Anomalous pulse patterns are not proof of a gas leak.
