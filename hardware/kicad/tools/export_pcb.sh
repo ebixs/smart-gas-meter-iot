@@ -25,6 +25,6 @@ for view in top bottom; do
   kicad-cli pcb render --side "$view" --quality high --width 2000 --height 1400 --background opaque \
     --output "$out/render/board-$view.png" "$pcb" >/dev/null
 done
-kicad-cli pcb render --side top --rotate "-35,0,25" --perspective --quality high --floor \
+kicad-cli pcb render --side top --rotate "325,0,25" --perspective --quality high --floor \
   --width 2000 --height 1400 --zoom 0.9 --output "$out/render/board-iso.png" "$pcb" >/dev/null
 echo "Exported review artefacts to $out"

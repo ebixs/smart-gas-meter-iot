@@ -17,7 +17,7 @@ BOARD_W = 100.0
 BOARD_H = 70.0
 ORIGIN = (100.0, 50.0)  # board top-left in KiCad page coordinates
 CORNER_R = 2.0
-LAYERS = 4  # F.Cu signal / In1 solid GND / In2 signal + 3V3 pour / B.Cu signal + GND pour
+LAYERS = 4  # F.Cu signal / In1 solid GND / In2 signal + 3V3 pour / B.Cu signal
 
 # ref: (x, y, rotation)
 # The ESP32-S3 module sits right of centre: its left-hand pins (EN, IO4-IO7, IO15, IO17/18,
@@ -99,9 +99,9 @@ SILKSCREEN = [
     # (text, x, y, size_mm, layer)
     ("SMART GAS METER IoT  v0.2", 62.0, 46.0, 1.5, "F.SilkS"),
     ("LAB PROTOTYPE - NO GAS-LINE CONNECTION", 62.0, 49.0, 1.2, "F.SilkS"),
-    ("PULSE", 29.0, 9.0, 0.9, "F.SilkS"),
-    ("TAMPER", 28.5, 14.0, 0.9, "F.SilkS"),
-    ("I2C", 29.5, 19.0, 0.9, "F.SilkS"),
+    ("PULSE", 26.5, 9.0, 0.9, "F.SilkS"),
+    ("TAMPER", 25.8, 14.0, 0.9, "F.SilkS"),
+    ("I2C", 27.5, 19.0, 0.9, "F.SilkS"),
     ("UART", 92.0, 19.2, 0.9, "F.SilkS"),
     ("MODEM IF", 55.0, 69.0, 0.9, "F.SilkS"),
     ("VMODEM", 71.3, 69.0, 0.9, "F.SilkS"),

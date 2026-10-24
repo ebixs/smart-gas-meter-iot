@@ -5291,7 +5291,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 30.48 149.86 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid f3c613a2-a937-573a-8926-a019b6c73ab6)
     (property "Reference" "TP1" (at 34.29 148.59 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5351,7 +5351,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 43.18 149.86 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid daaa9657-a80f-533f-97d4-7564e2b4c301)
     (property "Reference" "TP2" (at 46.99 148.59 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5411,7 +5411,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 55.88 149.86 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid d3c54888-4623-5246-9a66-e872a1442fff)
     (property "Reference" "TP3" (at 59.69 148.59 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5471,7 +5471,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 30.48 170.18 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid eb047098-fea5-5ce6-9ff4-a494bf69a86c)
     (property "Reference" "TP4" (at 34.29 168.91 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5513,7 +5513,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 43.18 170.18 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 3cef3b13-8af9-5289-aeaa-c6b412492e64)
     (property "Reference" "TP5" (at 46.99 168.91 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5555,7 +5555,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 55.88 170.18 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 49b58280-f87d-519b-b1f4-a3553d5750ec)
     (property "Reference" "TP6" (at 59.69 168.91 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5597,7 +5597,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 30.48 190.5 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid 09443b60-d94e-5e90-a310-d16a67cd708e)
     (property "Reference" "TP7" (at 34.29 189.23 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5639,7 +5639,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 43.18 190.5 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid c991c5aa-1c29-506c-a28d-884246385aa0)
     (property "Reference" "TP8" (at 46.99 189.23 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5699,7 +5699,7 @@
   )
 
   (symbol (lib_id "SGM:TestPoint") (at 55.88 190.5 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board yes) (dnp no)
     (uuid ab1fcb09-b14c-5675-883b-e93936cf4eca)
     (property "Reference" "TP9" (at 59.69 189.23 0)
       (effects (font (size 1.27 1.27)) (justify left))

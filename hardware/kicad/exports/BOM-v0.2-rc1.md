@@ -2,7 +2,7 @@
 
 Exact parts selected for schematic freeze; see [PART_SELECTION.md](../PART_SELECTION.md) for ratings and reasoning. Prices and stock change daily — re-check before ordering. **Not approved for purchase until the PCB and freeze review are signed off.**
 
-`hand-fit` = generic 2.54 mm headers fitted by hand; test points are bare pads and are not purchased.
+`hand-fit` = generic 2.54 mm headers fitted by hand. Test points TP1–TP9 are bare copper pads and are not listed.
 
 | Qty | Refs | Value | Manufacturer | MPN | LCSC | Footprint (SGM) | Fit |
 |---:|---|---|---|---|---|---|---|
@@ -32,12 +32,3 @@ Exact parts selected for schematic freeze; see [PART_SELECTION.md](../PART_SELEC
 | 1 | J6 | Modem daughterboard interface | - | generic | - | `PinHeader_1x08_P2.54mm_Vertical` | hand-fit |
 | 1 | J7 | MODEM_VIN bench supply input | - | generic | - | `PinHeader_1x02_P2.54mm_Vertical` | hand-fit |
 | 2 | R12, R13 | 100k 1% | UNI-ROYAL | 0603WAF1003T5E | C25803 | `R_0603_1608Metric` | SMT |
-| 1 | TP1 | TP_5V | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP2 | TP_3V3 | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP3 | TP_GND | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP4 | TP_PULSE | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP5 | TP_EN | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP6 | TP_BOOT | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP7 | TP_VMODEM | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP8 | TP_GND2 | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |
-| 1 | TP9 | TP_VBUS | - | generic | - | `TestPoint_Pad_D1.5mm` | hand-fit |

@@ -5,8 +5,8 @@ Runs inside KiCad 9's Python (``import pcbnew``). Steps:
   1. place footprints from the project-local SGM library, link them to the
      schematic symbols (same UUIDs as the generated schematic) and assign nets;
   2. draw the board outline, mounting holes, silkscreen and copper zones
-     (In1 = solid GND plane, In2 = signals + 3V3 pour, B.Cu = signals + GND pour;
-     every top-side GND pad reaches the In1 plane through its own via);
+     (In1 = solid GND plane, In2 = signals + 3V3 pour, F/B.Cu = signals only;
+     every SMD GND pad reaches the In1 plane through its own fan-out via);
   3. optionally autoroute with Freerouting (Specctra DSN/SES round trip);
   4. fill zones and save ``smart_gas_meter_iot.kicad_pcb``.
 
@@ -96,6 +96,39 @@ def zone(board: pcbnew.BOARD, layer: int, net: pcbnew.NETINFO_ITEM, name: str, p
     board.Add(z)
 
 
+def pin_names() -> dict[tuple[str, str], str]:
+    """(symbol, pin number) -> pin name, from the project symbol library."""
+    text = (KICAD_DIR / "lib" / "smart_gas_meter.kicad_sym").read_text(encoding="utf-8")
+    names: dict[tuple[str, str], str] = {}
+    for symbol in re.finditer(r'^\(symbol "([^"]+)"', text, re.M):
+        start = symbol.start()
+        end = text.find("\n(symbol ", start + 1)
+        body = text[start:end if end > 0 else None]
+        for pin in re.finditer(r'\(name "([^"]*)".*?\(number "([^"]+)"', body, re.S):
+            names.setdefault((symbol.group(1), pin.group(2)), pin.group(1))
+    return names
+
+
+def assign_nc_nets(board: pcbnew.BOARD) -> int:
+    """Give intentionally unconnected pins the per-pin net KiCad's schematic uses,
+    e.g. ``unconnected-(U1-IO8-Pad12)``, so schematic-parity DRC is exact."""
+    names = pin_names()
+    by_ref = {p.ref: p for p in design.PARTS}
+    count = 0
+    for fp in board.GetFootprints():
+        part = by_ref.get(fp.GetReference())
+        if part is None:
+            continue
+        for pad in fp.Pads():
+            if part.pins.get(pad.GetNumber()) == design.NC:
+                pin = names.get((part.symbol, pad.GetNumber()), "")
+                net = pcbnew.NETINFO_ITEM(board, f"unconnected-({part.ref}-{pin}-Pad{pad.GetNumber()})")
+                board.Add(net)
+                pad.SetNet(net)
+                count += 1
+    return count
+
+
 def build() -> pcbnew.BOARD:
     board = pcbnew.NewBoard(str(PCB))
     board.SetCopperLayerCount(layout.LAYERS)
@@ -182,10 +215,9 @@ def build() -> pcbnew.BOARD:
             t.SetMirrored(True)
         board.Add(t)
 
-    print(f"GND fanout: {fanout_ground(board)} vias")
+    print(f"GND fanout: {fanout_ground(board)} vias; NC pins: {assign_nc_nets(board)}")
     zone(board, pcbnew.In1_Cu, nets["GND"], "GND plane")
     zone(board, pcbnew.In2_Cu, nets["+3V3"], "+3V3 pour")
-    zone(board, pcbnew.B_Cu, nets["GND"], "GND pour bottom")
     return board
 
 
