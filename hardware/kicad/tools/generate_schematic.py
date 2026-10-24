@@ -17,6 +17,7 @@ Usage: python3 hardware/kicad/tools/generate_schematic.py [--kicad-share DIR]
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import sys
@@ -26,6 +27,7 @@ from pathlib import Path
 KICAD_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(KICAD_DIR))
 import design_v02 as design  # noqa: E402
+import pcb_layout_v02 as layout  # noqa: E402
 
 PROJECT = "smart_gas_meter_iot"
 GRID = 1.27
@@ -62,6 +64,7 @@ FOOTPRINT_SOURCES = {
     "PinHeader_1x04_P2.54mm_Vertical": "Connector_PinHeader_2.54mm",
     "PinHeader_1x08_P2.54mm_Vertical": "Connector_PinHeader_2.54mm",
     "TestPoint_Pad_D1.5mm": "TestPoint",
+    "MountingHole_3.2mm_M3": "MountingHole",
 }
 POWER_SYMBOLS = {"GND", "+3V3", "+5V"}
 
@@ -221,7 +224,8 @@ class Sheet:
             **part.fields,
         }
         lines = [f'  (symbol (lib_id "{design.LIB}:{part.symbol}") (at {fmt(x)} {fmt(y)} 0) (unit 1)',
-                 f"    (in_bom yes) (on_board yes) (dnp {'yes' if part.dnp else 'no'})",
+                 f"    (in_bom {'no' if part.symbol == 'TestPoint' else 'yes'}) (on_board yes) "
+                 f"(dnp {'yes' if part.dnp else 'no'})",
                  f"    (uuid {uid('sym', part.ref)})"]
         for i, (key, value) in enumerate(props.items()):
             hidden = key not in ("Reference", "Value")
@@ -330,7 +334,29 @@ def build_schematic(share: Path) -> tuple[str, dict[str, str]]:
     return text, symbols
 
 
-def write_libraries(share: Path, symbols: dict[str, str]) -> None:
+MODEL_RE = re.compile(r'\(model\s+"?\$\{[A-Z0-9_]+\}/([^/"]+)\.3dshapes/([^"\s]+)\.(?:wrl|step)"?')
+
+
+def vendor_3d_model(footprint: Path, models_3d: Path | None) -> None:
+    """Point a footprint at a project-local STEP model, copying it in when available."""
+    text = footprint.read_text(encoding="utf-8")
+    match = MODEL_RE.search(text)
+    if not match:
+        return
+    lib, name = match.groups()
+    local = KICAD_DIR / "lib" / "3d" / f"{name}.step"
+    local.parent.mkdir(exist_ok=True)
+    if models_3d is not None:
+        source = models_3d / f"{lib}.3dshapes" / f"{name}.step"
+        if source.exists():
+            shutil.copyfile(source, local)
+    if not local.exists():
+        raise SystemExit(f"3D model {name}.step not found; pass --kicad-3d with the KiCad 3dmodels dir")
+    text = MODEL_RE.sub(f'(model "${{KIPRJMOD}}/lib/3d/{name}.step"', text, count=1)
+    footprint.write_text(text, encoding="utf-8")
+
+
+def write_libraries(share: Path, symbols: dict[str, str], models_3d: Path | None = None) -> None:
     lib_dir = KICAD_DIR / "lib"
     lib_dir.mkdir(exist_ok=True)
     body = "\n".join(symbols.values())  # verbatim, so regeneration from this file is byte-identical
@@ -338,7 +364,7 @@ def write_libraries(share: Path, symbols: dict[str, str]) -> None:
         f"(kicad_symbol_lib (version 20220914) (generator kicad_symbol_editor)\n{body}\n)\n", encoding="utf-8")
     pretty = lib_dir / f"{design.LIB}.pretty"
     pretty.mkdir(exist_ok=True)
-    used = {p.footprint for p in design.PARTS}
+    used = {p.footprint for p in design.PARTS} | set(design.BOARD_ONLY_FOOTPRINTS)
     for stale in pretty.glob("*.kicad_mod"):
         if stale.stem not in used:
             stale.unlink()
@@ -348,6 +374,14 @@ def write_libraries(share: Path, symbols: dict[str, str]) -> None:
             shutil.copyfile(src, pretty / src.name)
         elif not (pretty / src.name).exists():
             raise SystemExit(f"footprint {fp} not found in {src.parent} or {pretty}")
+        vendor_3d_model(pretty / src.name, models_3d)
+        if fp == "ESP32-S3-WROOM-1":
+            # Stock antenna keep-out omits In2.Cu; extend it to every copper layer of the 4-layer board.
+            mod = pretty / src.name
+            text = mod.read_text(encoding="utf-8")
+            text = re.sub(r'\(zone \(net 0\) \(net_name ""\) \(layers [^)]*\)',
+                          '(zone (net 0) (net_name "") (layers "*.Cu")', text)
+            mod.write_text(text, encoding="utf-8")
     (KICAD_DIR / "sym-lib-table").write_text(
         '(sym_lib_table\n  (version 7)\n  (lib (name "SGM")(type "KiCad")(uri "${KIPRJMOD}/lib/smart_gas_meter.kicad_sym")'
         '(options "")(descr "Project-local copies of KiCad 7.0.11 stock symbols used by v0.2"))\n)\n', encoding="utf-8")
@@ -356,29 +390,56 @@ def write_libraries(share: Path, symbols: dict[str, str]) -> None:
         '(options "")(descr "Project-local copies of KiCad 7.0.11 stock footprints used by v0.2"))\n)\n', encoding="utf-8")
 
 
-PROJECT_FILE = """{
-  "meta": {
-    "filename": "smart_gas_meter_iot.kicad_pro",
-    "version": 1
-  },
-  "schematic": {
-    "legacy_lib_dir": "",
-    "legacy_lib_list": []
-  },
-  "sheets": [
-    [
-      "%s",
-      ""
-    ]
-  ],
-  "text_variables": {}
-}
+def _netclass(name: str, track: float, clearance: float, via: float, drill: float,
+              priority: int, dp_width: float = 0.2, dp_gap: float = 0.25) -> dict:
+    return {"bus_width": 12, "clearance": clearance, "diff_pair_gap": dp_gap, "diff_pair_via_gap": 0.25,
+            "diff_pair_width": dp_width, "line_style": 0, "microvia_diameter": 0.3, "microvia_drill": 0.1,
+            "name": name, "pcb_color": "rgba(0, 0, 0, 0.000)", "priority": priority,
+            "schematic_color": "rgba(0, 0, 0, 0.000)", "track_width": track, "via_diameter": via,
+            "via_drill": drill, "wire_width": 6}
+
+
+DESIGN_RULES = """(version 1)
+# Project design rules for carrier board v0.2 (generated by tools/generate_schematic.py).
+# No custom rules yet: board-setup constraints (in the .kicad_pcb) apply.
 """
+
+
+def project_file() -> str:
+    """KiCad 9 project with net classes used by the PCB (single source of truth)."""
+    data = {
+        "board": {"design_settings": {"rules": dict(layout.BOARD_RULES)}},
+        "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 3},
+        "net_settings": {
+            "classes": [
+                _netclass("Default", 0.25, 0.2, 0.6, 0.3, 2147483647),
+                # 0.4 mm on 1 oz outer copper carries > 1 A; narrow enough for the USB4105 pads.
+                _netclass("Power", 0.4, 0.2, 0.8, 0.4, 0),
+                # Native USB 2.0 full-speed pair; 0.2/0.2 mm on the outer layer of a JLC 4-layer stack.
+                _netclass("USB", 0.2, 0.2, 0.6, 0.3, 1, dp_width=0.2, dp_gap=0.2),
+            ],
+            "meta": {"version": 4},
+            "net_colors": None,
+            "netclass_assignments": None,
+            "netclass_patterns": [
+                {"netclass": "Power", "pattern": pattern}
+                for pattern in ("GND", "+5V", "+3V3", "/USB_VBUS", "/MODEM_VIN", "/REG_SW")
+            ] + [{"netclass": "USB", "pattern": "/USB_D*"}],
+        },
+        "schematic": {"legacy_lib_dir": "", "legacy_lib_list": []},
+        "sheets": [[uid("root"), ""]],
+        "text_variables": {},
+    }
+    return json.dumps(data, indent=2) + "\n"
+
+
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--kicad-share", type=Path, default=Path("/usr/share/kicad"))
+    parser.add_argument("--kicad-3d", type=Path, default=None,
+                        help="KiCad 3dmodels directory to vendor STEP models from (default: <share>/3dmodels)")
     parser.add_argument("--check", action="store_true",
                         help="do not write; fail if the committed schematic differs from design_v02.py")
     args = parser.parse_args()
@@ -391,8 +452,10 @@ def main() -> int:
         print("Committed schematic matches design_v02.py.")
         return 0
     (KICAD_DIR / f"{PROJECT}.kicad_sch").write_text(text, encoding="utf-8")
-    write_libraries(args.kicad_share, symbols)
-    (KICAD_DIR / f"{PROJECT}.kicad_pro").write_text(PROJECT_FILE % uid("root"), encoding="utf-8")
+    models_3d = args.kicad_3d or args.kicad_share / "3dmodels"
+    write_libraries(args.kicad_share, symbols, models_3d if models_3d.exists() else None)
+    (KICAD_DIR / f"{PROJECT}.kicad_pro").write_text(project_file(), encoding="utf-8")
+    (KICAD_DIR / f"{PROJECT}.kicad_dru").write_text(DESIGN_RULES, encoding="utf-8")
     print(f"Wrote {PROJECT}.kicad_sch with {len(design.PARTS)} parts and "
           f"{len(design.expected_nets())} nets; {len(symbols)} library symbols.")
     return 0

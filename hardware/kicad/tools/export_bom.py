@@ -19,6 +19,8 @@ import design_v02 as design  # noqa: E402
 def grouped():
     groups: OrderedDict[tuple, list[str]] = OrderedDict()
     for part in design.PARTS:
+        if part.symbol == "TestPoint":
+            continue  # bare copper pads, nothing to buy or place
         key = (part.value, part.footprint, part.mpn, part.fields.get("Manufacturer", ""),
                part.fields.get("LCSC", ""), part.dnp)
         groups.setdefault(key, []).append(part.ref)
@@ -46,7 +48,7 @@ def main() -> int:
         f"# BOM — carrier board v{rev} (generated from `design_v02.py`)\n\n"
         "Exact parts selected for schematic freeze; see [PART_SELECTION.md](../PART_SELECTION.md) for ratings and reasoning. "
         "Prices and stock change daily — re-check before ordering. **Not approved for purchase until the PCB and freeze review are signed off.**\n\n"
-        "`hand-fit` = generic 2.54 mm headers fitted by hand; test points are bare pads and are not purchased.\n\n"
+        "`hand-fit` = generic 2.54 mm headers fitted by hand. Test points TP1–TP9 are bare copper pads and are not listed.\n\n"
         + "\n".join(rows) + "\n", encoding="utf-8")
     print(f"Wrote BOM-v{rev}.md and BOM-v{rev}-jlcpcb.csv ({len(design.PARTS)} parts)")
     return 0

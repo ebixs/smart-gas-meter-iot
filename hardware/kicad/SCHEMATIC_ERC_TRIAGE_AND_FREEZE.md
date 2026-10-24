@@ -65,14 +65,14 @@ Status for v0.2-rc1 (2026-10-24). Evidence: [PART_SELECTION.md](PART_SELECTION.m
 - [x] ERC reviewed with zero violations (KiCad 9.0.3: 0 errors, 0 warnings, no exclusions).
 
 ## Board gate (stage 3)
-Do not route or release a board until the schematic netlist and footprints pass review. Board acceptance requires:
-- [ ] Board outline and mounting-hole coordinates frozen.
-- [ ] ESP32 antenna keep-out maintained per module datasheet.
-- [ ] USB differential pair routed to the chosen stack-up/impedance guidance.
-- [ ] Regulator switching loop and return paths minimized.
-- [ ] Connector accessibility and test-point spacing checked.
-- [ ] DRC report reviewed; zero unintended violations.
-- [ ] 3D model positions and clearances reviewed against actual parts.
+Status for v0.2-rc1 PCB (2026-10-24). Evidence: [PCB_DESIGN.md](PCB_DESIGN.md), [DRC report](exports/pcb/drc-kicad-9.rpt).
+- [x] Board outline (100 × 70 mm) and M3 mounting-hole coordinates defined in `pcb_layout_v02.py`.
+- [x] ESP32 antenna keep-out maintained on all copper layers; module antenna end at the board edge.
+- [ ] USB differential pair hand-tuned to the board-house stack-up. Currently autorouted with a 3.7 mm skew, which is acceptable for full-speed USB.
+- [ ] Regulator switching loop and return paths reviewed against the datasheet layout example. The loop is compact, but the formal review is open.
+- [x] Connector accessibility and test-point spacing checked (headers and buttons on the top side, labelled).
+- [x] DRC reviewed: 0 violations, 0 unconnected pads, 0 schematic-parity issues.
+- [ ] 3D model positions and clearances reviewed against actual parts (renders exported; mechanical review open).
 
 ## Safety and use boundary
 Bench prototype only. Use a current-limited low-voltage supply and a synthetic 3.3 V pulse source. Never connect to a live gas meter, gas line, valve, utility wiring, or unknown field signal. No valve actuation is included. Anomalous pulse patterns are not proof of a gas leak.

@@ -66,10 +66,11 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] Rebuild the native KiCad schematic from a reviewed design table (v0.2): KiCad 9 ERC 0 errors / 0 warnings, exported netlist checked pin-by-pin against the design.
 - [x] Select exact, orderable parts (MPN + LCSC) checked against datasheets; schematic freeze candidate v0.2-rc1 ([part selection](hardware/kicad/PART_SELECTION.md)).
 - [ ] Second-engineer sign-off of the schematic freeze.
-- [ ] Create and verify routed KiCad PCB and actual 3D assembly/exploded views.
+- [x] Create a routed 4-layer KiCad PCB from the schematic: KiCad 9 DRC 0 violations / 0 unconnected / 0 schematic-parity issues, with CAD-derived 3D renders ([PCB design](hardware/kicad/PCB_DESIGN.md)).
+- [ ] Hand-tune the USB pair, review the power layout and DFM, and get second-engineer sign-off before ordering boards.
 - [ ] Complete BOM with exact parts, footprints and approved alternates.
-- [ ] Run and review electrical-rule and design-rule checks.
-- [ ] Export and inspect Gerbers, drill, assembly and pick-and-place files.
+- [x] Run electrical-rule and design-rule checks (ERC and DRC clean; reports in `hardware/kicad/exports/`).
+- [x] Export Gerbers, drill, BOM and pick-and-place files as **review artefacts** (not released for fabrication).
 - [x] Add a development-only FastAPI + SQLite ingestion API with duplicate-safe records, bearer-token protection, pulse-delta reporting and a local dashboard (`/dashboard`).
 - [ ] Add per-device identity/credentials, production database hardening, firmware, billing and analytics.
 - [ ] Run recorded low-voltage bench tests and later region-specific radio validation.
@@ -97,7 +98,7 @@ The project is being developed as a practical engineering portfolio: from circui
 
 ### وضعیت واقعی پروژه
 
-مستندات معماری، نیازمندی‌ها، رابط مودم، نگاشت اولیه پایه‌ها و برنامه آمادگی ساخت در مخزن قرار گرفته‌اند. شماتیک بومی KiCad نسخه v0.2 از نو و به‌صورت کنترل‌شده ساخته شده و ERC آن بدون خطاست؛ اما هنوز بازبینی مهندسی و فریز نشده و **PCB مسیریابی‌شده، نمای سه‌بعدی استخراج‌شده از CAD و فایل‌های ساخت هنوز تولید و اعتبارسنجی نشده‌اند**؛ بنابراین پروژه هنوز آماده سفارش PCB یا مونتاژ نیست.
+مستندات معماری، نیازمندی‌ها، رابط مودم، نگاشت اولیه پایه‌ها و برنامه آمادگی ساخت در مخزن قرار گرفته‌اند. شماتیک بومی KiCad نسخه v0.2 به‌صورت کنترل‌شده از نو ساخته شده و ERC آن بدون خطاست. PCB چهارلایه هم از روی همین شماتیک مسیرکشی شده و DRC آن بدون خطا و کاملاً منطبق با شماتیک است. با این حال **فایل‌های ساخت فقط برای بازبینی هستند** و پیش از سفارش، مسیر USB، چیدمان تغذیه و بررسی مهندس دوم باید تکمیل شود؛ بنابراین پروژه هنوز آماده سفارش PCB یا مونتاژ نیست.
 
 ### نقشه راه
 
@@ -109,10 +110,10 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] بازسازی شماتیک بومی KiCad از جدول طراحی (v0.2): ERC در KiCad 9 بدون خطا و هشدار، و تطبیق پایه‌به‌پایه نت‌لیست با طراحی.
 - [x] انتخاب قطعات دقیق و قابل سفارش (MPN و کد LCSC) با بررسی دیتاشیت؛ نسخه‌ی کاندید فریز شماتیک v0.2-rc1.
 - [ ] تأیید نهایی فریز شماتیک توسط یک مهندس دوم.
-- [ ] طراحی و مسیریابی PCB و بررسی DRC.
-- [ ] استخراج نمای سه‌بعدی مونتاژ و انفجاری از مدل واقعی PCB.
+- [x] طراحی و مسیرکشی PCB چهارلایه و بررسی DRC (بدون خطا، بدون اتصال باز و منطبق با شماتیک).
+- [x] استخراج نمای سه‌بعدی از مدل واقعی PCB.
 - [ ] تکمیل BOM، فوت‌پرینت‌ها و قطعات جایگزین.
-- [ ] تولید و بررسی Gerber، فایل سوراخ‌کاری و فایل‌های مونتاژ.
+- [x] تولید Gerber، فایل سوراخ‌کاری و فایل‌های مونتاژ برای بازبینی (هنوز برای سفارش ساخت تأیید نشده).
 - [ ] اجرای آزمون‌های ثبت‌شده با مدار کم‌ولتاژ.
 - [ ] ارزیابی تخصصی ایمنی، اندازه‌گیری، رادیویی، EMC و مقررات پیش از استفاده عملیاتی.
 
@@ -125,7 +126,7 @@ The project is being developed as a practical engineering portfolio: from circui
 
 Smart Gas Meter IoT is a modular engineering prototype for simulated pulse acquisition, cellular telemetry, data analysis and draft billing. The repository documents the intended design and separates documented proposals from implemented and verified hardware.
 
-The current baseline proposes an ESP32-S3 controller, a modular cellular interface and a larger test-friendly PCB. A development-only FastAPI + SQLite service and local dashboard now accept/view synthetic telemetry, require a shared bearer token for data endpoints, and reject conflicting duplicate sequences. It is not production-secure and does not yet provide per-device credentials. A rebuilt native KiCad schematic (freeze candidate v0.2-rc1, exact parts selected) passes KiCad 9 ERC with no violations, but awaits second-engineer sign-off; a routed PCB, CAD-derived 3D views and manufacturing outputs are not yet available or validated. Only isolated low-voltage laboratory tests using synthetic pulses are in scope at this stage.
+The current baseline proposes an ESP32-S3 controller, a modular cellular interface and a larger test-friendly PCB. A development-only FastAPI + SQLite service and local dashboard now accept/view synthetic telemetry, require a shared bearer token for data endpoints, and reject conflicting duplicate sequences. It is not production-secure and does not yet provide per-device credentials. A rebuilt native KiCad schematic (freeze candidate v0.2-rc1, exact parts selected) passes KiCad 9 ERC with no violations, but awaits second-engineer sign-off; a routed 4-layer PCB passes DRC with schematic parity and has CAD-derived 3D renders; Gerbers exist as review artefacts only, pending USB-pair tuning, power-layout/DFM review and sign-off. Only isolated low-voltage laboratory tests using synthetic pulses are in scope at this stage.
 
 ---
 
@@ -164,10 +165,11 @@ No license has been selected yet. Until a license is added, the repository shoul
 
 
 ### v0.2 hardware design drafts
+- [PCB design & 3D renders](hardware/kicad/PCB_DESIGN.md) · [DRC report](hardware/kicad/exports/pcb/drc-kicad-9.rpt) · [Gerbers (review only)](hardware/kicad/exports/pcb/gerbers/)
 - [Native schematic v0.2-rc1 (PDF)](hardware/kicad/exports/smart_gas_meter_iot-schematic.pdf) · [KiCad ERC report](hardware/kicad/exports/erc-kicad-9.0.3.rpt) · [BOM](hardware/kicad/exports/BOM-v0.2-rc1.md) · [JLCPCB BOM (CSV)](hardware/kicad/exports/BOM-v0.2-rc1-jlcpcb.csv) · [Part selection](hardware/kicad/PART_SELECTION.md)
 - [Design table — single source of truth](hardware/kicad/design_v02.py) and [how the schematic is generated and verified](hardware/kicad/README.md)
 - [Candidate pin-to-net map (CSV)](hardware/kicad/board-v0.2-netlist-draft.csv)
 - [PCB placement and routing plan](hardware/kicad/board-v0.2-layout-plan.md)
 - [Native KiCad delivery gate](hardware/kicad/NATIVE_CAD_DELIVERY_GATE.md)
 
-The schematic is ERC-clean but still an engineering draft: no routed PCB or fabrication package exists yet. Engineering review, DRC and component-level verification remain release gates.
+Schematic (ERC-clean) and routed PCB (DRC-clean, schematic parity) exist for review. Fabrication still waits on USB-pair tuning, power-layout/DFM review, land-pattern checks and sign-off.

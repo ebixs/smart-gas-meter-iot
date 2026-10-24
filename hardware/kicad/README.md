@@ -1,6 +1,6 @@
 # Native KiCad project — carrier board v0.2
 
-**Status: v0.2-rc1 — schematic freeze candidate with exact parts selected ([PART_SELECTION.md](PART_SELECTION.md)). ERC-clean; awaiting second-engineer sign-off. No PCB yet — not fabrication-ready.**
+**Status: v0.2-rc1 — schematic freeze candidate with exact parts selected ([PART_SELECTION.md](PART_SELECTION.md)). ERC-clean; awaiting second-engineer sign-off. Routed 4-layer PCB is DRC-clean with schematic parity ([PCB_DESIGN.md](PCB_DESIGN.md)); not released for fabrication.**
 Bench-only prototype: current-limited low-voltage supply and a synthetic 3.3 V pulse source. Never connect it to a live gas meter, gas line, valve, mains or field wiring.
 
 ![Schematic v0.2-rc1](exports/smart_gas_meter_iot-schematic.png)
@@ -17,6 +17,10 @@ Bench-only prototype: current-limited low-voltage supply and a synthetic 3.3 V p
 | `tools/export_bom.py` | Writes the review BOM and the JLCPCB assembly BOM from `design_v02.py` |
 | `check_netlist_matches_design.py` | Compares a KiCad-exported netlist with `design_v02.py`, pin by pin |
 | `check_netlist_invariants.py` | Guardrail for the blocking faults found in the frozen draft (GND on supply rails, shorted capacitors, legacy dev-board headers, modem on 3V3) |
+| `pcb_layout_v02.py`, `tools/build_pcb.py` | PCB placement table and KiCad 9 build/autoroute script |
+| `smart_gas_meter_iot.kicad_pcb` | Routed 4-layer PCB (source of truth for copper) |
+| `tools/export_pcb.sh` | DRC with schematic parity, Gerbers, drill, CPL, layer PDFs, 3D renders → `exports/pcb/` |
+| `lib/3d/` | STEP models for every footprint (paths use `${KIPRJMOD}`) |
 | `exports/` | Schematic PDF/PNG, KiCad 9 ERC report, exported netlist and review/JLCPCB BOMs for `v0.2-rc1` |
 | `archive/v0.2-frozen-2026-10-23/` | The frozen first draft, kept unchanged as evidence (65 ERC messages, +5V/GND short) |
 
@@ -62,7 +66,7 @@ To change the circuit, edit `design_v02.py`, regenerate, and commit the schemati
 
 Exact parts, ratings and pinout checks are recorded in [PART_SELECTION.md](PART_SELECTION.md). The electrical freeze checklist in `SCHEMATIC_ERC_TRIAGE_AND_FREEZE.md` is complete apart from two items. One is the land-pattern overlay against manufacturer drawings, done at PCB stage. The other is the second-engineer sign-off. The modem SKU is deliberately still open: J6 is an interface placeholder.
 
-Next step: create the PCB from this exact revision (`CONTROLLED_REBUILD_SPEC.md`, steps 6–9).
+The PCB has been created from this exact revision; see [PCB_DESIGN.md](PCB_DESIGN.md) for its checks and the review items left before fabrication.
 
 ## Library licence
 
