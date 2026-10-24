@@ -1,5 +1,7 @@
 # Reference attribution and design status
 
+> **Update 2026-10-24:** the attribution below applies to the **archived** draft in `archive/v0.2-frozen-2026-10-23/`. The active v0.2-draft2 schematic was rebuilt from `design_v02.py` using only KiCad 7.0.11 stock-library symbols and footprints (copied into `lib/`). No 74th/esp32-dev-boards symbols remain in it. The MIT licence notice is kept because the archived file is still distributed.
+
 The current native KiCad schematic is adapted from the ESP32-S3-WROOM-1 example in **74th/esp32-dev-boards**.
 
 - Upstream repository: https://github.com/74th/esp32-dev-boards

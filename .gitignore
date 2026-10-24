@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+# KiCad local/editor state
+*.kicad_prl
+*-backups/
+_autosave-*
+fp-info-cache
+~*.lck

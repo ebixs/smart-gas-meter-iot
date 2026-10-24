@@ -1,5 +1,7 @@
 # v0.2 schematic ERC triage and freeze checklist
 
+> **Update 2026-10-24:** the findings below refer to the **archived** frozen draft (`archive/v0.2-frozen-2026-10-23/`). The active schematic is the controlled rebuild v0.2-draft2: KiCad 9.0.3 ERC 0 errors / 0 warnings ([report](exports/erc-kicad-9.0.3.rpt)), no exclusions. Its netlist passes the invariant guardrail and matches `design_v02.py` pin by pin. The freeze checklist at the end of this file remains open until the exact-part and datasheet review is done.
+
 **Status: OPEN — not approved for fabrication.** This file tracks real electrical review items. It does not waive KiCad ERC/DRC.
 
 ## Current CI evidence
