@@ -53,7 +53,7 @@ FOOTPRINT_SOURCES = {
     "Fuse_1206_3216Metric": "Fuse",
     "D_SMA": "Diode_SMD",
     "SOT-23-6": "Package_TO_SOT_SMD", "TSOT-23-6": "Package_TO_SOT_SMD",
-    "L_Taiyo-Yuden_NR-40xx": "Inductor_SMD",
+    "L_Sunlord_SWPA4030S": "Inductor_SMD",
     "ESP32-S3-WROOM-1": "RF_Module",
     "SW_SPST_TL3342": "Button_Switch_SMD",
     "LED_0603_1608Metric": "LED_SMD",
@@ -218,6 +218,7 @@ class Sheet:
             "Reference": part.ref, "Value": part.value,
             "Footprint": f"{design.LIB}:{part.footprint}", "Datasheet": "~",
             "MPN": part.mpn, "Design_Note": part.note or "-", "Block": part.block,
+            **part.fields,
         }
         lines = [f'  (symbol (lib_id "{design.LIB}:{part.symbol}") (at {fmt(x)} {fmt(y)} 0) (unit 1)',
                  f"    (in_bom yes) (on_board yes) (dnp {'yes' if part.dnp else 'no'})",
