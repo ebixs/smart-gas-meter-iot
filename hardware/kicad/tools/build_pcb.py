@@ -155,6 +155,8 @@ def build() -> pcbnew.BOARD:
         # Keep reference designators readable and off pads.
         fp.Reference().SetTextSize(pcbnew.VECTOR2I(MM(0.8), MM(0.8)))
         fp.Reference().SetTextThickness(MM(0.12))
+        if part.ref in layout.FAB_ONLY_REFERENCES:
+            fp.Reference().SetLayer(pcbnew.F_Fab)
 
     for ref, name, x, y in layout.MOUNTING_HOLES:
         fp = load_footprint(name)
