@@ -402,7 +402,7 @@ DESIGN_RULES = """(version 1)
 # Hand-soldered 2.54 mm headers sit between neighbouring pads and tracks, so one
 # resolved thermal spoke is accepted for through-hole pads; SMD pads connect solid.
 (rule "THT header thermal spokes"
-  (condition "A.Type == 'Pad' && A.Pad_Type == 'Through-hole'")
+  (condition "A.Pad_Type == 'Through-hole' || B.Pad_Type == 'Through-hole'")
   (constraint min_resolved_spokes (min 1)))
 """
 

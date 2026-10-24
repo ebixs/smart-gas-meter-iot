@@ -108,7 +108,7 @@ def build() -> pcbnew.BOARD:
     ds.m_MinThroughDrill = MM(0.2)
     # GCT's USB4105 land pattern puts its locating holes 0.19 mm from the GND pads.
     ds.m_HoleClearance = MM(0.15)
-    ds.m_HoleToHoleMin = MM(0.5)
+    ds.m_HoleToHoleMin = MM(0.4)  # JLCPCB via-to-via hole spacing is well below this
     ds.m_CopperEdgeClearance = MM(0.3)
 
     title = board.GetTitleBlock()

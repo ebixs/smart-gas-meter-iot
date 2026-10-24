@@ -28,7 +28,7 @@ PLACEMENT: dict[str, tuple[float, float, float]] = {
     "U1": (68.0, 13.25, 0),
     "C7": (56.5, 8.2, 0),
     "C6": (56.5, 10.8, 0),
-    "R3": (52.5, 8.2, 0),
+    "R3": (52.5, 8.2, 180),  # +3V3 end next to C7, away from the antenna keep-out
     "C8": (52.5, 10.8, 0),
     "TP5": (48.5, 8.2, 0),
     "SW1": (40.0, 30.0, 0),
