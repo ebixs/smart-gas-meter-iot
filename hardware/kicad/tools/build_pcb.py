@@ -134,15 +134,14 @@ def build() -> pcbnew.BOARD:
     board.SetCopperLayerCount(layout.LAYERS)
     ds = board.GetDesignSettings()
     ds.SetCopperLayerCount(layout.LAYERS)
-    ds.m_MinClearance = MM(0.15)
-    ds.m_TrackMinWidth = MM(0.15)
-    ds.m_ViasMinSize = MM(0.5)
-    # JLCPCB 4-layer capability: 0.2 mm min drill (the ESP32 module's thermal vias use 0.2 mm).
-    ds.m_MinThroughDrill = MM(0.2)
-    # GCT's USB4105 land pattern puts its locating holes 0.19 mm from the GND pads.
-    ds.m_HoleClearance = MM(0.15)
-    ds.m_HoleToHoleMin = MM(0.4)  # JLCPCB via-to-via hole spacing is well below this
-    ds.m_CopperEdgeClearance = MM(0.3)
+    rules = layout.BOARD_RULES
+    ds.m_MinClearance = MM(rules["min_clearance"])
+    ds.m_TrackMinWidth = MM(rules["min_track_width"])
+    ds.m_ViasMinSize = MM(rules["min_via_diameter"])
+    ds.m_MinThroughDrill = MM(rules["min_through_hole_diameter"])
+    ds.m_HoleClearance = MM(rules["min_hole_clearance"])
+    ds.m_HoleToHoleMin = MM(rules["min_hole_to_hole"])
+    ds.m_CopperEdgeClearance = MM(rules["min_copper_edge_clearance"])
 
     title = board.GetTitleBlock()
     title.SetTitle(design.TITLE)

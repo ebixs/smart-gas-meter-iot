@@ -19,6 +19,23 @@ ORIGIN = (100.0, 50.0)  # board top-left in KiCad page coordinates
 CORNER_R = 2.0
 LAYERS = 4  # F.Cu signal / In1 solid GND / In2 signal + 3V3 pour / B.Cu signal
 
+# Board setup constraints (mm). KiCad stores these in the .kicad_pro, so they are written
+# there by tools/generate_schematic.py and applied by tools/build_pcb.py from this one table.
+# Values sit inside JLCPCB's standard 4-layer capability.
+BOARD_RULES = {
+    "min_clearance": 0.15,
+    "min_track_width": 0.15,
+    "min_via_diameter": 0.5,
+    "min_via_annular_width": 0.1,
+    "min_through_hole_diameter": 0.2,  # ESP32-S3 module thermal vias use 0.2 mm
+    "min_hole_clearance": 0.15,  # GCT USB4105 locating holes sit 0.19 mm from its GND pads
+    "min_hole_to_hole": 0.4,
+    "min_copper_edge_clearance": 0.3,
+    "min_text_height": 0.8,
+    "min_text_thickness": 0.08,
+    "min_resolved_spokes": 2,
+}
+
 # ref: (x, y, rotation)
 # The ESP32-S3 module sits right of centre: its left-hand pins (EN, IO4-IO7, IO15, IO17/18,
 # USB D-/D+) face the lab-interface cluster and USB/power on the left, its bottom-row pins

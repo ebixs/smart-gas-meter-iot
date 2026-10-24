@@ -1,4 +1,21 @@
 {
+  "board": {
+    "design_settings": {
+      "rules": {
+        "min_clearance": 0.15,
+        "min_track_width": 0.15,
+        "min_via_diameter": 0.5,
+        "min_via_annular_width": 0.1,
+        "min_through_hole_diameter": 0.2,
+        "min_hole_clearance": 0.15,
+        "min_hole_to_hole": 0.4,
+        "min_copper_edge_clearance": 0.3,
+        "min_text_height": 0.8,
+        "min_text_thickness": 0.08,
+        "min_resolved_spokes": 2
+      }
+    }
+  },
   "meta": {
     "filename": "smart_gas_meter_iot.kicad_pro",
     "version": 3

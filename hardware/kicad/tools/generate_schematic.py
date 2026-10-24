@@ -27,6 +27,7 @@ from pathlib import Path
 KICAD_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(KICAD_DIR))
 import design_v02 as design  # noqa: E402
+import pcb_layout_v02 as layout  # noqa: E402
 
 PROJECT = "smart_gas_meter_iot"
 GRID = 1.27
@@ -407,6 +408,7 @@ DESIGN_RULES = """(version 1)
 def project_file() -> str:
     """KiCad 9 project with net classes used by the PCB (single source of truth)."""
     data = {
+        "board": {"design_settings": {"rules": dict(layout.BOARD_RULES)}},
         "meta": {"filename": f"{PROJECT}.kicad_pro", "version": 3},
         "net_settings": {
             "classes": [

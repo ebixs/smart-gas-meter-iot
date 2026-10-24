@@ -55,6 +55,11 @@ class BoardFileTests(unittest.TestCase):
                                 self.text)
         self.assertEqual(tracks_in1, [])
 
+    def test_project_carries_board_rules(self):
+        import json
+        project = json.loads((KICAD / "smart_gas_meter_iot.kicad_pro").read_text(encoding="utf-8"))
+        self.assertEqual(project["board"]["design_settings"]["rules"], layout.BOARD_RULES)
+
     def test_antenna_keepout_covers_all_copper(self):
         footprint = (KICAD / "lib" / f"{design.LIB}.pretty" / "ESP32-S3-WROOM-1.kicad_mod").read_text()
         self.assertIn('(layers "*.Cu")', footprint)
