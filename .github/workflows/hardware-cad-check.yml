@@ -45,31 +45,45 @@ jobs:
         run: |
           set +e
           set -uo pipefail
-          kicad-cli version
+          echo "::notice title=KiCad version::$(kicad-cli version)"
           mkdir -p /tmp/schematic-preview /tmp/netlists /tmp/gerbers /tmp/drill /tmp/cad-reports
           failed=0
+          # Report failures and report summaries as annotations so they are visible on the PR
+          # (and through the checks API) without downloading logs or artifacts.
+          fail() { echo "::error title=CAD check::$*"; failed=1; }
+          check() {  # run a python check; on failure surface its first lines as annotations
+            local title="$1"; shift
+            local out; out="$("$@" 2>&1)"; local rc=$?
+            echo "$out"
+            if [ "$rc" -ne 0 ]; then
+              echo "$out" | head -6 | while read -r line; do echo "::error title=$title::$line"; done
+              failed=1
+            fi
+          }
+          summarize() {
+            grep -E "^\*\* Found|ERC messages|^\[[a-z_]+\]" "$2" 2>/dev/null | sed -E 's/\(.*//' | sort | uniq -c \
+              | head -8 | while read -r line; do echo "::notice title=$1::$line"; done
+          }
           while IFS= read -r -d '' file; do
             base="$(basename "$file" .kicad_sch)"
             echo "Running ERC: $file"
             kicad-cli sch erc --exit-code-violations --output "/tmp/cad-reports/$base-erc.rpt" "$file"
             rc=$?
+            summarize "ERC $base" "/tmp/cad-reports/$base-erc.rpt"
             if [ "$rc" -eq 0 ]; then
               echo "ERC passed: $file"
             else
-              echo "ERC failed (exit $rc): $file"
-              failed=1
+              fail "ERC failed (exit $rc): $file"
             fi
             kicad-cli sch export svg "$file" --output "/tmp/schematic-preview/"
             rc=$?
             if [ "$rc" -ne 0 ]; then
-              echo "Schematic SVG export failed (exit $rc): $file"
-              failed=1
+              fail "Schematic SVG export failed (exit $rc): $file"
             fi
             kicad-cli sch export netlist "$file" --output "/tmp/netlists/$base.net"
             rc=$?
             if [ "$rc" -ne 0 ]; then
-              echo "Netlist export failed (exit $rc): $file"
-              failed=1
+              fail "Netlist export failed (exit $rc): $file"
             fi
           done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_sch' -print0)
           while IFS= read -r -d '' file; do
@@ -77,49 +91,32 @@ jobs:
             echo "Running DRC: $file"
             kicad-cli pcb drc --schematic-parity --severity-all --exit-code-violations --output "/tmp/cad-reports/$base-drc.rpt" "$file"
             rc=$?
+            summarize "DRC $base" "/tmp/cad-reports/$base-drc.rpt"
             if [ "$rc" -eq 0 ]; then
               echo "DRC passed: $file"
             else
-              echo "DRC failed (exit $rc): $file"
-              failed=1
+              fail "DRC failed (exit $rc): $file"
             fi
             kicad-cli pcb export gerbers "$file" --output "/tmp/gerbers/"
             rc=$?
             if [ "$rc" -ne 0 ]; then
-              echo "Gerber export failed (exit $rc): $file"
-              failed=1
+              fail "Gerber export failed (exit $rc): $file"
             fi
             kicad-cli pcb export drill "$file" --output "/tmp/drill/"
             rc=$?
             if [ "$rc" -ne 0 ]; then
-              echo "Drill export failed (exit $rc): $file"
-              failed=1
+              fail "Drill export failed (exit $rc): $file"
             fi
           done < <(find hardware/kicad -maxdepth 1 -type f -name '*.kicad_pcb' -print0)
           while IFS= read -r -d '' file; do
             echo "Checking exported netlist invariants: $file"
-            python3 hardware/kicad/check_netlist_invariants.py "$file"
-            rc=$?
-            if [ "$rc" -ne 0 ]; then
-              echo "Netlist invariant check failed (exit $rc): $file"
-              failed=1
-            fi
+            check "Netlist invariants" python3 hardware/kicad/check_netlist_invariants.py "$file"
           done < <(find /tmp/netlists -maxdepth 1 -type f -name '*.net' -print0)
           if [ -f /tmp/netlists/smart_gas_meter_iot.net ]; then
             echo "Comparing exported netlist with design_v02.py"
-            python3 hardware/kicad/check_netlist_matches_design.py /tmp/netlists/smart_gas_meter_iot.net
-            rc=$?
-            if [ "$rc" -ne 0 ]; then
-              echo "Netlist does not match design_v02.py (exit $rc)"
-              failed=1
-            fi
+            check "Netlist vs design" python3 hardware/kicad/check_netlist_matches_design.py /tmp/netlists/smart_gas_meter_iot.net
           fi
-          python3 hardware/kicad/tools/generate_schematic.py --check
-          rc=$?
-          if [ "$rc" -ne 0 ]; then
-            echo "Committed schematic is out of date with design_v02.py (exit $rc)"
-            failed=1
-          fi
+          check "Schematic sync" python3 hardware/kicad/tools/generate_schematic.py --check
           if [ "$failed" -ne 0 ]; then
             echo "::error::One or more CAD checks/exports/netlist invariants failed. Review uploaded reports; ERC/DRC violations are not suppressed."
             exit 1
