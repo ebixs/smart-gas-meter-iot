@@ -21,7 +21,7 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Interactive Project Gallery](hardware/visualization/project-gallery.html) · [3D Concept View](hardware/visualization/smart-gas-meter-exploded.html) · [Visual Design Notes](hardware/visualization/README.md) · [Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [Native KiCad Schematic Draft](hardware/kicad/smart_gas_meter_iot.kicad_sch) · [CAD Reference Attribution](hardware/kicad/REFERENCE_ATTRIBUTION_AND_STATUS.md) · [v0.2 Netlist Draft](hardware/kicad/board-v0.2-netlist-draft.csv) · [v0.2 PCB Layout Plan](hardware/kicad/board-v0.2-layout-plan.md) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
+[Interactive Project Gallery](hardware/visualization/project-gallery.html) · [3D Concept View](hardware/visualization/smart-gas-meter-exploded.html) · [Visual Design Notes](hardware/visualization/README.md) · [Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [Native KiCad Schematic v0.2](hardware/kicad/smart_gas_meter_iot.kicad_sch) · [Schematic PDF](hardware/kicad/exports/smart_gas_meter_iot-schematic.pdf) · [CAD Reference Attribution](hardware/kicad/REFERENCE_ATTRIBUTION_AND_STATUS.md) · [v0.2 Netlist Draft](hardware/kicad/board-v0.2-netlist-draft.csv) · [v0.2 PCB Layout Plan](hardware/kicad/board-v0.2-layout-plan.md) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
 
 </div>
 
@@ -62,7 +62,9 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] Add unit tests for the simulator and GitHub Actions CI workflow.
 - [x] Define the versioned telemetry contract and JSON Schema.
 - [x] Document the initial controller/board concept, cellular interface, product architecture, pinout proposal and release gates.
-- [x] Add a standalone interactive isometric concept illustration (not CAD-derived or fabrication-ready).\n- [ ] Create and verify native KiCad schematic.
+- [x] Add a standalone interactive isometric concept illustration (not CAD-derived or fabrication-ready).
+- [x] Rebuild the native KiCad schematic from a reviewed design table (v0.2-draft2): KiCad 9 ERC 0 errors / 0 warnings, exported netlist checked pin-by-pin against the design.
+- [ ] Engineering review and freeze of the schematic (exact connector/protection/regulator parts, datasheet pin checks).
 - [ ] Create and verify routed KiCad PCB and actual 3D assembly/exploded views.
 - [ ] Complete BOM with exact parts, footprints and approved alternates.
 - [ ] Run and review electrical-rule and design-rule checks.
@@ -94,7 +96,7 @@ The project is being developed as a practical engineering portfolio: from circui
 
 ### وضعیت واقعی پروژه
 
-مستندات معماری، نیازمندی‌ها، رابط مودم، نگاشت اولیه پایه‌ها و برنامه آمادگی ساخت در مخزن قرار گرفته‌اند. اما **شماتیک بومی KiCad، PCB مسیریابی‌شده، نمای سه‌بعدی استخراج‌شده از CAD و فایل‌های ساخت هنوز تولید و اعتبارسنجی نشده‌اند**؛ بنابراین پروژه هنوز آماده سفارش PCB یا مونتاژ نیست.
+مستندات معماری، نیازمندی‌ها، رابط مودم، نگاشت اولیه پایه‌ها و برنامه آمادگی ساخت در مخزن قرار گرفته‌اند. شماتیک بومی KiCad نسخه v0.2 از نو و به‌صورت کنترل‌شده ساخته شده و ERC آن بدون خطاست؛ اما هنوز بازبینی مهندسی و فریز نشده و **PCB مسیریابی‌شده، نمای سه‌بعدی استخراج‌شده از CAD و فایل‌های ساخت هنوز تولید و اعتبارسنجی نشده‌اند**؛ بنابراین پروژه هنوز آماده سفارش PCB یا مونتاژ نیست.
 
 ### نقشه راه
 
@@ -102,7 +104,9 @@ The project is being developed as a practical engineering portfolio: from circui
 - [x] ساخت شبیه‌ساز نرم‌افزاری، ابزار ارسال داده مصنوعی به API و آزمون‌های خودکار.
 - [x] مستندسازی تصمیم‌های اولیه برد، رابط مودم، نقاط تست و معیارهای آماده‌سازی ساخت.
 - [x] افزودن API آزمایشی FastAPI و SQLite با توکن دسترسی، جلوگیری از تکرار، گزارش اختلاف شمارنده پالس و داشبورد محلی (`/dashboard`).
-- [ ] افزودن هویت و اعتبارنامه مستقل برای هر دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.\n- [ ] ساخت شماتیک واقعی KiCad و بررسی ERC.
+- [ ] افزودن هویت و اعتبارنامه مستقل برای هر دستگاه، سخت‌سازی پایگاه داده، فریم‌ور و صورتحساب واقعی.
+- [x] بازسازی شماتیک بومی KiCad از جدول طراحی (نسخه v0.2-draft2): ERC در KiCad 9 بدون خطا و هشدار، و تطبیق پایه‌به‌پایه نت‌لیست با طراحی.
+- [ ] بازبینی مهندسی و فریز شماتیک (انتخاب قطعی کانکتور، محافظ‌ها و رگولاتور و تطبیق با دیتاشیت).
 - [ ] طراحی و مسیریابی PCB و بررسی DRC.
 - [ ] استخراج نمای سه‌بعدی مونتاژ و انفجاری از مدل واقعی PCB.
 - [ ] تکمیل BOM، فوت‌پرینت‌ها و قطعات جایگزین.
@@ -119,7 +123,7 @@ The project is being developed as a practical engineering portfolio: from circui
 
 Smart Gas Meter IoT is a modular engineering prototype for simulated pulse acquisition, cellular telemetry, data analysis and draft billing. The repository documents the intended design and separates documented proposals from implemented and verified hardware.
 
-The current baseline proposes an ESP32-S3 controller, a modular cellular interface and a larger test-friendly PCB. A development-only FastAPI + SQLite service and local dashboard now accept/view synthetic telemetry, require a shared bearer token for data endpoints, and reject conflicting duplicate sequences. It is not production-secure and does not yet provide per-device credentials. Native KiCad files, a routed PCB, CAD-derived 3D views and manufacturing outputs are not yet available or validated. Only isolated low-voltage laboratory tests using synthetic pulses are in scope at this stage.
+The current baseline proposes an ESP32-S3 controller, a modular cellular interface and a larger test-friendly PCB. A development-only FastAPI + SQLite service and local dashboard now accept/view synthetic telemetry, require a shared bearer token for data endpoints, and reject conflicting duplicate sequences. It is not production-secure and does not yet provide per-device credentials. A rebuilt native KiCad schematic (v0.2-draft2) passes KiCad 9 ERC with no violations, but it is not yet engineering-reviewed or frozen; a routed PCB, CAD-derived 3D views and manufacturing outputs are not yet available or validated. Only isolated low-voltage laboratory tests using synthetic pulses are in scope at this stage.
 
 ---
 
@@ -158,8 +162,10 @@ No license has been selected yet. Until a license is added, the repository shoul
 
 
 ### v0.2 hardware design drafts
+- [Native schematic v0.2-draft2 (PDF)](hardware/kicad/exports/smart_gas_meter_iot-schematic.pdf) · [KiCad ERC report](hardware/kicad/exports/erc-kicad-9.0.3.rpt) · [Generated BOM](hardware/kicad/exports/BOM-v0.2-draft2.md)
+- [Design table — single source of truth](hardware/kicad/design_v02.py) and [how the schematic is generated and verified](hardware/kicad/README.md)
 - [Candidate pin-to-net map (CSV)](hardware/kicad/board-v0.2-netlist-draft.csv)
 - [PCB placement and routing plan](hardware/kicad/board-v0.2-layout-plan.md)
 - [Native KiCad delivery gate](hardware/kicad/NATIVE_CAD_DELIVERY_GATE.md)
 
-These are engineering drafts, not a completed electrical schematic, routed PCB, or fabrication package. ERC/DRC and component-level verification remain release gates.
+The schematic is ERC-clean but still an engineering draft: no routed PCB or fabrication package exists yet. Engineering review, DRC and component-level verification remain release gates.

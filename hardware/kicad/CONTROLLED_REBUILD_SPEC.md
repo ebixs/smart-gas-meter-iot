@@ -1,5 +1,7 @@
 # Controlled schematic reconstruction — v0.2
 
+> **Progress 2026-10-24 (v0.2-draft2):** steps 1–5 are done. The frozen draft is archived under `archive/v0.2-frozen-2026-10-23/`. A clean sheet is generated from `design_v02.py` using project-local copies of stock KiCad symbols/footprints. KiCad 9.0.3 ERC reports 0 errors and 0 warnings, and the exported netlist passes `check_netlist_invariants.py` and a pin-by-pin comparison with the design (`check_netlist_matches_design.py`). All required rails (`USB_VBUS`, `+5V`, `+3V3`, `GND`, `MODEM_VIN`) are distinct. The schematic-stage "definition of done" is still open on the exact-part selection and independent datasheet review listed in `README.md`. Step 6 (PCB) has not started.
+
 **Status: implementation contract; not a released schematic.**  
 **Safety boundary:** bench-only, current-limited low-voltage supply and synthetic 3.3 V pulse source. Never connect to a live gas meter, gas line, valve, utility wiring, or an unknown field signal.
 

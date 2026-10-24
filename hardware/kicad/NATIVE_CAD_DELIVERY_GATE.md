@@ -2,7 +2,7 @@
 
 **Current status: engineering draft; not fabrication-ready.**
 
-The repository contains a native KiCad S-expression schematic at `smart_gas_meter_iot.kicad_sch`. It has embedded symbol definitions and placed symbol instances, but the last recorded ERC run reported 65 violations. The presence of a native file does not establish electrical correctness.
+The repository contains a native KiCad schematic at `smart_gas_meter_iot.kicad_sch` (v0.2-draft2). It is generated from `design_v02.py`. KiCad 9.0.3 ERC reports 0 errors and 0 warnings, and the exported netlist matches the design table pin by pin. The previous draft, which had 65 ERC messages and a +5V/GND short, is archived as evidence. A clean ERC is necessary but not sufficient: exact parts, footprints and an independent datasheet review are still required before freeze.
 
 ## Current deliverables
 - `SCHEMATIC_IMPLEMENTATION_PLAN.md`: design scope and proposed signal map.

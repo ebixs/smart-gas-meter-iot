@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "filename": "smart_gas_meter_iot.kicad_pro",
+    "version": 1
+  },
+  "schematic": {
+    "legacy_lib_dir": "",
+    "legacy_lib_list": []
+  },
+  "sheets": [
+    [
+      "52889bd6-86d8-5e4e-8a48-da626b3b0f72",
+      ""
+    ]
+  ],
+  "text_variables": {}
+}

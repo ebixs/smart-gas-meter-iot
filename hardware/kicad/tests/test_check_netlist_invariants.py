@@ -35,12 +35,36 @@ class NetlistInvariantTests(unittest.TestCase):
     def test_rejects_legacy_devboard_headers_with_module(self):
         fixture = '''(export
           (components
-            (comp (ref "U1"))
-            (comp (ref "J1"))
-            (comp (ref "J2"))
+            (comp (ref "U1") (value "ESP32-S3-WROOM-1")
+              (libsource (lib "Espressif") (part "ESP32-S3-WROOM-1") (description "")))
+            (comp (ref "J1") (value "J1")
+              (libsource (lib "esp32-dev-boards") (part "ESP32-S3-DEVKITC-1-J1-mini") (description "")))
+            (comp (ref "J2") (value "J2")
+              (libsource (lib "esp32-dev-boards") (part "ESP32-S3-DEVKITC-1-J2-mini") (description "")))
           )
           (nets (net (code "1") (name "PULSE_IN")
             (node (ref "U1") (pin "1") (pinfunction "GPIO4")))))'''
+        self.assertEqual(self.run_checker(fixture), 1)
+
+    def test_accepts_module_with_ordinary_connectors_j1_j2(self):
+        fixture = '''(export
+          (components
+            (comp (ref "U1") (value "ESP32-S3-WROOM-1-N8")
+              (libsource (lib "SGM") (part "ESP32-S3-WROOM-1") (description "")))
+            (comp (ref "J1") (value "USB-C")
+              (libsource (lib "SGM") (part "USB_C_Receptacle_USB2.0_16P") (description "")))
+            (comp (ref "J2") (value "PULSE_IN")
+              (libsource (lib "SGM") (part "Conn_01x02") (description "")))
+          )
+          (nets (net (code "1") (name "PULSE_IN")
+            (node (ref "U1") (pin "4") (pinfunction "IO4"))
+            (node (ref "J2") (pin "1") (pinfunction "Pin_1")))))'''
+        self.assertEqual(self.run_checker(fixture), 0)
+
+    def test_rejects_modem_supply_on_3v3(self):
+        fixture = '''(export (components (comp (ref "J6")))
+          (nets (net (code "1") (name "+3V3")
+            (node (ref "J6") (pin "1") (pinfunction "MODEM_VIN")))))'''
         self.assertEqual(self.run_checker(fixture), 1)
 
 
