@@ -2,7 +2,7 @@
 
 > **Update 2026-10-24:** the findings below refer to the **archived** frozen draft (`archive/v0.2-frozen-2026-10-23/`). The active schematic is the controlled rebuild v0.2-draft2: KiCad 9.0.3 ERC 0 errors / 0 warnings ([report](exports/erc-kicad-9.0.3.rpt)), no exclusions. Its netlist passes the invariant guardrail and matches `design_v02.py` pin by pin. The freeze checklist at the end of this file remains open until the exact-part and datasheet review is done.
 
-**Status: OPEN — not approved for fabrication.** This file tracks real electrical review items. It does not waive KiCad ERC/DRC.
+**Status: schematic freeze candidate v0.2-rc1. Board gate OPEN, not approved for fabrication.** This file tracks real electrical review items. It does not waive KiCad ERC/DRC.
 
 ## Current CI evidence
 - Native schematic parses and netlist export is attempted by KiCad CLI.
@@ -52,16 +52,17 @@ The exported `smart_gas_meter_iot.net` was inspected in addition to the ERC summ
 6. Re-run KiCad ERC; only after a clean reviewed report should PCB layout begin.
 
 ## Electrical freeze items
-- [ ] ESP32-S3-WROOM-1-N8 pin-number mapping verified against manufacturer datasheet.
-- [ ] USB-C connector exact manufacturer part number selected; CC1/CC2 Rd and D+/D− pin mapping reviewed.
-- [ ] USB ESD/protection part and VBUS protection selected from datasheets.
-- [ ] 3.3 V regulator selected with verified inductor, input/output capacitor values, current capability and thermal layout.
-- [ ] All module power pins and local decoupling reviewed.
-- [ ] BOOT/EN reset network follows Espressif reference design and startup requirements.
-- [ ] Synthetic pulse input is limited to 3.3 V lab logic, has a defined default state and series protection.
-- [ ] All unconnected pins are either intentionally documented or connected as required.
-- [ ] Footprints match manufacturer package drawings and KiCad pad numbers.
-- [ ] ERC reviewed with zero unintended violations.
+Status for v0.2-rc1 (2026-10-24). Evidence: [PART_SELECTION.md](PART_SELECTION.md), [ERC report](exports/erc-kicad-9.0.3.rpt), `check_netlist_matches_design.py`.
+- [x] ESP32-S3-WROOM-1-N8 pin-number mapping verified against the manufacturer pin table (1 GND, 2 3V3, 3 EN, 13/14 IO19/IO20, 27 IO0, 36/37 RXD0/TXD0, 40/41 GND). Second-engineer review pending.
+- [x] USB-C connector selected (GCT USB4105-GF-A); CC1/CC2 each with its own 5.1 kΩ Rd; D+/D− pin map checked against the GCT pin table.
+- [x] USB ESD (USBLC6-2SC6) and VBUS protection (1206L075/13.2WR PTC + SMAJ6.5CA TVS) selected from datasheets.
+- [x] 3.3 V regulator AP63203WU-7 with datasheet-table passives (3.9 µH Isat 3 A, 10 µF in, 2 × 22 µF 16 V out, 100 nF BST); 2 A rating vs ≈ 0.41 A load. **Thermal layout remains a PCB-stage item.**
+- [x] Module power pin and local decoupling (10 µF + 100 nF) per Espressif guidance.
+- [x] BOOT/EN: 10 kΩ / 1 µF EN RC per Espressif guidelines, RESET to GND, GPIO0 10 kΩ pull-up with BOOT button.
+- [x] Synthetic pulse input: 3.3 V lab logic only, 10 kΩ pull-up default-high, 1 kΩ series, optional DNP filter.
+- [x] All unconnected pins carry explicit no-connect flags and are listed as `NC` in `design_v02.py`; the netlist check proves the NC set is exact.
+- [ ] Footprints match manufacturer package drawings. Symbol pin ↔ pad numbers are verified for all 48 parts; **land-pattern overlay against the drawings is a PCB-stage item.**
+- [x] ERC reviewed with zero violations (KiCad 9.0.3: 0 errors, 0 warnings, no exclusions).
 
 ## Board gate (stage 3)
 Do not route or release a board until the schematic netlist and footprints pass review. Board acceptance requires:

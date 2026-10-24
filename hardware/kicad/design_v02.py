@@ -174,17 +174,64 @@ PARTS: list[Part] = [
     Part("TP9", "TestPoint", "TP_VBUS", "TestPoint_Pad_D1.5mm", (55.88, 190.5), {"1": "USB_VBUS"}, "test"),
 ]
 
+# --------------------------------------------------------------------------- exact part selection
+# Selected 2026-10-24 for schematic freeze v0.2-rc1. Ratings were checked against the
+# manufacturer datasheet / distributor parametric data (LCSC/JLCPCB part pages).
+# See PART_SELECTION.md for the reasoning behind each choice.
+# ref(s): (value, manufacturer, MPN, LCSC code, footprint override or None)
+PART_SELECTION: dict[str, tuple[str, str, str, str, str | None]] = {
+    "J1": ("USB4105-GF-A (USB-C)", "GCT", "USB4105-GF-A", "C3020560", None),
+    "R1 R2": ("5.1k 1%", "UNI-ROYAL", "0603WAF5101T5E", "C23186", None),
+    "F1": ("PTC 0.75A/13.2V", "Littelfuse", "1206L075/13.2WR", "C207036", None),
+    "D1": ("SMAJ6.5CA", "ZHIDE", "SMAJ6.5CA", "C5161320", None),
+    "U2": ("USBLC6-2SC6", "STMicroelectronics", "USBLC6-2SC6", "C7519", None),
+    "U3": ("AP63203WU-7", "Diodes Inc.", "AP63203WU-7", "C780769", None),
+    "C1": ("10uF 25V X7R", "Murata", "GRM31CR71E106KA12L", "C77093", None),
+    "C2 C3 C7 C9 C10": ("100nF 50V", "YAGEO", "CC0603KRX7R9BB104", "C14663", None),
+    "L1": ("3.9uH Isat 3A", "Sunlord", "SWPA4030S3R9MT", "C96899", "L_Sunlord_SWPA4030S"),
+    "C4 C5": ("22uF 16V", "Murata", "GRM21BR61C226ME44L", "C86817", None),
+    "U1": ("ESP32-S3-WROOM-1-N8", "Espressif", "ESP32-S3-WROOM-1-N8", "C2913198", None),
+    "C6": ("10uF 25V", "Samsung", "CL21A106KAYNNNE", "C15850", None),
+    "C8": ("1uF 50V", "Samsung", "CL10A105KB8NNNC", "C15849", None),
+    "R3 R4 R5 R8": ("10k 1%", "UNI-ROYAL", "0603WAF1002T5E", "C25804", None),
+    "R6 R7 R9": ("1k 1%", "UNI-ROYAL", "0603WAF1001T5E", "C21190", None),
+    "R10 R11": ("4.7k 1%", "UNI-ROYAL", "0603WAF4701T5E", "C23162", None),
+    "R12 R13": ("100k 1%", "UNI-ROYAL", "0603WAF1003T5E", "C25803", None),
+    "SW1 SW2": ("TL3342", "E-Switch", "TL3342F160QG", "C2886898", None),
+    "D2": ("Red LED", "Everlight", "19-213SURC/S530-A3/5T", "C2986056", None),
+}
+# Parts without an orderable selection: pin headers (generic 2.54 mm, hand-fitted)
+# and test points (bare copper pads, no component).
+GENERIC_PARTS = {"J2", "J3", "J4", "J5", "J6", "J7", "TP1", "TP2", "TP3", "TP4", "TP5", "TP6", "TP7", "TP8", "TP9"}
+
+
+def _apply_selection() -> None:
+    by_ref = {p.ref: p for p in PARTS}
+    for refs, (value, maker, mpn, lcsc, footprint) in PART_SELECTION.items():
+        for ref in refs.split():
+            part = by_ref[ref]
+            part.value = value + (" (DNP)" if part.dnp else "")
+            part.mpn = mpn
+            part.fields = {"Manufacturer": maker, "LCSC": lcsc}
+            if footprint:
+                part.footprint = footprint
+    for ref in GENERIC_PARTS:
+        by_ref[ref].mpn = "generic"
+
+
+_apply_selection()
+
 # Power-flag locations (mm). A PWR_FLAG marks the net as driven for ERC because
 # these rails are fed through passive parts (fuse, inductor) or the connector.
 PWR_FLAGS = {"+5V": (226.06, 33.02), "+3V3": (241.3, 33.02), "GND": (256.54, 33.02)}
 
 TITLE = "Smart Gas Meter IoT - carrier board v0.2 (controlled rebuild)"
-REVISION = "0.2-draft2"
+REVISION = "0.2-rc1"
 COMMENTS = (
-    "ENGINEERING DRAFT - NOT FABRICATION READY. Generated from design_v02.py.",
+    "SCHEMATIC FREEZE CANDIDATE rc1 - NOT FABRICATION READY. Generated from design_v02.py.",
     "Bench-only: current-limited low-voltage supply + synthetic 3.3V pulse source.",
     "Never connect to a live gas meter, gas line, valve, mains or field wiring.",
-    "Candidate values from datasheet typical applications; verify before freeze.",
+    "Exact parts selected (see PART_SELECTION.md); PCB layout and bench bring-up pending.",
 )
 
 

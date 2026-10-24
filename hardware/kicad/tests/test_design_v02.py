@@ -72,6 +72,39 @@ class DesignTableTests(unittest.TestCase):
         self.assertEqual(nets["USB_CC2"], {("J1", "B5"), ("R2", "1")})
 
 
+class PartSelectionTests(unittest.TestCase):
+    def test_every_part_is_selected_or_explicitly_generic(self):
+        for part in design.PARTS:
+            if part.ref in design.GENERIC_PARTS:
+                self.assertEqual(part.mpn, "generic", part.ref)
+            else:
+                self.assertNotIn(part.mpn, ("", "TBD"), part.ref)
+                self.assertNotIn("candidate", part.mpn.lower(), part.ref)
+                self.assertRegex(part.fields.get("LCSC", ""), r"^C\d+$", part.ref)
+
+    def test_selection_refers_only_to_existing_parts(self):
+        refs = {p.ref for p in design.PARTS}
+        for group in design.PART_SELECTION:
+            self.assertTrue(set(group.split()) <= refs, group)
+
+    def test_ptc_is_the_13v2_variant(self):
+        fuse = next(p for p in design.PARTS if p.ref == "F1")
+        self.assertEqual(fuse.mpn, "1206L075/13.2WR")
+
+    def test_status_led_is_not_a_3v3_forward_voltage_part(self):
+        led = next(p for p in design.PARTS if p.ref == "D2")
+        self.assertNotIn("GHC", led.mpn)  # green 0603 parts with Vf ~3.3 V cannot be driven from a 3.3 V GPIO
+
+    def test_committed_bom_matches_design(self):
+        csv_path = KICAD / "exports" / f"BOM-v{design.REVISION}-jlcpcb.csv"
+        self.assertTrue(csv_path.exists(), "run tools/export_bom.py")
+        text = csv_path.read_text(encoding="utf-8")
+        for part in design.PARTS:
+            lcsc = part.fields.get("LCSC")
+            if lcsc and not part.dnp:
+                self.assertIn(lcsc, text, part.ref)
+
+
 class NetlistComparisonTests(unittest.TestCase):
     def test_design_netlist_matches(self):
         self.assertEqual(MATCH.compare(synthetic_netlist()), [])

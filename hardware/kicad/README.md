@@ -1,22 +1,23 @@
 # Native KiCad project — carrier board v0.2
 
-**Status: v0.2-draft2, ERC-clean engineering draft. Not reviewed, not frozen, not fabrication-ready.**
+**Status: v0.2-rc1 — schematic freeze candidate with exact parts selected ([PART_SELECTION.md](PART_SELECTION.md)). ERC-clean; awaiting second-engineer sign-off. No PCB yet — not fabrication-ready.**
 Bench-only prototype: current-limited low-voltage supply and a synthetic 3.3 V pulse source. Never connect it to a live gas meter, gas line, valve, mains or field wiring.
 
-![Schematic v0.2-draft2](exports/smart_gas_meter_iot-schematic.png)
+![Schematic v0.2-rc1](exports/smart_gas_meter_iot-schematic.png)
 
 ## What is here
 
 | Path | Purpose |
 |---|---|
-| `design_v02.py` | **Single source of truth**: every part, value, footprint, candidate MPN and pin → net assignment |
+| `design_v02.py` | **Single source of truth**: every part, value, footprint, selected MPN/LCSC code and pin → net assignment |
 | `tools/generate_schematic.py` | Generates the schematic, project file and project-local libraries from `design_v02.py` |
 | `smart_gas_meter_iot.kicad_sch` / `.kicad_pro` | Native KiCad schematic (KiCad 7 file format; opens in KiCad 7, 8 and 9) |
 | `lib/smart_gas_meter.kicad_sym`, `lib/SGM.pretty/` | Project-local copies of the KiCad 7.0.11 stock symbols/footprints actually used, so CI needs no global libraries |
 | `sym-lib-table`, `fp-lib-table` | Project library tables (nickname `SGM`) |
+| `tools/export_bom.py` | Writes the review BOM and the JLCPCB assembly BOM from `design_v02.py` |
 | `check_netlist_matches_design.py` | Compares a KiCad-exported netlist with `design_v02.py`, pin by pin |
 | `check_netlist_invariants.py` | Guardrail for the blocking faults found in the frozen draft (GND on supply rails, shorted capacitors, legacy dev-board headers, modem on 3V3) |
-| `exports/` | Schematic PDF/PNG, KiCad 9 ERC report, exported netlist and generated BOM for `v0.2-draft2` |
+| `exports/` | Schematic PDF/PNG, KiCad 9 ERC report, exported netlist and review/JLCPCB BOMs for `v0.2-rc1` |
 | `archive/v0.2-frozen-2026-10-23/` | The frozen first draft, kept unchanged as evidence (65 ERC messages, +5V/GND short) |
 
 ## Circuit summary
@@ -47,6 +48,7 @@ The CI workflow `hardware-cad-check.yml` repeats all four checks with KiCad 9 on
 
 ```bash
 python3 hardware/kicad/tools/generate_schematic.py          # rewrite schematic + libraries from design_v02.py
+python3 hardware/kicad/tools/export_bom.py                  # review BOM + JLCPCB BOM
 kicad-cli sch erc --exit-code-violations hardware/kicad/smart_gas_meter_iot.kicad_sch   # KiCad 8/9
 kicad-cli sch export netlist -o /tmp/sgm.net hardware/kicad/smart_gas_meter_iot.kicad_sch
 python3 hardware/kicad/check_netlist_matches_design.py /tmp/sgm.net
@@ -56,15 +58,11 @@ python3 -m unittest discover -s hardware/kicad/tests
 
 To change the circuit, edit `design_v02.py`, regenerate, and commit the schematic, libraries and exports together. Hand edits in the KiCad editor are possible, but they must then be reflected back into `design_v02.py`, or the sync check fails.
 
-## Still open before schematic freeze
+## Status of the freeze
 
-- Select exact USB-C connector, PTC fuse, TVS and inductor SKUs; re-check footprints against manufacturer drawings (the footprints are stock KiCad candidates).
-- Confirm AP63203 FB connection for the fixed-output variant, input/output capacitor ratings and thermal limits against the current datasheet.
-- Independent review of the ESP32-S3 module pin map, strapping behaviour and EN timing against the Espressif datasheet and hardware design guidelines.
-- Modem SKU, I/O voltage, enable/reset polarity and peak current; daughterboard level translation.
-- Power budget for the PTC fuse rating; LED current after LED selection.
+Exact parts, ratings and pinout checks are recorded in [PART_SELECTION.md](PART_SELECTION.md). The electrical freeze checklist in `SCHEMATIC_ERC_TRIAGE_AND_FREEZE.md` is complete apart from two items. One is the land-pattern overlay against manufacturer drawings, done at PCB stage. The other is the second-engineer sign-off. The modem SKU is deliberately still open: J6 is an interface placeholder.
 
-Only after this review is the PCB created from this exact schematic revision (`CONTROLLED_REBUILD_SPEC.md`, steps 6–9).
+Next step: create the PCB from this exact revision (`CONTROLLED_REBUILD_SPEC.md`, steps 6–9).
 
 ## Library licence
 
