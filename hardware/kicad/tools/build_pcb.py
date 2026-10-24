@@ -182,10 +182,94 @@ def build() -> pcbnew.BOARD:
             t.SetMirrored(True)
         board.Add(t)
 
+    print(f"GND fanout: {fanout_ground(board)} vias")
     zone(board, pcbnew.In1_Cu, nets["GND"], "GND plane")
     zone(board, pcbnew.In2_Cu, nets["+3V3"], "+3V3 pour")
     zone(board, pcbnew.B_Cu, nets["GND"], "GND pour bottom")
     return board
+
+
+def fanout_ground(board: pcbnew.BOARD) -> int:
+    """Drop every SMD GND pad to the In1 GND plane with a short track and a via.
+
+    Freerouting connects signals well but does not fan SMD pads out to a plane
+    layer, so this is done deterministically before routing. Candidate via
+    positions are tried around each pad (outward first) and accepted only if
+    they keep clear of other-net copper, holes, the board edge and keep-outs.
+    """
+    via_d, drill, clear = MM(0.6), MM(0.3), MM(0.25)
+    gnd = board.FindNet("GND")
+    blockers = []  # (bbox, netcode, is_hole)
+    for fp in board.GetFootprints():
+        for pad in fp.Pads():
+            box = pad.GetBoundingBox()
+            blockers.append((box, pad.GetNetCode(), pad.GetAttribute() == pcbnew.PAD_ATTRIB_NPTH))
+    keepouts = [z for z in board.Zones() if z.GetIsRuleArea()]
+    for fp in board.GetFootprints():
+        keepouts += [z for z in fp.Zones() if z.GetIsRuleArea()]
+    edge = board.GetBoardEdgesBoundingBox()
+    edge.Inflate(-MM(0.8))
+    placed: list[pcbnew.VECTOR2I] = []
+
+    def free(pt: pcbnew.VECTOR2I) -> bool:
+        if not edge.Contains(pt):
+            return False
+        for zone in keepouts:
+            if zone.Outline().Contains(pt):
+                return False
+        probe = pcbnew.BOX2I(pcbnew.VECTOR2I(pt.x - via_d // 2 - clear, pt.y - via_d // 2 - clear),
+                             pcbnew.VECTOR2L(via_d + 2 * clear, via_d + 2 * clear))
+        for box, net, hole in blockers:
+            if (net != gnd.GetNetCode() or hole) and box.Intersects(probe):
+                return False
+        return all((pt - other).EuclideanNorm() > via_d + clear for other in placed)
+
+    count = 0
+    for fp in board.GetFootprints():
+        center = fp.GetPosition()
+        for pad in fp.Pads():
+            if pad.GetNetCode() != gnd.GetNetCode() or pad.GetAttribute() != pcbnew.PAD_ATTRIB_SMD:
+                continue
+            if not pad.IsOnLayer(pcbnew.F_Cu):
+                continue
+            if fp.GetReference() == "U1" and pad.GetNumber() == "41":
+                continue  # exposed pad already has its own thermal vias to every layer
+            p = pad.GetPosition()
+            out = p - center
+            norm = max(out.EuclideanNorm(), 1)
+            ux, uy = out.x / norm, out.y / norm
+            directions = [(ux, uy), (-uy, ux), (uy, -ux), (-ux, -uy)]
+            half = max(pad.GetSize().x, pad.GetSize().y) // 2
+            target = None
+            for dx, dy in directions:
+                for extra in (0.55, 0.8, 1.1, 1.5, 2.0):
+                    dist = half + MM(extra)
+                    pt = pcbnew.VECTOR2I(int(p.x + dx * dist), int(p.y + dy * dist))
+                    if free(pt):
+                        target = pt
+                        break
+                if target:
+                    break
+            if target is None:
+                print(f"fanout: no free via site for {fp.GetReference()}.{pad.GetNumber()}")
+                continue
+            via = pcbnew.PCB_VIA(board)
+            via.SetPosition(target)
+            via.SetWidth(via_d)
+            via.SetDrill(drill)
+            via.SetNet(gnd)
+            board.Add(via)
+            track = pcbnew.PCB_TRACK(board)
+            track.SetStart(p)
+            track.SetEnd(target)
+            track.SetWidth(MM(0.3))
+            track.SetLayer(pcbnew.F_Cu)
+            track.SetNet(gnd)
+            board.Add(track)
+            placed.append(target)
+            blockers.append((via.GetBoundingBox(), gnd.GetNetCode(), False))
+            count += 1
+    return count
 
 
 def fill_and_save(board: pcbnew.BOARD) -> pcbnew.BOARD:
