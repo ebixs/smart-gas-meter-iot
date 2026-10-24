@@ -225,6 +225,9 @@ _apply_selection()
 # these rails are fed through passive parts (fuse, inductor) or the connector.
 PWR_FLAGS = {"+5V": (226.06, 33.02), "+3V3": (241.3, 33.02), "GND": (256.54, 33.02)}
 
+# Footprints placed on the PCB only (no schematic symbol), vendored into lib/SGM.pretty.
+BOARD_ONLY_FOOTPRINTS = ("MountingHole_3.2mm_M3",)
+
 TITLE = "Smart Gas Meter IoT - carrier board v0.2 (controlled rebuild)"
 REVISION = "0.2-rc1"
 COMMENTS = (

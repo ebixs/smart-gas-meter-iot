@@ -75,7 +75,7 @@ jobs:
           while IFS= read -r -d '' file; do
             base="$(basename "$file" .kicad_pcb)"
             echo "Running DRC: $file"
-            kicad-cli pcb drc --exit-code-violations --output "/tmp/cad-reports/$base-drc.rpt" "$file"
+            kicad-cli pcb drc --schematic-parity --severity-all --exit-code-violations --output "/tmp/cad-reports/$base-drc.rpt" "$file"
             rc=$?
             if [ "$rc" -eq 0 ]; then
               echo "DRC passed: $file"
