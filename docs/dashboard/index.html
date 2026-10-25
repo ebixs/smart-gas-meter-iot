@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SGM Fleet Console</title>
+<meta name="description" content="Fleet console for the Smart Gas Meter prototype: readings, billing-period self-reading, forecasts, alerts and illustrative invoices on a synthetic 240-meter fleet.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Vazirmatn:wght@400;600&display=swap">
+<style>
+/* Layout: a utility console. Header band with the yellow gas-pipe rule, KPI strip,
+   then device list | device detail, then fleet-wide alerts and model quality. */
+:root {
+  --bg: #f2f3ef;
+  --surface: #ffffff;
+  --surface-2: #f8f8f5;
+  --ink: #15181b;
+  --ink-2: #4b5157;
+  --muted: #7b8187;
+  --line: #dfe1db;
+  --line-2: #c9ccc4;
+  --pipe: #f2b200;          /* Iranian gas pipes are painted yellow */
+  --pipe-ink: #5a4300;
+  --s1: #2a78d6;            /* data series (validated categorical order) */
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --band: rgba(42, 120, 214, 0.14);
+  --good: #0ca30c;
+  --warn: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --drum: #15181b;
+  --drum-ink: #f4f4ef;
+  --drum-red: #c9352f;
+  --alert-band: rgba(236, 131, 90, 0.18);
+  --font-display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-fa: "Vazirmatn", "IBM Plex Sans", Tahoma, sans-serif;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1214; --surface: #171b1e; --surface-2: #1c2125; --ink: #e8ebe6; --ink-2: #b4bab6;
+    --muted: #868d91; --line: #2a3035; --line-2: #3a4147; --pipe: #f2b200; --pipe-ink: #f7d46a;
+    --s1: #4f93e6; --s2: #f07c4c; --s3: #2cc28c; --band: rgba(79, 147, 230, 0.2);
+    --drum: #050607; --drum-ink: #f4f4ef; --drum-red: #e0483f; --alert-band: rgba(240, 124, 76, 0.2);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1214; --surface: #171b1e; --surface-2: #1c2125; --ink: #e8ebe6; --ink-2: #b4bab6;
+  --muted: #868d91; --line: #2a3035; --line-2: #3a4147; --pipe: #f2b200; --pipe-ink: #f7d46a;
+  --s1: #4f93e6; --s2: #f07c4c; --s3: #2cc28c; --band: rgba(79, 147, 230, 0.2);
+  --drum: #050607; --drum-ink: #f4f4ef; --drum-red: #e0483f; --alert-band: rgba(240, 124, 76, 0.2);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--s1); }
+.fa { font-family: var(--font-fa); direction: rtl; unicode-bidi: isolate; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.wrap {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+:focus-visible { outline: 3px solid var(--pipe); outline-offset: 2px; border-radius: 4px; }
+
+/* Header */
+.top { background: var(--surface); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
+.brand svg { flex: none; }
+.brand b { font: 700 20px/1 var(--font-display); letter-spacing: -0.01em; }
+.brand small { display: block; font: 400 12px/1.3 var(--font-fa); color: var(--muted); margin-top: 3px; }
+.top nav { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.top nav a {
+  color: var(--ink-2); text-decoration: none; font-weight: 500; padding: 6px 10px; border-radius: 6px;
+}
+.top nav a:hover { background: var(--surface-2); color: var(--ink); }
+.pipe-rule { height: 6px; background: var(--pipe); }
+
+.notice { background: var(--surface-2); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+.notice .wrap { padding-block: 8px; display: flex; gap: 8px 18px; flex-wrap: wrap; }
+.notice strong { color: var(--ink); font-weight: 600; }
+
+main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 24px 56px; }
+main > section { min-width: 0; }
+h2 {
+  font: 700 22px/1.2 var(--font-display); margin: 0; letter-spacing: -0.01em; text-wrap: balance;
+}
+h3 { font: 600 13px/1.3 var(--font-body); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0; }
+.section-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.section-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.pad { padding: 16px 18px; }
+
+/* KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
+.kpi { padding: 16px 18px; border-right: 1px solid var(--line); min-width: 0; }
+.kpi:last-child { border-right: 0; }
+.kpi .v { font: 600 28px/1.1 var(--font-num); letter-spacing: -0.02em; margin-top: 6px; }
+.kpi .v small { font-size: 15px; color: var(--muted); font-weight: 500; }
+.kpi .s { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+
+/* Fleet chart */
+.fleet { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 16px; }
+
+/* Devices */
+.devices { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; align-items: start; }
+.list { display: flex; flex-direction: column; max-height: 1180px; }
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
+.filters input { grid-column: 1 / -1; }
+input, select, button {
+  font: inherit; color: var(--ink); background: var(--surface-2); border: 1px solid var(--line-2);
+  border-radius: 7px; padding: 7px 10px; min-width: 0;
+}
+button { cursor: pointer; font-weight: 500; }
+button:hover { border-color: var(--ink-2); }
+.count { font-size: 12px; color: var(--muted); padding: 6px 12px; border-bottom: 1px solid var(--line); }
+.rows { overflow-y: auto; flex: 1; }
+.row {
+  display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 10px 12px 10px 14px; width: 100%;
+  border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; text-align: left;
+  position: relative;
+}
+.row:hover { background: var(--surface-2); }
+.row[aria-current="true"] { background: var(--surface-2); }
+.row[aria-current="true"]::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--pipe); }
+.row .id { font: 500 14px/1.3 var(--font-num); }
+.row .meta { font-size: 12px; color: var(--muted); grid-column: 1; }
+.row svg { grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; line-height: 1;
+  padding: 5px 8px 5px 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line);
+  color: var(--ink-2); white-space: nowrap;
+}
+.chip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: currentColor; }
+.chip.good i { background: var(--good); }
+.chip.warn i { background: var(--warn); }
+.chip.serious i { background: var(--serious); }
+.chip.critical i { background: var(--critical); }
+
+.detail { display: grid; gap: 16px; min-width: 0; }
+.ident { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; }
+.ident h2 { font-size: 26px; }
+.ident .sub { color: var(--ink-2); font-size: 14px; display: flex; gap: 6px 14px; flex-wrap: wrap; margin-top: 6px; }
+
+/* Odometer */
+.odo { display: grid; gap: 6px; justify-items: end; }
+.drums { display: flex; gap: 3px; padding: 6px; background: var(--drum); border-radius: 8px; box-shadow: inset 0 2px 6px rgba(0,0,0,.5); }
+.drum {
+  width: 26px; height: 38px; display: grid; place-items: center; border-radius: 3px;
+  font: 600 24px/1 var(--font-num); color: var(--drum-ink);
+  background: linear-gradient(#2b2f33, #0d0f11 18%, #1c2023 50%, #0d0f11 82%, #2b2f33);
+}
+.drum.red { color: #fff; background: linear-gradient(#7a1d19, var(--drum-red) 22%, #e2564e 50%, var(--drum-red) 78%, #7a1d19); }
+.drum.sep { width: 6px; background: none; }
+.odo .lbl { font-size: 12px; color: var(--muted); }
+
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.chart-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.chart-head .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .sw { width: 14px; height: 3px; border-radius: 2px; background: var(--s1); }
+.legend .sw.band { height: 10px; background: var(--alert-band); border: 1px solid var(--serious); }
+.legend .sw.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--critical); }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font: 11px var(--font-body); }
+.chart .axis { stroke: var(--line-2); }
+.chart .grid { stroke: var(--line); }
+.tip {
+  position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12px;
+  padding: 7px 9px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -100%); margin-top: -10px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+}
+.tip b { font-family: var(--font-num); }
+
+.facts { display: grid; gap: 10px; }
+.fact { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; border-bottom: 1px dashed var(--line); padding-bottom: 8px; }
+.fact:last-child { border-bottom: 0; padding-bottom: 0; }
+.fact span:first-child { color: var(--ink-2); font-size: 14px; }
+.fact span:last-child { font: 500 15px var(--font-num); text-align: right; }
+.big { font: 600 30px/1.1 var(--font-num); letter-spacing: -0.02em; }
+.big small { font-size: 14px; color: var(--muted); font-weight: 500; }
+.range { position: relative; height: 34px; margin: 14px 0 6px; }
+.range .track { position: absolute; left: 0; right: 0; top: 15px; height: 4px; background: var(--line); border-radius: 2px; }
+.range .span { position: absolute; top: 9px; height: 16px; background: var(--band); border: 1px solid var(--s1); border-radius: 4px; }
+.range .p50 { position: absolute; top: 4px; width: 3px; height: 26px; background: var(--s1); border-radius: 2px; transform: translateX(-1px); }
+.range .last { position: absolute; top: 10px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 3px solid var(--ink); transform: translateX(-7px); }
+.range-labels { display: flex; justify-content: space-between; font: 12px var(--font-num); color: var(--muted); }
+.note { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+.stamp {
+  display: inline-block; font: 600 11px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--pipe-ink); border: 1.5px solid var(--pipe); border-radius: 4px; padding: 4px 6px;
+}
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.btn-row a, .btn-row button { font-size: 13px; padding: 6px 10px; border-radius: 7px; border: 1px solid var(--line-2); background: var(--surface-2); color: var(--ink); text-decoration: none; font-weight: 500; }
+
+.alerts-list { display: grid; gap: 8px; }
+.alert-item { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.alert-item .when { font: 12px var(--font-num); color: var(--muted); grid-column: 2; }
+.alert-item p { margin: 0; grid-column: 2; font-size: 13px; color: var(--ink-2); }
+.empty { color: var(--muted); font-size: 14px; }
+
+/* Tables */
+.tablewrap { overflow: auto; max-height: 560px; }
+.tablewrap thead th { position: sticky; top: 0; background: var(--surface); z-index: 1; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font: 600 12px var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 10px 12px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: var(--surface-2); }
+td.num, th.num { text-align: right; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.chips button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.bars { display: grid; gap: 10px; }
+.bar { display: grid; grid-template-columns: minmax(120px, 1.2fr) minmax(0, 2fr) 56px; gap: 10px; align-items: center; font-size: 13px; }
+.bar .track { height: 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; position: relative; overflow: hidden; }
+.bar .fill { position: absolute; inset: 0 auto 0 0; background: var(--s1); border-radius: 0 4px 4px 0; }
+.bar .fill.alt { background: var(--line-2); }
+.bar .val { font: 500 13px var(--font-num); text-align: right; }
+.pr { display: grid; grid-template-columns: minmax(130px, 1.3fr) repeat(2, minmax(0, 1fr)); gap: 8px 14px; align-items: center; font-size: 13px; }
+.pr .h { font: 600 12px var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.meter { display: grid; grid-template-columns: 1fr 40px; gap: 8px; align-items: center; }
+.meter .track { height: 8px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; position: relative; overflow: hidden; }
+.meter .fill { position: absolute; inset: 0 auto 0 0; background: var(--s1); }
+.meter .fill.p { background: var(--s2); }
+.meter span { font: 500 12px var(--font-num); text-align: right; }
+
+footer { border-top: 1px solid var(--line); background: var(--surface); font-size: 13px; color: var(--ink-2); }
+footer .wrap { padding-block: 20px; display: flex; gap: 10px 24px; flex-wrap: wrap; }
+footer a { color: var(--ink); }
+
+.loading { padding: 40px 0; color: var(--muted); }
+
+@media (max-width: 1100px) {
+  .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kpi:nth-child(3) { border-right: 0; }
+  .kpi:nth-child(n+4) { border-top: 1px solid var(--line); }
+  .fleet { grid-template-columns: 1fr; }
+  .devices { grid-template-columns: 1fr; }
+  .list { max-height: 420px; }
+}
+@media (max-width: 720px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi { border-right: 1px solid var(--line); }
+  .kpi:nth-child(2n) { border-right: 0; }
+  .kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .kpi:nth-child(3) { border-right: 1px solid var(--line); }
+  .kpi:last-child { grid-column: 1 / -1; }
+  .grid2, .grid3 { grid-template-columns: 1fr; }
+  .ident { grid-template-columns: 1fr; }
+  .odo { justify-items: start; }
+  .drum { width: 22px; height: 34px; font-size: 20px; }
+  .top nav { margin-left: 0; }
+  .bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 48px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../" aria-label="Smart Gas Meter project home">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="1" y="1" width="32" height="32" rx="8" fill="var(--ink)"/>
+        <path d="M8 24 V15 a5 5 0 0 1 5 -5 H26" fill="none" stroke="var(--pipe)" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="21" cy="21" r="4.5" fill="none" stroke="var(--bg)" stroke-width="2.2"/>
+        <path d="M21 21 L23.4 18.6" stroke="var(--bg)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span><b>SGM Fleet Console</b><small>کنسول ناوگان کنتور هوشمند گاز</small></span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#overview">Overview</a>
+      <a href="#device">Meters</a>
+      <a href="#alerts">Alerts</a>
+      <a href="#models">Models</a>
+      <a href="../verify/">Verify an invoice</a>
+    </nav>
+  </div>
+  <div class="pipe-rule" aria-hidden="true"></div>
+</header>
+<div class="notice">
+  <div class="wrap">
+    <span><strong>Synthetic fleet.</strong> 240 simulated meters in six Iranian cities; no real households.</span>
+    <span><strong>Not a leak detector.</strong> An alert is a pattern worth a look, never proof of a gas leak.</span>
+    <span><strong>Illustrative tariff.</strong> Invoice amounts use placeholder prices, not an official bill.</span>
+  </div>
+</div>
+
+<main class="wrap" id="app">
+  <p class="loading" id="loading">Loading fleet data…</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Smart Gas Meter IoT · bench prototype</span>
+    <a href="https://github.com/ebixs/smart-gas-meter-iot/blob/main/docs/analytics/REPORT.md">Analytics report</a>
+    <a href="../analytics/invoices/sample-invoice-typical.pdf">Sample invoice (PDF)</a>
+    <a href="../verify/">Invoice verification</a>
+    <a href="https://github.com/ebixs/smart-gas-meter-iot">Source on GitHub</a>
+  </div>
+</footer>
+
+<script>
+"use strict";
+const PULSE_M3 = 0.01; // pulse constant of the simulated G4 meters
+const DATA_URL = "../analytics/dashboard-data.json";
+
+/* ---------- Jalali calendar (port of jalaali-js, same algorithm as the firmware and billing) */
+const BREAKS = [-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178];
+const div = (a, b) => ~~(a / b), mod = (a, b) => a - ~~(a / b) * b;
+function jalCal(jy) {
+  let gy = jy + 621, leapJ = -14, jp = BREAKS[0], jm, jump = 0, n;
+  for (let i = 1; i < BREAKS.length; i++) {
+    jm = BREAKS[i]; jump = jm - jp; if (jy < jm) break;
+    leapJ += div(jump, 33) * 8 + div(mod(jump, 33), 4); jp = jm;
+  }
+  n = jy - jp; leapJ += div(n, 33) * 8 + div(mod(n, 33) + 3, 4);
+  if (mod(jump, 33) === 4 && jump - n === 4) leapJ++;
+  const march = 20 + leapJ - (div(gy, 4) - div((div(gy, 100) + 1) * 3, 4) - 150);
+  if (jump - n < 6) n = n - jump + div(jump + 4, 33) * 33;
+  let leap = mod(mod(n + 1, 33) - 1, 4); if (leap === -1) leap = 4;
+  return { leap, gy, march };
+}
+function g2d(gy, gm, gd) {
+  const d = div((gy + div(gm - 8, 6) + 100100) * 1461, 4) + div(153 * mod(gm + 9, 12) + 2, 5) + gd - 34840408;
+  return d - div(div(gy + 100100 + div(gm - 8, 6), 100) * 3, 4) + 752;
+}
+function toJalali(gy, gm, gd) {
+  const jdn = g2d(gy, gm, gd); let jy = gy - 621; const r = jalCal(jy);
+  let k = jdn - g2d(gy, 3, r.march);
+  if (k >= 0) { if (k <= 185) return [jy, 1 + div(k, 31), mod(k, 31) + 1]; k -= 186; }
+  else { jy--; k += 179; if (r.leap === 1) k++; }
+  return [jy, 7 + div(k, 30), mod(k, 30) + 1];
+}
+const J_MONTHS = ["Farvardin", "Ordibehesht", "Khordad", "Tir", "Mordad", "Shahrivar", "Mehr", "Aban", "Azar", "Dey", "Bahman", "Esfand"];
+const J_MONTHS_FA = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
+const iso = s => s.slice(0, 10);
+const jOf = s => { const [y, m, d] = iso(s).split("-").map(Number); return toJalali(y, m, d); };
+const jStr = s => { const [y, m, d] = jOf(s); return `${y}/${String(m).padStart(2, "0")}/${String(d).padStart(2, "0")}`; };
+const fmtDate = s => new Date(iso(s) + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+const nf = (v, d = 0) => Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const faNum = v => Number(v).toLocaleString("fa-IR");
+const faYear = v => Number(v).toLocaleString("fa-IR", { useGrouping: false });
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+const DETECTORS = {
+  continuous_flow: { name: "Continuous night flow", sev: "serious", hint: "night minimum stayed above what heating explains" },
+  zero_while_expected: { name: "No pulses while use expected", sev: "serious", hint: "stuck or disconnected sensor" },
+  sustained_drop: { name: "Possible interference", sev: "serious", hint: "steady share of pulses missing" },
+  usage_spike: { name: "Usage spike", sev: "warn", hint: "sharp jump against the prior week" },
+  data_gap: { name: "Data gap", sev: "warn", hint: "no readings received" },
+  counter_reset: { name: "Counter reset", sev: "warn", hint: "cumulative counter went backwards" },
+};
+const LABELS = {
+  leak_like_flow: "Leak-like continuous flow", stuck_meter: "Stuck / disconnected sensor", comms_outage: "Communication outage",
+  magnet_tamper: "Magnet interference", usage_spike: "Usage spike", counter_reset: "Counter reset",
+};
+const CITY = { tehran: "Tehran", rasht: "Rasht", mashhad: "Mashhad", tabriz: "Tabriz", ahvaz: "Ahvaz", shahrekord: "Shahrekord" };
+const STATUS = {
+  open: { label: "Open alert", cls: "serious" },
+  recent: { label: "Alert in last 30 days", cls: "warn" },
+  normal: { label: "Normal", cls: "good" },
+};
+
+let D, byId = {}, alertsBy = {}, selected = null;
+const state = { q: "", city: "", status: "", detector: "" };
+
+function daysBetween(a, b) { return Math.round((Date.parse(iso(b)) - Date.parse(iso(a))) / 86400000); }
+
+function prepare(data) {
+  D = data;
+  const end = D.data_end;
+  for (const a of D.alerts) (alertsBy[a.device_id] ||= []).push(a);
+  for (const d of D.devices) {
+    byId[d.id] = d;
+    const al = alertsBy[d.id] || [];
+    const open = al.some(a => daysBetween(a.end, end) <= 1);
+    const recent = al.some(a => daysBetween(a.end, end) <= 30);
+    d.status = open ? "open" : recent ? "recent" : "normal";
+    const series = D.daily[d.id] || [];
+    d.last30 = series.slice(-30).reduce((s, r) => s + r[1], 0);
+    d.spark = series.slice(-60).map(r => r[1]);
+  }
+}
+
+/* ---------- small SVG helpers */
+function niceTicks(max, n = 4) {
+  if (max <= 0) return [0, 1];
+  const raw = max / n, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * p).find(s => s >= raw);
+  const out = []; for (let v = 0; v <= max + step * 0.001; v += step) out.push(+v.toFixed(6));
+  if (out[out.length - 1] < max) out.push(+(out[out.length - 1] + step).toFixed(6));
+  return out;
+}
+function sparkline(vals, w = 64, h = 20) {
+  if (!vals.length) return "";
+  const mx = Math.max(...vals, 0.001);
+  const pts = vals.map((v, i) => `${(i / (vals.length - 1) * w).toFixed(1)},${(h - 2 - v / mx * (h - 4)).toFixed(1)}`).join(" ");
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="var(--s1)" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+}
+
+/* Daily line chart with optional alert bands; hover crosshair + tooltip. */
+function lineChart(el, rows, opts = {}) {
+  const W = Math.max(320, el.clientWidth || 640), H = opts.height || 220;
+  const m = { l: 44, r: 12, t: 14, b: 28 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const t0 = Date.parse(rows[0][0]), t1 = Date.parse(rows[rows.length - 1][0]);
+  const x = s => m.l + (Date.parse(s) - t0) / Math.max(1, t1 - t0) * iw;
+  const ymax = Math.max(...rows.map(r => r[1]), 0.1) * 1.08;
+  const ticks = niceTicks(ymax); const top = ticks[ticks.length - 1];
+  const y = v => m.t + ih - v / top * ih;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "chart")}">`;
+  for (const t of ticks) svg += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end">${nf(t, t < 10 && top <= 10 ? 1 : 0)}</text>`;
+  for (const b of opts.bands || []) {
+    const a = Math.max(x(b.start), m.l), z = Math.min(x(b.end), W - m.r);
+    if (z > a) svg += `<rect x="${a}" y="${m.t}" width="${Math.max(2, z - a)}" height="${ih}" fill="var(--alert-band)"/><rect x="${a}" y="${m.t}" width="${Math.max(2, z - a)}" height="3" fill="var(--serious)"/>`;
+  }
+  // month ticks (first day of each Jalali month), labelled with the Jalali month
+  let lastLabel = -1e9;
+  for (const r of rows) {
+    const [, , jd] = jOf(r[0]);
+    if (jd === 1) {
+      const px = x(r[0]);
+      svg += `<line class="axis" x1="${px}" x2="${px}" y1="${m.t + ih}" y2="${m.t + ih + 4}"/>`;
+      if (px - lastLabel > 54) { const [jy, jm] = jOf(r[0]); svg += `<text x="${px + 3}" y="${H - 8}">${J_MONTHS[jm - 1].slice(0, 3)}${jm === 1 ? " " + jy : ""}</text>`; lastLabel = px; }
+    }
+  }
+  svg += `<line class="axis" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>`;
+  // area + line, broken at non-ok days
+  let path = "", area = "", seg = [];
+  const flush = () => {
+    if (seg.length > 1) {
+      path += "M" + seg.map(p => p.join(",")).join("L");
+      area += `M${seg[0][0]},${m.t + ih}L` + seg.map(p => p.join(",")).join("L") + `L${seg[seg.length - 1][0]},${m.t + ih}Z`;
+    }
+    seg = [];
+  };
+  for (const r of rows) { if (r[2] === "ok") seg.push([x(r[0]).toFixed(1), y(r[1]).toFixed(1)]); else flush(); }
+  flush();
+  svg += `<path d="${area}" fill="var(--s1)" opacity="0.10"/><path d="${path}" fill="none" stroke="var(--s1)" stroke-width="1.6" stroke-linejoin="round"/>`;
+  for (const r of rows) if (r[2] !== "ok") svg += `<circle cx="${x(r[0])}" cy="${m.t + ih - 5}" r="4" fill="var(--critical)" stroke="var(--surface)" stroke-width="2"><title>${esc(r[2])}: ${fmtDate(r[0])}</title></circle>`;
+  const last = rows[rows.length - 1];
+  svg += `<circle cx="${x(last[0])}" cy="${y(last[1])}" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>`;
+  svg += `<line id="xh" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="var(--ink-2)" stroke-dasharray="3 3" visibility="hidden"/><circle id="xd" r="4.5" fill="var(--s1)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>`;
+  svg += `<rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent" class="hit"/></svg><div class="tip" hidden></div>`;
+  el.innerHTML = svg;
+  const s = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = s.querySelector("#xh"), xd = s.querySelector("#xd");
+  const move = ev => {
+    const pt = s.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const p = pt.matrixTransform(s.getScreenCTM().inverse());
+    const t = t0 + (p.x - m.l) / iw * (t1 - t0);
+    let best = rows[0], bd = Infinity;
+    for (const r of rows) { const d = Math.abs(Date.parse(r[0]) - t); if (d < bd) { bd = d; best = r; } }
+    const px = x(best[0]), py = y(best[1]);
+    xh.setAttribute("x1", px); xh.setAttribute("x2", px); xh.setAttribute("visibility", "visible");
+    xd.setAttribute("cx", px); xd.setAttribute("cy", py); xd.setAttribute("visibility", "visible");
+    const rect = s.getBoundingClientRect(), scale = rect.width / W;
+    tip.hidden = false; tip.style.left = px * scale + "px"; tip.style.top = py * scale + "px";
+    tip.innerHTML = `${fmtDate(best[0])} · <span class="fa">${jStr(best[0])}</span><br><b>${nf(best[1], 2)} m³</b>${best[2] !== "ok" ? " · " + esc(best[2]) : ""}`;
+  };
+  s.addEventListener("pointermove", move);
+  s.addEventListener("pointerleave", () => { tip.hidden = true; xh.setAttribute("visibility", "hidden"); xd.setAttribute("visibility", "hidden"); });
+}
+
+/* Vertical bars with hover tooltip; highlight = index to emphasise. */
+function barChart(el, items, opts = {}) {
+  const W = Math.max(300, el.clientWidth || 520), H = opts.height || 200;
+  const m = { l: 44, r: 8, t: 14, b: 30 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const ticks = niceTicks(Math.max(...items.map(i => i.v), 1) * 1.05), top = ticks[ticks.length - 1];
+  const bw = iw / items.length, gap = Math.min(8, bw * 0.25);
+  const y = v => m.t + ih - v / top * ih;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || "bar chart")}">`;
+  for (const t of ticks) svg += `<line class="grid" x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${m.l - 8}" y="${y(t) + 4}" text-anchor="end">${nf(t)}</text>`;
+  items.forEach((it, i) => {
+    const bx = m.l + i * bw + gap / 2, h = Math.max(0, m.t + ih - y(it.v)), r = Math.min(4, (bw - gap) / 2);
+    const fill = it.hi ? "var(--s1)" : it.partial ? "var(--line)" : "var(--line-2)";
+    const yy = m.t + ih - h;
+    svg += `<path d="M${bx},${m.t + ih}V${yy + r}q0,-${r} ${r},-${r}h${bw - gap - 2 * r}q${r},0 ${r},${r}V${m.t + ih}Z" fill="${fill}" data-i="${i}"/>`;
+    if (i % Math.ceil(items.length / 13) === 0 || it.hi) svg += `<text x="${bx + (bw - gap) / 2}" y="${H - 10}" text-anchor="middle">${esc(it.short)}</text>`;
+  });
+  svg += `<line class="axis" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/></svg><div class="tip" hidden></div>`;
+  el.innerHTML = svg;
+  const s = el.querySelector("svg"), tip = el.querySelector(".tip");
+  s.addEventListener("pointermove", ev => {
+    const pt = s.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const p = pt.matrixTransform(s.getScreenCTM().inverse());
+    const i = Math.floor((p.x - m.l) / bw);
+    if (i < 0 || i >= items.length) { tip.hidden = true; return; }
+    const it = items[i], scale = s.getBoundingClientRect().width / W;
+    tip.hidden = false; tip.style.left = (m.l + i * bw + bw / 2) * scale + "px"; tip.style.top = y(it.v) * scale + "px";
+    tip.innerHTML = `${esc(it.label)}<br><b>${nf(it.v, 1)} m³</b>${it.partial ? " · partial month" : ""}`;
+  });
+  s.addEventListener("pointerleave", () => { tip.hidden = true; });
+}
+
+/* ---------- views */
+function render() {
+  const app = document.getElementById("app");
+  const open = D.devices.filter(d => d.status === "open").length;
+  const gbm = D.forecast_metrics[0];
+  const [jy, jm, jd] = jOf(D.data_end);
+  app.innerHTML = `
+  <section id="overview" aria-labelledby="ov-h">
+    <div class="section-head"><h2 id="ov-h">Fleet overview</h2><p>Readings through ${fmtDate(D.data_end)} · <span class="fa">${faNum(jd)} ${J_MONTHS_FA[jm - 1]} ${faYear(jy)}</span></p></div>
+    <div class="card kpis">
+      <div class="kpi"><h3>Meters</h3><div class="v">${D.devices.length}</div><div class="s">6 cities, hourly pulse readings</div></div>
+      <div class="kpi"><h3>Billing period</h3><div class="v">${D.devices[0].invoice.period}</div><div class="s">${J_MONTHS[Number(D.devices[0].invoice.period.slice(5)) - 1]} invoices issued from self-readings</div></div>
+      <div class="kpi"><h3>Open alerts</h3><div class="v">${open}</div><div class="s">${D.alerts.length} alerts in the last 13 months</div></div>
+      <div class="kpi"><h3>Forecast error</h3><div class="v">${nf(gbm.WAPE * 100, 1)}<small>%</small></div><div class="s">WAPE, next-month gas use</div></div>
+      <div class="kpi"><h3>Interval coverage</h3><div class="v">${nf(D.forecast_coverage * 100, 0)}<small>%</small></div><div class="s">actuals inside P10–P90 (target 80%)</div></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="fl-h">
+    <div class="fleet">
+      <div class="card pad">
+        <div class="chart-head"><h3 id="fl-h">Fleet gas use, m³ per day</h3><div class="legend"><span><i class="sw"></i>all ${D.devices.length} meters</span></div></div>
+        <div class="chart" id="fleet-chart"></div>
+      </div>
+      <div class="card pad">
+        <div class="chart-head"><h3>Household use by city, last 30 days</h3></div>
+        <div class="bars" id="city-bars"></div>
+        <p class="note">Average m³ per household per day. Cold cities heat more; Ahvaz barely heats at all.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="device" aria-labelledby="dv-h">
+    <div class="section-head"><h2 id="dv-h">Meters</h2><p>Pick a meter to see its readings, self-read invoice and alerts.</p></div>
+    <div class="devices">
+      <div class="card list">
+        <div class="filters">
+          <input id="f-q" type="search" placeholder="Search meter ID" aria-label="Search meter ID">
+          <select id="f-city" aria-label="City"><option value="">All cities</option>${Object.entries(CITY).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
+          <select id="f-status" aria-label="Status"><option value="">Any status</option>${Object.entries(STATUS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("")}</select>
+        </div>
+        <div class="count" id="f-count"></div>
+        <div class="rows" id="rows" role="listbox" aria-label="Meters"></div>
+      </div>
+      <div class="detail" id="detail"></div>
+    </div>
+  </section>
+
+  <section id="alerts" aria-labelledby="al-h">
+    <div class="section-head"><h2 id="al-h">Alerts</h2><p>Patterns flagged by the detectors. Each one asks for a look; none is proof of a leak.</p></div>
+    <div class="card pad">
+      <div class="chips" id="det-chips" role="group" aria-label="Filter by detector"></div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Meter</th><th>Detector</th><th>Window</th><th class="num">Days</th><th>Why it was flagged</th><th>Confidence</th></tr></thead>
+        <tbody id="alert-rows"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section id="models" aria-labelledby="md-h">
+    <div class="section-head"><h2 id="md-h">How good are the models?</h2><p>Scored against the simulator's ground truth, never against the training data.</p></div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="chart-head"><h3>Next-month forecast error (WAPE, lower is better)</h3></div>
+        <div class="bars" id="wape-bars"></div>
+        <p class="note">Rolling-origin backtest over 9 held-out months. Intervals are conformally calibrated per month.</p>
+      </div>
+      <div class="card pad">
+        <div class="chart-head"><h3>Detector recall and precision</h3><div class="legend"><span><i class="sw"></i>recall</span><span><i class="sw" style="background:var(--s2)"></i>precision</span></div></div>
+        <div class="pr" id="pr"></div>
+        <p class="note">Recall: share of injected faults found. Precision: share of alerts that matched a real fault (±2 days).</p>
+      </div>
+    </div>
+  </section>`;
+
+  drawFleet();
+  drawCities();
+  drawModels();
+  drawAlertChips();
+  drawAlerts();
+  bindFilters();
+  drawRows();
+  const fromHash = decodeURIComponent(location.hash.slice(1));
+  select(byId[fromHash] ? fromHash : (D.devices.find(d => d.status === "open") || D.devices[0]).id, false);
+}
+
+function drawFleet() {
+  const sums = new Map();
+  for (const rows of Object.values(D.daily)) for (const r of rows) sums.set(r[0], (sums.get(r[0]) || 0) + r[1]);
+  const rows = [...sums.entries()].sort((a, b) => a[0] < b[0] ? -1 : 1).map(([d, v]) => [d, v, "ok"]);
+  lineChart(document.getElementById("fleet-chart"), rows, { height: 230, label: "Fleet gas use per day" });
+}
+
+function drawCities() {
+  const acc = {};
+  for (const d of D.devices) { (acc[d.city] ||= { s: 0, n: 0, fa: d.city_fa }); acc[d.city].s += d.last30 / 30; acc[d.city].n++; }
+  const items = Object.entries(acc).map(([k, v]) => ({ k, fa: v.fa, v: v.s / v.n })).sort((a, b) => b.v - a.v);
+  const mx = Math.max(...items.map(i => i.v));
+  document.getElementById("city-bars").innerHTML = items.map(i => `
+    <div class="bar"><span>${CITY[i.k]} <span class="fa" style="color:var(--muted);font-size:12px">${esc(i.fa)}</span></span>
+    <span class="track"><span class="fill" style="width:${i.v / mx * 100}%"></span></span><span class="val">${nf(i.v, 1)}</span></div>`).join("");
+}
+
+function drawModels() {
+  const mx = Math.max(...D.forecast_metrics.map(m => m.WAPE));
+  document.getElementById("wape-bars").innerHTML = D.forecast_metrics.map((m, i) => `
+    <div class="bar"><span>${esc(m.method.replace(/\s*\(.*\)/, ""))}</span>
+    <span class="track"><span class="fill ${i ? "alt" : ""}" style="width:${m.WAPE / mx * 100}%"></span></span>
+    <span class="val">${nf(m.WAPE * 100, 1)}%</span></div>`).join("");
+  const cell = (v, p) => v == null ? `<div class="meter"><div class="track"></div><span>–</span></div>` :
+    `<div class="meter"><div class="track"><div class="fill ${p ? "p" : ""}" style="width:${v * 100}%"></div></div><span>${nf(v * 100, 0)}%</span></div>`;
+  document.getElementById("pr").innerHTML = `<span class="h">Fault</span><span class="h">Recall</span><span class="h">Precision</span>` +
+    D.detection.map(e => `<span>${esc(LABELS[e.label] || e.label)}</span>${cell(e.recall)}${cell(e.precision, true)}`).join("");
+}
+
+function drawAlertChips() {
+  const counts = {};
+  for (const a of D.alerts) counts[a.detector] = (counts[a.detector] || 0) + 1;
+  const btn = (k, label, n) => `<button type="button" data-det="${k}" aria-pressed="${state.detector === k}">${esc(label)} <span class="num" style="color:inherit;opacity:.7">${n}</span></button>`;
+  const el = document.getElementById("det-chips");
+  el.innerHTML = btn("", "All", D.alerts.length) + Object.keys(DETECTORS).filter(k => counts[k]).map(k => btn(k, DETECTORS[k].name, counts[k])).join("");
+  el.onclick = e => { const b = e.target.closest("button"); if (!b) return; state.detector = b.dataset.det; drawAlertChips(); drawAlerts(); };
+}
+
+function drawAlerts() {
+  const rows = D.alerts.filter(a => !state.detector || a.detector === state.detector)
+    .sort((a, b) => (a.start < b.start ? 1 : -1));
+  document.getElementById("alert-rows").innerHTML = rows.map(a => {
+    const det = DETECTORS[a.detector] || { name: a.detector, sev: "warn" };
+    return `<tr class="clickable" data-id="${esc(a.device_id)}" tabindex="0">
+      <td class="num" style="text-align:left">${esc(a.device_id)}</td>
+      <td><span class="chip ${det.sev}"><i></i>${esc(det.name)}</span></td>
+      <td class="num" style="text-align:left;white-space:nowrap">${jStr(a.start)} → ${jStr(a.end)}</td>
+      <td class="num">${daysBetween(a.start, a.end)}</td>
+      <td style="color:var(--ink-2)">${esc(a.reason)}</td>
+      <td>${esc(a.confidence)}</td></tr>`;
+  }).join("");
+  const tb = document.getElementById("alert-rows");
+  const go = e => { const tr = e.target.closest("tr"); if (!tr) return; select(tr.dataset.id, true); document.getElementById("device").scrollIntoView({ behavior: "smooth" }); };
+  tb.onclick = go;
+  tb.onkeydown = e => { if (e.key === "Enter") go(e); };
+}
+
+function bindFilters() {
+  const q = document.getElementById("f-q"), c = document.getElementById("f-city"), s = document.getElementById("f-status");
+  q.oninput = () => { state.q = q.value.trim().toLowerCase(); drawRows(); };
+  c.onchange = () => { state.city = c.value; drawRows(); };
+  s.onchange = () => { state.status = s.value; drawRows(); };
+}
+
+function filtered() {
+  return D.devices.filter(d => (!state.q || d.id.includes(state.q)) && (!state.city || d.city === state.city) && (!state.status || d.status === state.status));
+}
+
+function drawRows() {
+  const list = filtered();
+  document.getElementById("f-count").textContent = `${list.length} of ${D.devices.length} meters`;
+  const el = document.getElementById("rows");
+  el.innerHTML = list.map(d => `
+    <button type="button" class="row" role="option" data-id="${d.id}" aria-current="${d.id === selected}">
+      <span class="id">${d.id}</span>
+      <span class="meta">${CITY[d.city]} · ${nf(d.last30, 0)} m³ / 30 d ${d.status !== "normal" ? `· <span class="chip ${STATUS[d.status].cls}" style="padding:2px 6px;font-size:11px"><i></i>${STATUS[d.status].label}</span>` : ""}</span>
+      ${sparkline(d.spark)}
+    </button>`).join("") || `<p class="empty pad">No meter matches these filters.</p>`;
+  el.onclick = e => { const b = e.target.closest(".row"); if (b) select(b.dataset.id, true); };
+}
+
+function monthly(rows) {
+  const acc = new Map();
+  for (const r of rows) {
+    const [jy, jm, jd] = jOf(r[0]); const k = `${jy}/${String(jm).padStart(2, "0")}`;
+    const o = acc.get(k) || { k, jy, jm, v: 0, days: 0, first: jd };
+    o.v += r[1]; o.days++; acc.set(k, o);
+  }
+  return [...acc.values()].map(o => ({ ...o, partial: o.first !== 1 }));
+}
+
+function odometer(pulses) {
+  const m3 = pulses * PULSE_M3;
+  const whole = Math.floor(m3).toString().padStart(6, "0"), frac = Math.round((m3 % 1) * 100).toString().padStart(2, "0");
+  return `<div class="drums" role="img" aria-label="Meter reading ${nf(m3, 2)} cubic metres">${[...whole].map(c => `<span class="drum">${c}</span>`).join("")}<span class="drum sep"></span>${[...frac].map(c => `<span class="drum red">${c}</span>`).join("")}</div>`;
+}
+
+function select(id, push) {
+  selected = id;
+  const d = byId[id]; if (!d) return;
+  if (push) history.replaceState(null, "", "#" + id);
+  document.querySelectorAll("#rows .row").forEach(r => r.setAttribute("aria-current", r.dataset.id === id));
+  const rows = D.daily[id] || [];
+  const al = (alertsBy[id] || []).slice().sort((a, b) => (a.start < b.start ? 1 : -1));
+  const st = STATUS[d.status];
+  const months = monthly(rows);
+  const latest = months.filter(m => !m.partial).slice(-1)[0];
+  const yearAgo = months.find(m => m.jy === latest.jy - 1 && m.jm === latest.jm && !m.partial);
+  const yoy = yearAgo ? (latest.v / yearAgo.v - 1) * 100 : null;
+  const inv = d.invoice, f = d.forecast;
+  const lastMonth = latest ? latest.v : 0;
+  const lo = Math.min(f.p10, lastMonth) * 0.85, hi = Math.max(f.p90, lastMonth) * 1.1;
+  const pos = v => ((v - lo) / (hi - lo) * 100).toFixed(1) + "%";
+  const ts = d.last_reading.ts;
+  const tehran = new Date(Date.parse(ts) + 3.5 * 3600000).toISOString().slice(11, 16);
+
+  document.getElementById("detail").innerHTML = `
+    <div class="card pad ident">
+      <div>
+        <h3>Meter</h3>
+        <h2 class="num">${d.id}</h2>
+        <div class="sub"><span>${CITY[d.city]} <span class="fa">${esc(d.city_fa)}</span></span><span>${d.area_m2} m² · ${d.occupants} occupants</span><span class="chip ${st.cls}"><i></i>${st.label}</span></div>
+      </div>
+      <div class="odo">${odometer(d.last_reading.pulses)}<span class="lbl">m³ · last reading ${jStr(ts)} ${tehran} Tehran · ${nf(d.last_reading.pulses)} pulses</span></div>
+    </div>
+    <div class="card pad">
+      <div class="chart-head"><h3>Daily gas use, m³</h3>
+        <div class="legend"><span><i class="sw"></i>recorded</span><span><i class="sw band"></i>alert window</span><span><i class="sw dot"></i>data quality flag</span></div></div>
+      <div class="chart" id="daily-chart"></div>
+    </div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="chart-head"><h3>Monthly use by Jalali month</h3>
+          ${yoy == null ? "" : `<span class="num" style="font-size:13px;color:var(--ink-2)">${J_MONTHS[latest.jm - 1]} ${latest.jy} vs ${latest.jy - 1}: <b style="color:var(--ink)">${yoy >= 0 ? "+" : ""}${nf(yoy, 0)}%</b></span>`}</div>
+        <div class="chart" id="month-chart"></div>
+        <p class="note">Highlighted: the latest complete month. Pale bars are partial months at the edges of the data.</p>
+      </div>
+      <div class="card pad">
+        <div class="chart-head"><h3>Forecast · ${J_MONTHS[f.jmonth - 1]} ${f.jyear}</h3><span class="fa" style="font-size:13px;color:var(--muted)">${J_MONTHS_FA[f.jmonth - 1]} ${faYear(f.jyear)}</span></div>
+        <div class="big">${nf(f.p50, 0)} <small>m³ expected</small></div>
+        <div class="range" aria-hidden="true"><div class="track"></div>
+          <div class="span" style="left:${pos(f.p10)};width:calc(${pos(f.p90)} - ${pos(f.p10)})"></div>
+          <div class="p50" style="left:${pos(f.p50)}"></div>
+          <div class="last" style="left:${pos(lastMonth)}" title="last month"></div></div>
+        <div class="range-labels"><span>P10 ${nf(f.p10, 0)}</span><span>P90 ${nf(f.p90, 0)} m³</span></div>
+        <p class="note">Shaded: 80% interval. Ring: last month's actual (${nf(lastMonth, 0)} m³). Heating season starts in ${J_MONTHS[f.jmonth - 1]}, so the jump is expected.</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card pad">
+        <div class="chart-head"><h3>Invoice · ${esc(inv.period)} (self-read)</h3><span class="stamp">Illustrative</span></div>
+        <div class="facts">
+          <div class="fact"><span>Consumption</span><span>${nf(inv.m3, 2)} m³</span></div>
+          <div class="fact"><span>Tariff steps reached</span><span>${inv.tiers} of 4</span></div>
+          <div class="fact"><span>Total payable</span><span>${nf(inv.total)} IRR</span></div>
+          <div class="fact"><span>In toman</span><span class="fa">${faNum(inv.total / 10)} تومان</span></div>
+          <div class="fact"><span>Status</span><span style="font-family:var(--font-body);font-size:13px">${esc(inv.status)}</span></div>
+        </div>
+        <div class="btn-row">
+          ${inv.token ? `<a href="../verify/#${encodeURIComponent(inv.token)}">Verify this invoice</a>` : ""}
+          <button type="button" id="csv">Download daily CSV</button>
+        </div>
+        <p class="note">${esc(inv.id)} · reading frozen by the meter at 00:00 Tehran on the first day of the next month.</p>
+      </div>
+      <div class="card pad">
+        <div class="chart-head"><h3>Alerts for this meter</h3><span class="num" style="font-size:13px;color:var(--muted)">${al.length}</span></div>
+        <div class="alerts-list">${al.length ? al.map(a => {
+          const det = DETECTORS[a.detector] || { name: a.detector, sev: "warn", hint: "" };
+          return `<div class="alert-item"><span class="chip ${det.sev}"><i></i>${esc(det.name)}</span>
+            <span class="when">${jStr(a.start)} → ${jStr(a.end)} · ${daysBetween(a.start, a.end)} d · ${esc(a.confidence)} confidence</span>
+            <p>${esc(a.reason)}.</p></div>`; }).join("") : `<p class="empty">No alerts in the last 13 months.</p>`}</div>
+      </div>
+    </div>`;
+
+  lineChart(document.getElementById("daily-chart"), rows, { height: 240, bands: al, label: `Daily gas use for ${id}` });
+  barChart(document.getElementById("month-chart"), months.map(m => ({
+    v: m.v, short: J_MONTHS[m.jm - 1].slice(0, 3), label: `${J_MONTHS[m.jm - 1]} ${m.jy}`, hi: m === latest, partial: m.partial,
+  })), { label: `Monthly gas use for ${id}` });
+  document.getElementById("csv").onclick = () => {
+    const csv = "date,jalali_date,volume_m3,quality\n" + rows.map(r => `${r[0]},${jStr(r[0])},${r[1]},${r[2]}`).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `${id}-daily.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+}
+
+let resizeTimer;
+addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (D) { drawFleet(); if (selected) select(selected, false); } }, 150);
+});
+addEventListener("hashchange", () => { const id = decodeURIComponent(location.hash.slice(1)); if (byId[id] && id !== selected) select(id, false); });
+
+fetch(DATA_URL).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => { prepare(data); render(); })
+  .catch(err => { document.getElementById("loading").textContent = `Could not load ${DATA_URL} (${err.message}). Serve the docs folder over HTTP, e.g. python -m http.server.`; });
+</script>
+</body>
+</html>

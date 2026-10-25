@@ -232,7 +232,8 @@ def dashboard_dataset(r, out: Path) -> Path:
                                                 "p90": round(float(f.p90), 1)},
             "invoice": None if i is None else {"id": i.invoice_id, "period": i.period_jalali,
                                                "m3": i.consumption_m3, "total": i.total_payable,
-                                               "status": i.status, "tiers": len(i.tier_lines)},
+                                               "status": i.status, "tiers": len(i.tier_lines),
+                                               "token": i.verify_token},
         })
     payload = {
         "generated_from": "sgm_analytics.pipeline (synthetic fleet, not field data)",
@@ -256,6 +257,25 @@ def _md_table(df: pd.DataFrame) -> str:
     for _, row in df.iterrows():
         lines.append("| " + " | ".join(str(row[c]) for c in cols) + " |")
     return "\n".join(lines)
+
+
+def verify_index(invoices: list[dict]) -> dict:
+    """Token -> public invoice summary for the static verification page (docs/verify).
+
+    The QR code carries only an opaque HMAC token. A real deployment answers the
+    lookup from the billing database; the static demo publishes the summaries of
+    the synthetic fleet's invoices. No subscriber reference is included.
+    """
+    entries = {}
+    for inv in invoices:
+        entries[inv["verify_token"]] = {
+            "invoice_id": inv["invoice_id"], "device_id": inv["device_id"], "city": inv["city"],
+            "period_jalali": inv["period_jalali"], "consumption_m3": inv["consumption_m3"],
+            "total_payable": inv["total_payable"], "currency": inv["currency"], "status": inv["status"],
+            "tariff_version": inv["tariff_version"], "tiers": len(inv["tier_lines"]),
+        }
+    return {"note": "Synthetic demo invoices. Prices are illustrative placeholders, not an official tariff.",
+            "invoices": entries}
 
 
 def publish(r, out: Path, holdout=None) -> None:
@@ -282,6 +302,9 @@ def publish(r, out: Path, holdout=None) -> None:
         invoice_pdf.render_invoice(inv, inv_dir / f"sample-invoice-{name}.pdf")
         (inv_dir / f"sample-invoice-{name}.json").write_text(billing.invoice_json(inv), encoding="utf-8")
     dashboard_dataset(r, out)
+    index = verify_index([json.loads(billing.invoice_json(i)) for i in r.invoices])
+    (out / "verify-index.json").write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")),
+                                           encoding="utf-8")
 
     def fmt(ev: pd.DataFrame) -> pd.DataFrame:
         e = ev.copy()
