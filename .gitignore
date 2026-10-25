@@ -9,3 +9,11 @@ _autosave-*
 fp-info-cache
 ~*.lck
 analytics/output/
+
+# ESP-IDF build outputs
+firmware/build/
+firmware/build-*/
+firmware/sdkconfig
+firmware/sdkconfig.old
+firmware/managed_components/
+firmware/dependencies.lock

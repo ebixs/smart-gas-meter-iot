@@ -1,0 +1,103 @@
+menu "Smart Gas Meter (bench prototype)"
+
+    config SGM_DEVICE_ID
+        string "Device ID (empty = sgm-<last 3 MAC bytes>)"
+        default ""
+        help
+            Letters, digits, '.', '_' and '-' only, at most 64 characters.
+
+    config SGM_INPUT_MODE
+        string "input_mode reported in telemetry"
+        default "bench_pulse"
+        help
+            "bench_pulse" for a signal generator or switch on J2. The pulse
+            input is a 3.3 V lab signal only: never connect a live gas meter,
+            gas line, valve, mains or field wiring.
+
+    choice SGM_PERIOD
+        prompt "Billing self-reading period"
+        default SGM_PERIOD_SEASONAL
+        config SGM_PERIOD_SEASONAL
+            bool "Seasonal (Farvardin, Tir, Mehr, Dey)"
+        config SGM_PERIOD_MONTHLY
+            bool "Monthly (every Jalali month)"
+    endchoice
+
+    config SGM_SNAPSHOT_INTERVAL_S
+        int "Interval record every N seconds"
+        range 60 86400
+        default 3600
+
+    config SGM_UPLINK_INTERVAL_S
+        int "Try to send queued records every N seconds"
+        range 60 604800
+        default 3600
+        help
+            Mains-powered default. For a battery build use one or a few
+            uploads per day (see docs/hardware-decisions.md).
+
+    config SGM_QUEUE_LEN
+        int "Records kept while the uplink is down"
+        range 16 1024
+        default 256
+
+    config SGM_DEBOUNCE_MIN_LOW_MS
+        int "Shortest contact closure accepted as a pulse (ms)"
+        default 30
+
+    config SGM_DEBOUNCE_MIN_HIGH_MS
+        int "Shortest open gap between two closures (ms)"
+        default 30
+
+    config SGM_MIN_PULSE_PERIOD_MS
+        int "Pulses closer than this are flagged implausible (ms)"
+        default 5000
+        help
+            G4 meter: Qmax 6 m3/h at 0.01 m3/pulse = one pulse per 6 s.
+
+    config SGM_COMMIT_EVERY_PULSES
+        int "Save the counter after N pulses"
+        range 1 100
+        default 1
+
+    choice SGM_UPLINK
+        prompt "Uplink"
+        default SGM_UPLINK_WIFI
+        config SGM_UPLINK_WIFI
+            bool "Wi-Fi + HTTP (bench)"
+        config SGM_UPLINK_CELL
+            bool "Cellular modem over UART (Quectel AT, LTE Cat-M/NB/Cat-1)"
+    endchoice
+
+    config SGM_API_URL
+        string "Batch ingestion URL"
+        default "http://192.168.1.10:8000/api/v1/readings/batch"
+
+    config SGM_API_TOKEN
+        string "Bearer token (development only)"
+        default ""
+
+    config SGM_WIFI_SSID
+        string "Wi-Fi SSID"
+        depends on SGM_UPLINK_WIFI
+        default ""
+
+    config SGM_WIFI_PASSWORD
+        string "Wi-Fi password"
+        depends on SGM_UPLINK_WIFI
+        default ""
+
+    config SGM_CELL_APN
+        string "APN"
+        depends on SGM_UPLINK_CELL
+        default "mcinet"
+        help
+            Operator APN, e.g. "mcinet" (Hamrah-e Aval) or "mtnirancell"
+            (Irancell). An IoT SIM usually comes with its own APN.
+
+    config SGM_SMS_GATEWAY
+        string "SMS gateway number for period-close fallback (empty = off)"
+        depends on SGM_UPLINK_CELL
+        default ""
+
+endmenu

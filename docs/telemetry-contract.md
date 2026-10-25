@@ -21,3 +21,17 @@ This contract defines the JSON record emitted by the software pulse simulator. I
 6. Define authentication, retention, and access controls before exposing an ingestion endpoint.
 
 The schema and handling notes are a draft interface. They do not mean that an API or database ingestion path is implemented.
+
+## Contract v2 (bench firmware)
+
+- Machine-readable schema: [`schemas/telemetry-v2.schema.json`](../schemas/telemetry-v2.schema.json)
+- Producer: the ESP32-S3 firmware in [`firmware/`](../firmware/README.md) and its host demo (`sgm_host demo`).
+- Adds `record_type` (`interval`, `period_close`, `event`), `time_source`, `fw_version`, and optional
+  `period`, `events`, `rssi_dbm`, `supply_mv`. `input_mode` may be `bench_pulse` for a lab signal on J2.
+- `period_close` is the device's own billing reading: the cumulative count frozen at 00:00 Iran time on the
+  first day of a Jalali month (monthly) or season (Farvardin, Tir, Mehr, Dey).
+- `sequence` is persisted before a record is queued, so it increases across reboots. `uptime_ms` restarts at
+  every boot, so the backend does not use it to order v2 records.
+- Records are uploaded in batches to `POST /api/v1/readings/batch` (at most 64). The response reports each
+  record as `stored`, `duplicate`, `invalid` or `conflict`, so one bad record cannot block the device queue.
+- `simulator/validate_telemetry.py` validates both versions; v1 records keep their original rules.

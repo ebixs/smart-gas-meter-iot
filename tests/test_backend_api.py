@@ -168,5 +168,56 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
 
 
+    @staticmethod
+    def reading_v2(sequence=1, pulses=0, timestamp=None, uptime=1000, **extra):
+        record = {
+            "schema_version": 2, "device_id": "sgm-bench-01", "sequence": sequence,
+            "timestamp": timestamp or f"2026-09-22T20:{sequence:02d}:00.000Z", "uptime_ms": uptime,
+            "pulse_count_total": pulses, "input_mode": "bench_pulse", "record_type": "interval",
+            "time_source": "network", "fw_version": "0.3.0",
+        }
+        record.update(extra)
+        return record
+
+    def test_v2_period_close_round_trip(self):
+        record = self.reading_v2(4, 44, "2026-09-22T20:30:00.000Z", record_type="period_close",
+                                 period={"calendar": "jalali", "start": "1405/04", "months": 3},
+                                 events=["counter_restored"], rssi_dbm=-79)
+        response = self.client.post("/api/v1/readings", json=record, headers=self.headers)
+        self.assertEqual(response.status_code, 201, response.text)
+        latest = self.client.get("/api/v1/devices/sgm-bench-01/latest", headers=self.headers).json()
+        self.assertEqual(latest["period"]["start"], "1405/04")
+        self.assertEqual(latest["timestamp"], "2026-09-22T20:30:00.000000Z")
+
+    def test_v2_rejects_period_on_interval_and_unknown_event(self):
+        bad = self.reading_v2(period={"calendar": "jalali", "start": "1405/04", "months": 3})
+        self.assertEqual(self.client.post("/api/v1/readings", json=bad, headers=self.headers).status_code, 422)
+        bad = self.reading_v2(events=["gas_leak_confirmed"])
+        self.assertEqual(self.client.post("/api/v1/readings", json=bad, headers=self.headers).status_code, 422)
+
+    def test_v2_uptime_may_restart_after_reboot(self):
+        before = self.reading_v2(1, 10, uptime=9_000_000)
+        after = self.reading_v2(2, 10, uptime=50, events=["counter_restored", "brownout_reset"],
+                                record_type="event")
+        for record in (before, after):
+            self.assertEqual(self.client.post("/api/v1/readings", json=record, headers=self.headers).status_code, 201)
+
+    def test_batch_reports_each_record_and_never_blocks_on_one_bad_record(self):
+        batch = [self.reading_v2(1, 5), {"schema_version": 2, "device_id": "x"}, self.reading_v2(3, 7),
+                 self.reading_v2(4, 2)]  # 4 decreases the counter: conflict
+        response = self.client.post("/api/v1/readings/batch", json=batch, headers=self.headers)
+        self.assertEqual(response.status_code, 200, response.text)
+        statuses = [r["status"] for r in response.json()["results"]]
+        self.assertEqual(statuses, ["stored", "invalid", "stored", "conflict"])
+        again = self.client.post("/api/v1/readings/batch", json=batch[:1], headers=self.headers).json()
+        self.assertEqual(again["results"][0]["status"], "duplicate")
+
+    def test_batch_requires_token_and_bounds_size(self):
+        self.assertEqual(self.client.post("/api/v1/readings/batch", json=[self.reading_v2()]).status_code, 401)
+        too_many = [self.reading_v2(i, i) for i in range(1, 66)]
+        self.assertEqual(
+            self.client.post("/api/v1/readings/batch", json=too_many, headers=self.headers).status_code, 422)
+
+
 if __name__ == "__main__":
     unittest.main()
