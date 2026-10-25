@@ -1,0 +1,99 @@
+{
+  "title": "کنتور هوشمند گاز — از گاز درون لوله تا عدد روی سرور",
+  "wordsPerSecond": 2.1,
+  "scenes": [
+    {
+      "id": "s01", "name": "قلاب",
+      "visual": "Index drums roll in close-up; two big numbers count up: 860 and 660 million m³ a day.",
+      "onScreen": ["۸۶۰ میلیون مترمکعب در روز", "۶۶۰ میلیون مترمکعب: خانگی و تجاری"],
+      "source": ["mehr-1404-09-30"],
+      "text": "در یک روز سرد زمستان، شبکهٔ گاز ایران حدود هشتصد و شصت میلیون مترمکعب گاز تحویل می‌دهد و نزدیک ششصد و شصت میلیون مترمکعبِ آن در خانه‌ها و واحدهای تجاری مصرف می‌شود. نصب کنتور هوشمند در خانه‌ها تازه آغاز شده و بیشترِ کنتورهای خانگی هنوز مکانیکی‌اند؛ عددشان را فقط وقتی می‌دانیم که کسی بیاید و آن را بخواند."
+    },
+    {
+      "id": "s02", "name": "مسئله",
+      "visual": "A calendar strip with a gap between two readings; a city map of 27 million dots; a price tag of 4 billion dollars.",
+      "onScreen": ["۲۷ میلیون مشترک", "برآورد هوشمندسازی: حدود ۴ میلیارد دلار"],
+      "source": ["mehr-1403-05-13", "irib-1405-04-08"],
+      "text": "یعنی شرکت گاز مصرفِ واقعی را فقط در فاصلهٔ بین دو قرائت می‌بیند. نشتی یا دست‌کاری دیر پیدا می‌شود و در اوجِ سرما، تصویرِ لحظه‌ای از مصرف در دست نیست. عوض کردنِ کنتورِ بیست و هفت میلیون مشترک هم کار کوچکی نیست؛ برآوردِ هزینهٔ هوشمندسازی، حدود چهار میلیارد دلار اعلام شده است."
+    },
+    {
+      "id": "s03", "name": "ایده",
+      "visual": "The assembled model turns on its stand; the SGM box, the pulser and the cable are labelled.",
+      "onScreen": ["به‌جای تعویض کنتور، کنار همان کنتور", "شمارش · خوداظهاری فصلی · سیم‌کارت · فاکتور"],
+      "source": [],
+      "text": "پروژهٔ کنتور هوشمند گاز، یک نمونهٔ آزمایشگاهیِ متن‌باز است با یک ایدهٔ ساده: به‌جای عوض کردنِ کنتور، کنارِ همان کنتورِ موجود، یک دستگاه کوچک بگذاریم که هر ده لیتر گاز را بشمارد، در پایانِ هر فصل خودش عدد را ثبت کند، آن را با سیم‌کارت به سرور بفرستد، و سرور فاکتوری قابلِ چاپ و قابلِ راستی‌آزمایی صادر کند."
+    },
+    {
+      "id": "s04", "name": "درون کنتور",
+      "visual": "Exploded view: the upper case lifts, the measuring unit rises, covers and diaphragms slide apart; each part lights up as it is named.",
+      "onScreen": ["دیافراگم‌ها", "سوپاپ‌های کشویی", "میل‌لنگ", "کوپلینگ مغناطیسی"],
+      "source": [],
+      "text": "اول ببینیم یک کنتور دیافراگمی چطور کار می‌کند. گاز از اتصالِ ورودی وارد می‌شود و دو محفظهٔ اندازه‌گیری را به نوبت پر و خالی می‌کند. دیافراگم‌های انعطاف‌پذیر با هر بار پر شدن به جلو و عقب رانده می‌شوند و هر رفت‌وبرگشت، حجمِ ثابتی از گاز را جابه‌جا می‌کند. میله‌ها و بازوها این حرکت را به میل‌لنگ می‌رسانند. میل‌لنگ هم سوپاپ‌های کشویی را جابه‌جا می‌کند تا گاز به بخشِ درست برود، و هم از راهِ چرخ‌دنده‌ها و یک کوپلینگ مغناطیسی، غلتک‌های شمارنده را می‌چرخاند."
+    },
+    {
+      "id": "s05", "name": "از آهنربا تا پالس",
+      "visual": "Close-up of the last red drum and its magnet; the reed blades close; one pulse travels down the cable; '1 turn = 1 pulse = 0.01 m³'.",
+      "onScreen": ["۱ دور = ۱ پالس = ۰٫۰۱ مترمکعب", "حذف لرزش: ۳۰ میلی‌ثانیه"],
+      "source": ["repo-firmware"],
+      "text": "حالا مهم‌ترین قطعه: آخرین غلتکِ قرمز. هر دورِ کاملِ آن یعنی ده لیتر گاز. در این غلتک یک آهنربای کوچک هست. پالسرِ رید زیرِ شمارنده نصب می‌شود و هر بار که آهنربا از کنارش رد می‌شود، کنتاکت بسته می‌شود؛ یک پالس، بدون هیچ تماسی با گاز. فِرم‌ور فقط بسته‌شدنی را می‌شمارد که دست‌کم سی میلی‌ثانیه طول بکشد، تا لرزشِ کنتاکت دو بار شمرده نشود."
+    },
+    {
+      "id": "s06", "name": "درون دستگاه",
+      "visual": "The enclosure opens: lid, modem board, main board, battery; ESP32-S3, the two flash slots, the modem and the battery are highlighted in turn.",
+      "onScreen": ["ESP32-S3", "دو نسخه در حافظهٔ فلش + CRC-32", "BG95-M3 یا EC200U-EU", "باتری Li-SOCl₂ (پیشنهاد نسخهٔ ۰٫۳)"],
+      "source": ["repo-firmware", "repo-hardware-decisions"],
+      "text": "سیمِ پالس به بُردِ اصلی می‌رسد. مغزِ دستگاه یک ماژولِ ESP32-S3 است. عدد را دو بار و با کدِ کنترلیِ CRC در حافظهٔ فلش ذخیره می‌کند، تا با قطعِ برق یا ریست، شمارش از دست نرود. یک بُردِ مودمِ جداشدنی، با جای مشترک برای دو مودمِ Quectel، دستگاه را به شبکهٔ موبایل وصل می‌کند. چون جعبهٔ کنتور معمولاً پریز ندارد، برای نسخهٔ بعد باتریِ لیتیوم تیونیل‌کلرید پیشنهاد شده؛ بودجهٔ انرژیِ ما عمرِ آن را بیش از ده سال تخمین می‌زند، که هنوز باید اندازه‌گیری شود."
+    },
+    {
+      "id": "s07", "name": "خوداظهاری فصلی",
+      "visual": "A Jalali clock ticks 31 Shahrivar 23:59:58 → 1 Mehr 00:00; a period_close record freezes; it waits in a queue; after 24 h an SMS card types itself.",
+      "onScreen": ["۰۰:۰۰ اولین روزِ هر فصل، به وقت تهران", "رکورد «بستن دوره»", "پیامک پشتیبان پس از ۲۴ ساعت"],
+      "source": ["repo-firmware"],
+      "text": "و امضای این پروژه: خوداظهاریِ فصلی. ساعتِ صفرِ بامدادِ اولین روزِ هر فصلِ شمسی، به وقتِ تهران، دستگاه عددِ کنتور را ثابت می‌کند و یک رکوردِ «بستنِ دوره» می‌سازد. رکورد در صف می‌ماند تا ارسال و تأیید شود. اگر تا بیست و چهار ساعت ارسال نشد، همان رکورد به‌صورت یک پیامک هم فرستاده می‌شود. پیامک جایگزینِ رکورد نیست؛ پشتیبانِ آن است."
+    },
+    {
+      "id": "s08", "name": "سرور و فاکتور",
+      "visual": "Fleet of 240 dots becomes a chart; one meter's forecast band; one flagged series with 'asks for a look'; a tiered invoice with a QR code that verifies.",
+      "onScreen": ["۲۴۰ خانهٔ شبیه‌سازی‌شده در ۶ شهر", "پیش‌بینی ماه بعد", "فاکتور پلکانی + QR"],
+      "source": ["repo-analytics"],
+      "text": "در سمتِ سرور، روی داده‌های شبیه‌سازی‌شدهٔ دویست و چهل خانه در شش شهر، مصرفِ ماهِ بعد پیش‌بینی می‌شود، الگوهای غیرعادی علامت می‌خورند و فاکتورِ پلکانی با کدِ QR صادر می‌شود که هر کسی می‌تواند اصالتش را بررسی کند. علامتِ ناهنجاری فقط یعنی «یک نفر نگاه کند»؛ هرگز به‌تنهایی اثباتِ نشتی نیست."
+    },
+    {
+      "id": "s09", "name": "در زندگی روزمره",
+      "visual": "A home: a phone shows the seasonal bill from the real reading; nobody waits at the door; an unusual-use alert.",
+      "onScreen": ["قبض بر اساس عدد واقعی", "بی‌نیاز از مراجعهٔ مأمور", "خبرِ زودهنگامِ مصرفِ غیرعادی"],
+      "source": [],
+      "text": "برای مردم، این می‌تواند یعنی قبضی بر اساسِ عددِ واقعیِ کنتور؛ لازم نیست کسی در خانه منتظرِ مأمورِ قرائت بماند؛ و اگر مصرف ناگهان غیرعادی شد، زودتر خبردار می‌شوند."
+    },
+    {
+      "id": "s10", "name": "برای شرکت ملی گاز",
+      "visual": "A national map warms up from blue to amber as a cold front arrives; '2 °C ≈ 50 million m³ a day'; a meter that keeps its old body but gains a smart module.",
+      "onScreen": ["قرائت خودکار", "تصویر نزدیک به لحظه در روزهای اوج", "۲ درجه کمتر ≈ ۵۰ میلیون مترمکعب در روز", "هوشمندسازیِ کنتورِ موجود"],
+      "source": ["mehr-1404-09-30", "irib-1405-04-08"],
+      "text": "و برای شرکتِ ملیِ گاز، مزیت‌های بالقوه روشن است: قرائتِ خودکار به‌جای مراجعهٔ حضوری؛ تصویری نزدیک به لحظه از مصرف در روزهای اوج، وقتی به گفتهٔ مدیرعاملِ شرکت ملی گاز، فقط دو درجه خنک‌تر بودنِ خانه‌ها حدود پنجاه میلیون مترمکعب گاز در روز صرفه‌جویی می‌کند؛ کشفِ زودترِ دست‌کاری و مصرفِ غیرعادی؛ و هوشمند کردنِ کنتورهای موجود، بی‌آن‌که همه‌شان عوض شوند. هزینه و دقتِ واقعیِ این راه، فقط با آزمونِ میدانی و همکاری با اپراتور معلوم می‌شود."
+    },
+    {
+      "id": "s11", "name": "صداقت و گام بعد",
+      "visual": "The bench label fills the frame: bench prototype · synthetic pulses · illustrative tariff · never on live gas. Then the next-steps checklist.",
+      "onScreen": ["نمونهٔ آزمایشگاهی", "پالس شبیه‌سازی‌شده", "تعرفهٔ نمایشی", "هرگز روی گازِ واقعی"],
+      "source": [],
+      "text": "این پروژه امروز یک نمونهٔ آزمایشگاهی است: پالس‌ها شبیه‌سازی‌شده‌اند، تعرفه نمایشی است و دستگاه هرگز نباید به کنتور یا لولهٔ گازِ واقعی وصل شود. گام‌های بعدی، آزمونِ میدانی با اپراتور، گواهی‌های ایمنی و اندازه‌شناسی، و طراحیِ محفظهٔ نهایی است."
+    },
+    {
+      "id": "s12", "name": "پایان",
+      "visual": "The model closes up and turns once; end card with the name, the repository and the honesty label.",
+      "onScreen": ["کنتور هوشمند گاز", "github.com/ebixs/smart-gas-meter-iot"],
+      "source": [],
+      "text": "کنتورِ هوشمندِ گاز: هر ده لیتر، شمرده می‌شود. کد، مدلِ سه‌بعدی و داده‌ها در گیت‌هاب در دسترس است."
+    }
+  ],
+  "sources": {
+    "mehr-1404-09-30": { "title": "مصرف ۶۶۰ میلیون مترمکعبی گاز در بخش خانگی و تجاری — خبرگزاری مهر، ۳۰ آذر ۱۴۰۴ (سعید توکلی، مدیرعامل شرکت ملی گاز)", "url": "https://www.mehrnews.com/news/6697446" },
+    "mehr-1403-05-13": { "title": "گاز دزدی به اتمام می‌رسد — خبرگزاری مهر، ۱۳ مرداد ۱۴۰۳ (رضا نوشادی؛ ۲۷ میلیون مشترک، برآورد ۴ میلیارد دلار، پایلوت در ۷ استان)", "url": "https://www.mehrnews.com/news/6184688" },
+    "irib-1405-04-08": { "title": "توسعه کنتورهای هوشمند گاز و آغاز نصب در منازل — خبرگزاری صدا و سیما، ۸ تیر ۱۴۰۵ (مدیرعامل شرکت گاز استان تهران)", "url": "https://www.iribnews.ir/fa/news/5838846" },
+    "tehrantimes-2022": { "title": "26m smart gas meters to be installed across Iran in 4 years — Tehran Times, 27 June 2022 (Majid Chegeni, NIGC)", "url": "https://www.tehrantimes.com/news/474097/26m-smart-gas-meters-to-be-installed-across-Iran-in-4-years" },
+    "repo-firmware": { "title": "firmware/README.md — debounce, A/B flash slots with CRC-32, period_close, SMS fallback", "url": "https://github.com/ebixs/smart-gas-meter-iot/blob/main/firmware/README.md" },
+    "repo-hardware-decisions": { "title": "docs/hardware-decisions.md — battery, modem, power budget", "url": "https://github.com/ebixs/smart-gas-meter-iot/blob/main/docs/hardware-decisions.md" },
+    "repo-analytics": { "title": "docs/analytics/REPORT.md — 240 simulated households, forecasts, anomalies, invoices", "url": "https://github.com/ebixs/smart-gas-meter-iot/blob/main/docs/analytics/REPORT.md" }
+  }
+}

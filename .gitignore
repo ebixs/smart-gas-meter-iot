@@ -17,3 +17,11 @@ firmware/sdkconfig
 firmware/sdkconfig.old
 firmware/managed_components/
 firmware/dependencies.lock
+# exploded-view build previews (the page, PDF and videos are committed)
+hardware/visualization/exploded/test.html
+hardware/visualization/media/sgm-exploded-sheets-a4-p*.png
+hardware/visualization/media/sgm-exploded-sheets-a4.html
+media/explainer/*.video.mp4
+media/explainer/audio/*.raw
+media/explainer/explainer.html
+hardware/visualization/media/*.video.mp4
