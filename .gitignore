@@ -24,3 +24,4 @@ hardware/visualization/media/sgm-exploded-sheets-a4.html
 media/explainer/*.video.mp4
 media/explainer/audio/*.raw
 media/explainer/explainer.html
+hardware/visualization/media/*.video.mp4
