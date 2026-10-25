@@ -8,3 +8,4 @@ data/
 _autosave-*
 fp-info-cache
 ~*.lck
+analytics/output/
