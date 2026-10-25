@@ -21,9 +21,33 @@
 
 [Overview](#english) · [فارسی](#فارسی) · [Deutsch](#deutsch) · [Architecture](#architecture) · [Safety](#safety)
 
-[Interactive Project Gallery](hardware/visualization/project-gallery.html) · [3D Concept View](hardware/visualization/smart-gas-meter-exploded.html) · [Visual Design Notes](hardware/visualization/README.md) · [Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [Native KiCad Schematic v0.2](hardware/kicad/smart_gas_meter_iot.kicad_sch) · [Schematic PDF](hardware/kicad/exports/smart_gas_meter_iot-schematic.pdf) · [CAD Reference Attribution](hardware/kicad/REFERENCE_ATTRIBUTION_AND_STATUS.md) · [v0.2 Netlist Draft](hardware/kicad/board-v0.2-netlist-draft.csv) · [v0.2 PCB Layout Plan](hardware/kicad/board-v0.2-layout-plan.md) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
+[Project site](https://ebixs.github.io/smart-gas-meter-iot/) · [Interactive Project Gallery](hardware/visualization/project-gallery.html) · [3D Concept View](hardware/visualization/smart-gas-meter-exploded.html) · [Visual Design Notes](hardware/visualization/README.md) · [Requirements](docs/requirements.md) · [Architecture Details](docs/architecture.md) · [Development API](docs/api-development.md) · [Production Architecture](docs/production-product-architecture.md) · [Design Decisions v1](hardware/design-decisions-v1.md) · [Release Readiness](hardware/release-readiness.md) · [Pinout & Test Points](hardware/pinout-and-testpoints-v0.2.md) · [AI, Billing & Tamper Requirements](docs/ai-billing-and-tamper-requirements.md) · [Telemetry Contract](docs/telemetry-contract.md) · [Telemetry JSON Schema](schemas/telemetry.schema.json) · [Board v0.1 Design](hardware/board-v0.1-design.md) · [Schematic Plan](hardware/board-v0.2-schematic-plan.md) · [Cellular Modem Interface](hardware/modem-daughterboard-interface.md) · [Board BOM](hardware/BOM-board-v0.1.md) · [Board Netlist Draft](hardware/board-v0.1-netlist-draft.csv) · [Native KiCad Schematic v0.2](hardware/kicad/smart_gas_meter_iot.kicad_sch) · [Schematic PDF](hardware/kicad/exports/smart_gas_meter_iot-schematic.pdf) · [CAD Reference Attribution](hardware/kicad/REFERENCE_ATTRIBUTION_AND_STATUS.md) · [v0.2 Netlist Draft](hardware/kicad/board-v0.2-netlist-draft.csv) · [v0.2 PCB Layout Plan](hardware/kicad/board-v0.2-layout-plan.md) · [PCB Layout Checklist](hardware/board-v0.1-layout-checklist.md) · [Bring-up Test Plan](hardware/board-v0.1-bringup-test-plan.md) · [Initial BOM](hardware/BOM-draft.md) · [Pulse Simulator Spec](hardware/pulse-simulator-spec.md) · [Software Simulator](simulator/pulse_simulator.py) · [Send Synthetic Data to API](simulator/push_to_api.py)
 
 </div>
+
+---
+
+## Showcase
+
+<p align="center">
+  <a href="https://ebixs.github.io/smart-gas-meter-iot/"><img src="hardware/visualization/media/sgm-launch-film-poster.png" alt="Frame from the 30-second project film: the meter freezes its own reading at 00:00 on 1 Mehr 1405" width="820"></a>
+  <br>
+  <sub><a href="hardware/visualization/media/sgm-launch-film.mp4">30-second film (MP4)</a> · <a href="https://ebixs.github.io/smart-gas-meter-iot/">project site</a> · all data synthetic · bench prototype</sub>
+</p>
+
+| | What it is | Where |
+|---|---|---|
+| **Fleet console** | 240 simulated meters: readings, self-read invoices, forecasts, alerts | [`docs/dashboard`](docs/dashboard/index.html) · [live](https://ebixs.github.io/smart-gas-meter-iot/dashboard/) |
+| **How a pulse works** | Interactive isometric figure: drums, reed pulser, cable, SGM display | [`hardware/visualization/anatomy`](hardware/visualization/anatomy/build.mjs) · [live](https://ebixs.github.io/smart-gas-meter-iot/anatomy/pulse-anatomy-light.html) |
+| **Invoice check** | Scan an invoice's QR token, see what the issuer billed | [`docs/verify`](docs/verify/index.html) · [live](https://ebixs.github.io/smart-gas-meter-iot/verify/) |
+| **Firmware** | ESP32-S3: debounced reed input, power-safe counter, Jalali self-reading, LTE + SMS fallback | [`firmware/`](firmware/README.md) |
+| **Analytics & billing** | Fleet simulator, forecasts (WAPE 9.5 %), six fault detectors, bilingual PDF invoices | [`analytics/`](analytics/) · [report](docs/analytics/REPORT.md) |
+| **Hardware** | KiCad 9 schematic, routed 4-layer PCB, BOM, v0.3 power/modem decisions | [`hardware/kicad`](hardware/kicad/) · [decisions](docs/hardware-decisions.md) |
+| **Film source** | Code-drawn 30 s film, deterministic frame capture | [`media/film`](media/film/BRIEF.md) |
+
+> **Bench only.** The pulse input takes a synthetic 3.3 V signal; never connect a live gas meter, gas line, valve, mains or field wiring. An analytics alert is not proof of a leak. Invoice prices are illustrative.
+>
+> **فقط روی میز آزمایش.** ورودی پالس فقط سیگنال مصنوعی ۳٫۳ ولت می‌پذیرد؛ هرگز به کنتور، لوله گاز، شیر، برق شهر یا سیم‌کشی میدانی وصل نشود. هشدار تحلیلی اثبات نشت گاز نیست و قیمت‌های قبض نمونه‌اند.
 
 ---
 
@@ -34,7 +58,7 @@
 
 **Smart Gas Meter IoT** is a proposed end-to-end prototype for exploring how embedded electronics, simulated meter pulses, cellular connectivity, and a Python backend can work together to monitor consumption and prepare billing records.
 
-The project is being developed as a practical engineering portfolio: from circuit and PCB design to firmware, data services, a dashboard, and analytics. **This repository is at an early stage; planned features are not yet claimed as implemented.**
+The project is being developed as a practical engineering portfolio: from circuit and PCB design to firmware, data services, a dashboard, and analytics. **Built so far:** KiCad schematic and routed PCB, ESP32-S3 bench firmware, telemetry contract v2 with a batch API, the analytics and billing pipeline, a fleet console and an invoice verification page (see Showcase). **Not done:** a fabricated and flashed board, field trials, any certification. Anything not listed as built is still a plan.
 
 ### Current engineering baseline
 
