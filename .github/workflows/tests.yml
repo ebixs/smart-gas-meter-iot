@@ -31,3 +31,26 @@ jobs:
           python simulator/pulse_simulator.py --device-id ci-lab --pulses 3 --interval-ms 250 > /tmp/readings.jsonl
           python simulator/validate_telemetry.py /tmp/readings.jsonl
           python -c "import json; rows=[json.loads(line) for line in open('/tmp/readings.jsonl', encoding='utf-8')]; assert len(rows)==3; assert [r['pulse_count_total'] for r in rows]==[1,2,3]; assert all(r['input_mode']=='simulated' for r in rows)"
+
+  analytics-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: analytics/requirements.txt
+      - name: Install analytics dependencies
+        run: python -m pip install -r analytics/requirements.txt
+      - name: Run analytics unit tests
+        working-directory: analytics
+        run: python -m unittest discover -s tests -v
+      - name: Smoke-test the end-to-end pipeline on a small fleet
+        working-directory: analytics
+        run: |
+          python -m sgm_analytics.pipeline --devices 16 --out /tmp/sgm-out --holdout-seed 0
+          test -s /tmp/sgm-out/forecast_metrics.csv
+          ls /tmp/sgm-out/invoices | head -3

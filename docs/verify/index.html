@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SGM Invoice Check</title>
+<meta name="description" content="Check a Smart Gas Meter demo invoice by the token in its QR code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Vazirmatn:wght@400;600&display=swap">
+<style>
+/* Layout: one narrow column, like a receipt held up to the light. */
+:root {
+  --bg: #f2f3ef; --surface: #ffffff; --surface-2: #f8f8f5; --ink: #15181b; --ink-2: #4b5157; --muted: #7b8187;
+  --line: #dfe1db; --line-2: #c9ccc4; --pipe: #f2b200; --pipe-ink: #5a4300; --good: #0a7d0a; --good-bg: #e7f5e5;
+  --bad: #b3302b; --bad-bg: #fbe9e7;
+  --font-display: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-fa: "Vazirmatn", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1214; --surface: #171b1e; --surface-2: #1c2125; --ink: #e8ebe6; --ink-2: #b4bab6; --muted: #868d91;
+    --line: #2a3035; --line-2: #3a4147; --pipe-ink: #f7d46a; --good: #5fd35f; --good-bg: #13301a; --bad: #ff8a80; --bad-bg: #3a1714;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1214; --surface: #171b1e; --surface-2: #1c2125; --ink: #e8ebe6; --ink-2: #b4bab6; --muted: #868d91;
+  --line: #2a3035; --line-2: #3a4147; --pipe-ink: #f7d46a; --good: #5fd35f; --good-bg: #13301a; --bad: #ff8a80; --bad-bg: #3a1714;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--font-body); }
+.pipe { height: 6px; background: var(--pipe); }
+.wrap { max-width: 560px; margin: 0 auto; padding-block: 36px 60px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+a { color: inherit; }
+.back { font-size: 14px; color: var(--ink-2); }
+h1 { font: 700 30px/1.15 var(--font-display); margin: 18px 0 6px; letter-spacing: -0.01em; text-wrap: balance; }
+.fa { font-family: var(--font-fa); direction: rtl; unicode-bidi: isolate; }
+.lead { color: var(--ink-2); margin: 0 0 22px; }
+form { display: flex; gap: 8px; }
+input { flex: 1; min-width: 0; font: 15px var(--font-num); letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 8px; padding: 10px 12px; }
+button { font: 600 15px var(--font-body); color: var(--bg); background: var(--ink); border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--pipe); outline-offset: 2px; }
+.result { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.verdict { display: flex; gap: 12px; align-items: center; padding: 14px 18px; font-weight: 600; }
+.verdict.ok { background: var(--good-bg); color: var(--good); }
+.verdict.no { background: var(--bad-bg); color: var(--bad); }
+.verdict svg { flex: none; }
+dl { margin: 0; padding: 6px 18px 14px; display: grid; grid-template-columns: auto 1fr; gap: 0 16px; }
+dt, dd { padding: 9px 0; border-bottom: 1px dashed var(--line); margin: 0; }
+dt { color: var(--ink-2); font-size: 14px; }
+dd { text-align: right; font: 500 15px var(--font-num); font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere; }
+dl > :nth-last-child(-n+2) { border-bottom: 0; }
+.stamp { display: inline-block; font: 600 11px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--pipe-ink); border: 1.5px solid var(--pipe); border-radius: 4px; padding: 4px 6px; }
+.how { margin-top: 30px; font-size: 14px; color: var(--ink-2); }
+.how h2 { font: 600 13px var(--font-body); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+.how ol { padding-left: 20px; margin: 0; display: grid; gap: 6px; }
+code { font-family: var(--font-num); font-size: 13px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 4px; }
+.sample { margin-top: 10px; font-size: 13px; color: var(--muted); }
+.sample button { background: none; color: var(--ink); border: 0; padding: 0; font: inherit; text-decoration: underline; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="pipe" aria-hidden="true"></div>
+<div class="wrap">
+  <a class="back" href="../dashboard/">← Fleet console</a>
+  <h1>Check an invoice <span class="fa" style="font-size:20px;color:var(--muted);font-weight:600">· استعلام قبض</span></h1>
+  <p class="lead">Scan the QR code on a Smart Gas Meter invoice, or type the token printed under it.</p>
+  <form id="f" autocomplete="off">
+    <label for="token" style="position:absolute;left:-9999px">Verification token</label>
+    <input id="token" name="token" placeholder="e.g. J3KAFWNWAJGEFBHEQXQ6UPWH" maxlength="40" spellcheck="false">
+    <button type="submit">Check</button>
+  </form>
+  <p class="sample">No invoice at hand? <button type="button" id="sample">Try the sample invoice's token</button>.</p>
+  <div id="out" aria-live="polite"></div>
+  <section class="how">
+    <h2>What this check proves</h2>
+    <ol>
+      <li>The QR code holds only an opaque token, signed with HMAC-SHA256 when the invoice is issued. It carries no name, address or amount.</li>
+      <li>The token is looked up in the issuer's records. A match shows the amount and period the issuer actually billed, so a forged or edited printout does not match.</li>
+      <li>This demo publishes the records of a synthetic 240-meter fleet. Prices are illustrative placeholders, not an official tariff.</li>
+    </ol>
+  </section>
+</div>
+<script>
+"use strict";
+const INDEX_URL = "../analytics/verify-index.json";
+const SAMPLE = "J3KAFWNWAJGEFBHEQXQ6UPWH";
+const out = document.getElementById("out"), input = document.getElementById("token");
+let index = null;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const nf = v => Number(v).toLocaleString("en-US");
+const ok = '<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="currentColor"/><path d="M6.5 11.5l3 3 6-6.5" fill="none" stroke="var(--good-bg)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const no = '<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="currentColor"/><path d="M7.5 7.5l7 7M14.5 7.5l-7 7" stroke="var(--bad-bg)" stroke-width="2.2" stroke-linecap="round"/></svg>';
+
+async function load() {
+  if (index) return index;
+  const r = await fetch(INDEX_URL);
+  if (!r.ok) throw new Error("HTTP " + r.status);
+  return (index = await r.json());
+}
+
+async function check(raw) {
+  const token = raw.trim().toUpperCase().replace(/[^A-Z2-7]/g, "");
+  if (!token) { out.innerHTML = ""; return; }
+  input.value = token;
+  try { await load(); } catch (e) {
+    out.innerHTML = `<div class="result"><div class="verdict no">${no}Could not reach the invoice records (${esc(e.message)}). Try again later.</div></div>`;
+    return;
+  }
+  const inv = index.invoices[token];
+  if (!inv) {
+    out.innerHTML = `<div class="result"><div class="verdict no">${no}No invoice was issued with this token.</div>
+      <dl><dt>Token</dt><dd>${esc(token)}</dd><dt>What to do</dt><dd style="font-family:var(--font-body);font-size:14px">Check the characters, or treat the printout as not genuine.</dd></dl></div>`;
+    return;
+  }
+  out.innerHTML = `<div class="result"><div class="verdict ok">${ok}This invoice was issued by the meter operator.</div>
+    <dl>
+      <dt>Invoice</dt><dd>${esc(inv.invoice_id)}</dd>
+      <dt>Billing period</dt><dd>${esc(inv.period_jalali)}</dd>
+      <dt>Meter</dt><dd>${esc(inv.device_id)} · ${esc(inv.city)}</dd>
+      <dt>Consumption</dt><dd>${Number(inv.consumption_m3).toFixed(2)} m³</dd>
+      <dt>Total payable</dt><dd>${nf(inv.total_payable)} ${esc(inv.currency)}</dd>
+      <dt>Status</dt><dd style="font-family:var(--font-body);font-size:13px">${esc(inv.status)}</dd>
+      <dt>Tariff</dt><dd>${esc(inv.tariff_version)} <span class="stamp">Illustrative</span></dd>
+    </dl></div>`;
+  if (location.hash.slice(1) !== token) history.replaceState(null, "", "#" + token);
+}
+
+document.getElementById("f").addEventListener("submit", e => { e.preventDefault(); check(input.value); });
+document.getElementById("sample").addEventListener("click", () => check(SAMPLE));
+addEventListener("hashchange", () => check(decodeURIComponent(location.hash.slice(1))));
+if (location.hash.length > 1) check(decodeURIComponent(location.hash.slice(1)));
+</script>
+</body>
+</html>

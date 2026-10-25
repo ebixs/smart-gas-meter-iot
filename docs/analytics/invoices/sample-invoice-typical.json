@@ -1,0 +1,81 @@
+{
+  "invoice_id": "INV-140506-sgm-0041",
+  "device_id": "sgm-0041",
+  "subscriber_ref": "SUB-38480816",
+  "city": "shahrekord",
+  "tariff_region": "cold",
+  "period_jalali": "1405/06",
+  "period_start": "2026-08-23T00:00:00+03:30",
+  "period_end": "2026-09-23T00:00:00+03:30",
+  "previous_reading_pulses": 1375297,
+  "current_reading_pulses": 1380179,
+  "consumption_m3": 48.82,
+  "pattern_m3": 83.78,
+  "tier_lines": [
+    {
+      "tier": 1,
+      "from_m3": 0.0,
+      "to_m3": 83.78,
+      "quantity_m3": 48.82,
+      "price_per_m3": 3000,
+      "amount": 146460
+    }
+  ],
+  "energy_charge": 146460,
+  "fixed_charge": 50000,
+  "tax": 19646,
+  "total_payable": 216000,
+  "currency": "IRR",
+  "tariff_version": "IR-RES-ILLUSTRATIVE-1404.08",
+  "status": "ILLUSTRATIVE FINAL",
+  "quality_notes": [],
+  "verify_token": "J3KAFWNWAJGEFBHEQXQ6UPWH",
+  "trace": [
+    {
+      "step": "period",
+      "start": "2026-08-23T00:00:00+03:30",
+      "end": "2026-09-23T00:00:00+03:30",
+      "rule": "half-open [start, end), Asia/Tehran"
+    },
+    {
+      "step": "readings",
+      "previous_pulses": 1375297,
+      "current_pulses": 1380179,
+      "intervals_used": 744,
+      "consumption_m3": 48.82,
+      "rule": "sum of quality-checked interval volumes (handles counter resets and gaps)"
+    },
+    {
+      "step": "pattern",
+      "region": "cold",
+      "jalali_month": 6,
+      "median_m3_per_day": 2.702,
+      "days": 31,
+      "pattern_m3": 83.78,
+      "rule": "median household m3/day for region and month over up to 5 prior years (quality-OK days)"
+    },
+    {
+      "step": "tiers",
+      "season": "warm",
+      "lines": [
+        {
+          "tier": 1,
+          "from_m3": 0.0,
+          "to_m3": 83.78,
+          "quantity_m3": 48.82,
+          "price_per_m3": 3000,
+          "amount": 146460
+        }
+      ]
+    },
+    {
+      "step": "amount",
+      "energy": 146460,
+      "fixed": 50000,
+      "tax_rate": 0.1,
+      "tax": 19646,
+      "rounded_down_to": 1000,
+      "total": 216000
+    }
+  ]
+}

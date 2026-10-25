@@ -1,10 +1,12 @@
-name: Deploy visual project gallery
+name: Deploy project site
 
 on:
   push:
     branches: [main]
     paths:
-      - "hardware/visualization/project-gallery.html"
+      - "hardware/visualization/**"
+      - "hardware/kicad/exports/**"
+      - "docs/**"
       - ".github/workflows/deploy-visual-gallery.yml"
   workflow_dispatch:
 
@@ -30,10 +32,23 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Package visual gallery
+      - name: Assemble site
+        # / = gallery and landing, /dashboard = fleet console, /verify = invoice QR check,
+        # /analytics = report, figures, sample invoices and the dashboard dataset.
+        run: |
+          mkdir -p _site
+          cp -r hardware/visualization/. _site/
+          rm -f _site/README.md
+          for dir in dashboard verify analytics site; do
+            if [ -d "docs/$dir" ]; then cp -r "docs/$dir" "_site/$dir"; fi
+          done
+          if [ -d hardware/kicad/exports ]; then mkdir -p _site/hardware && cp -r hardware/kicad/exports _site/hardware/kicad-exports; fi
+          touch _site/.nojekyll
+          find _site -maxdepth 2 | sort | head -50
+      - name: Package site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: hardware/visualization
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

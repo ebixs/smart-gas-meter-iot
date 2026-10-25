@@ -1,0 +1,129 @@
+{
+  "invoice_id": "INV-140506-sgm-0058",
+  "device_id": "sgm-0058",
+  "subscriber_ref": "SUB-37310611",
+  "city": "shahrekord",
+  "tariff_region": "cold",
+  "period_jalali": "1405/06",
+  "period_start": "2026-08-23T00:00:00+03:30",
+  "period_end": "2026-09-23T00:00:00+03:30",
+  "previous_reading_pulses": 3180336,
+  "current_reading_pulses": 3202292,
+  "consumption_m3": 219.56,
+  "pattern_m3": 83.78,
+  "tier_lines": [
+    {
+      "tier": 1,
+      "from_m3": 0.0,
+      "to_m3": 83.78,
+      "quantity_m3": 83.78,
+      "price_per_m3": 3000,
+      "amount": 251325
+    },
+    {
+      "tier": 2,
+      "from_m3": 83.78,
+      "to_m3": 125.66,
+      "quantity_m3": 41.89,
+      "price_per_m3": 7500,
+      "amount": 314156
+    },
+    {
+      "tier": 3,
+      "from_m3": 125.66,
+      "to_m3": 167.55,
+      "quantity_m3": 41.89,
+      "price_per_m3": 19000,
+      "amount": 795862
+    },
+    {
+      "tier": 4,
+      "from_m3": 167.55,
+      "to_m3": null,
+      "quantity_m3": 52.01,
+      "price_per_m3": 50000,
+      "amount": 2600500
+    }
+  ],
+  "energy_charge": 3961843,
+  "fixed_charge": 50000,
+  "tax": 401184,
+  "total_payable": 4413000,
+  "currency": "IRR",
+  "tariff_version": "IR-RES-ILLUSTRATIVE-1404.08",
+  "status": "ILLUSTRATIVE FINAL",
+  "quality_notes": [],
+  "verify_token": "REQEHCZWNB2PQQ2V6GHPISMC",
+  "trace": [
+    {
+      "step": "period",
+      "start": "2026-08-23T00:00:00+03:30",
+      "end": "2026-09-23T00:00:00+03:30",
+      "rule": "half-open [start, end), Asia/Tehran"
+    },
+    {
+      "step": "readings",
+      "previous_pulses": 3180336,
+      "current_pulses": 3202292,
+      "intervals_used": 744,
+      "consumption_m3": 219.56,
+      "rule": "sum of quality-checked interval volumes (handles counter resets and gaps)"
+    },
+    {
+      "step": "pattern",
+      "region": "cold",
+      "jalali_month": 6,
+      "median_m3_per_day": 2.702,
+      "days": 31,
+      "pattern_m3": 83.78,
+      "rule": "median household m3/day for region and month over up to 5 prior years (quality-OK days)"
+    },
+    {
+      "step": "tiers",
+      "season": "warm",
+      "lines": [
+        {
+          "tier": 1,
+          "from_m3": 0.0,
+          "to_m3": 83.78,
+          "quantity_m3": 83.78,
+          "price_per_m3": 3000,
+          "amount": 251325
+        },
+        {
+          "tier": 2,
+          "from_m3": 83.78,
+          "to_m3": 125.66,
+          "quantity_m3": 41.89,
+          "price_per_m3": 7500,
+          "amount": 314156
+        },
+        {
+          "tier": 3,
+          "from_m3": 125.66,
+          "to_m3": 167.55,
+          "quantity_m3": 41.89,
+          "price_per_m3": 19000,
+          "amount": 795862
+        },
+        {
+          "tier": 4,
+          "from_m3": 167.55,
+          "to_m3": null,
+          "quantity_m3": 52.01,
+          "price_per_m3": 50000,
+          "amount": 2600500
+        }
+      ]
+    },
+    {
+      "step": "amount",
+      "energy": 3961843,
+      "fixed": 50000,
+      "tax_rate": 0.1,
+      "tax": 401184,
+      "rounded_down_to": 1000,
+      "total": 4413000
+    }
+  ]
+}

@@ -13,17 +13,18 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterator, Literal
+from typing import Annotated, Any, Iterator, Literal, Union
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Body, Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, ConfigDict, Field, StrictInt, field_validator
+from pydantic import BaseModel, ConfigDict, Field, StrictInt, TypeAdapter, ValidationError, field_validator, model_validator
 
 DB_PATH = Path(os.environ.get("SGM_DATABASE_PATH", "data/telemetry.sqlite3"))
 API_TOKEN = os.environ.get("SGM_API_TOKEN", "")
 bearer_scheme = HTTPBearer(auto_error=False)
-app = FastAPI(title="Smart Gas Meter IoT Lab API", version="0.1.0")
+app = FastAPI(title="Smart Gas Meter IoT Lab API", version="0.2.0")
+BATCH_MAX = 64
 
 
 class TelemetryReading(BaseModel):
@@ -52,6 +53,60 @@ class TelemetryReading(BaseModel):
         return value.astimezone(timezone.utc)
 
 
+class Period(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    calendar: Literal["jalali"]
+    start: str = Field(pattern=r"^1[34][0-9]{2}/(0[1-9]|1[0-2])$")
+    months: Literal[1, 3]
+
+
+EventName = Literal[
+    "tamper_open", "tamper_closed", "counter_restored", "store_empty", "queue_overflow",
+    "implausible_rate", "late_close", "brownout_reset", "watchdog_reset",
+]
+
+
+class TelemetryReadingV2(BaseModel):
+    """Bench-firmware contract (schemas/telemetry-v2.schema.json)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[2]
+    device_id: str = Field(pattern=r"^[A-Za-z0-9._-]{1,64}$")
+    sequence: StrictInt = Field(ge=1)
+    timestamp: datetime
+    uptime_ms: StrictInt = Field(ge=0)
+    pulse_count_total: StrictInt = Field(ge=0)
+    input_mode: Literal["simulated", "bench_pulse"]
+    record_type: Literal["interval", "period_close", "event"]
+    time_source: Literal["network", "sntp", "backfilled"]
+    fw_version: str = Field(min_length=1, max_length=32)
+    period: Period | None = None
+    events: list[EventName] | None = Field(default=None, min_length=1)
+    rssi_dbm: StrictInt | None = Field(default=None, ge=-140, le=0)
+    supply_mv: StrictInt | None = Field(default=None, ge=1, le=20000)
+
+    @field_validator("timestamp")
+    @classmethod
+    def timestamp_must_be_utc(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() != timezone.utc.utcoffset(value):
+            raise ValueError("timestamp must be UTC")
+        return value.astimezone(timezone.utc)
+
+    @model_validator(mode="after")
+    def period_matches_type(self) -> "TelemetryReadingV2":
+        if (self.record_type == "period_close") != (self.period is not None):
+            raise ValueError("period is required on period_close records and only allowed there")
+        if self.events is not None and len(set(self.events)) != len(self.events):
+            raise ValueError("events must be unique")
+        return self
+
+
+AnyReading = Annotated[Union[TelemetryReading, TelemetryReadingV2], Field(discriminator="schema_version")]
+READING_ADAPTER: TypeAdapter[Any] = TypeAdapter(AnyReading)
+
+
 @contextmanager
 def connection() -> Iterator[sqlite3.Connection]:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -65,7 +120,7 @@ def connection() -> Iterator[sqlite3.Connection]:
                 timestamp TEXT NOT NULL,
                 uptime_ms INTEGER NOT NULL,
                 pulse_count_total INTEGER NOT NULL,
-                input_mode TEXT NOT NULL CHECK (input_mode = 'simulated'),
+                input_mode TEXT NOT NULL CHECK (input_mode IN ('simulated', 'bench_pulse')),
                 payload_json TEXT NOT NULL,
                 PRIMARY KEY (device_id, sequence)
             )"""
@@ -101,11 +156,13 @@ def health() -> dict[str, str]:
     return {"status": "ok", "mode": "synthetic-lab-only"}
 
 
-@app.post("/api/v1/readings", status_code=201)
-def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_token)) -> dict[str, object]:
-    payload = reading.model_dump(mode="json")
+def store_reading(reading: TelemetryReading | TelemetryReadingV2) -> dict[str, object]:
+    """Idempotent insert with ordering checks. Raises HTTPException(409) on conflicts."""
+    payload = reading.model_dump(mode="json", exclude_none=True)
     payload["timestamp"] = reading.timestamp.astimezone(timezone.utc).isoformat(timespec="microseconds").replace("+00:00", "Z")
     payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    # uptime_ms restarts at every reboot of a v2 device, so it only orders v1 simulator streams.
+    check_uptime = reading.schema_version == 1
     with connection() as db:
         existing = db.execute(
             "SELECT payload_json FROM readings WHERE device_id=? AND sequence=?",
@@ -130,7 +187,7 @@ def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_toke
         ).fetchone()
         if previous and (
             payload["timestamp"] < previous["timestamp"]
-            or reading.uptime_ms < previous["uptime_ms"]
+            or (check_uptime and reading.uptime_ms < previous["uptime_ms"])
             or reading.pulse_count_total < previous["pulse_count_total"]
         ):
             raise HTTPException(
@@ -139,7 +196,7 @@ def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_toke
             )
         if following and (
             payload["timestamp"] > following["timestamp"]
-            or reading.uptime_ms > following["uptime_ms"]
+            or (check_uptime and reading.uptime_ms > following["uptime_ms"])
             or reading.pulse_count_total > following["pulse_count_total"]
         ):
             raise HTTPException(
@@ -157,6 +214,39 @@ def ingest_reading(reading: TelemetryReading, _: None = Depends(require_api_toke
         )
         db.commit()
     return {"accepted": True, "duplicate": False, "device_id": reading.device_id, "sequence": reading.sequence}
+
+
+@app.post("/api/v1/readings", status_code=201)
+def ingest_reading(
+    reading: AnyReading, _: None = Depends(require_api_token)
+) -> dict[str, object]:
+    return store_reading(reading)
+
+
+@app.post("/api/v1/readings/batch")
+def ingest_batch(
+    records: list[dict[str, Any]] = Body(..., min_length=1, max_length=BATCH_MAX),
+    _: None = Depends(require_api_token),
+) -> dict[str, object]:
+    """Store-and-forward upload from the firmware: each record is validated and stored
+    on its own, so one bad record is reported instead of blocking the device queue."""
+    results: list[dict[str, object]] = []
+    for index, raw in enumerate(records):
+        try:
+            reading = READING_ADAPTER.validate_python(raw)
+        except ValidationError as exc:
+            results.append({"index": index, "status": "invalid",
+                            "detail": [e["msg"] for e in exc.errors()][:3]})
+            continue
+        try:
+            outcome = store_reading(reading)
+            results.append({"index": index, "sequence": reading.sequence,
+                            "status": "duplicate" if outcome["duplicate"] else "stored"})
+        except HTTPException as exc:
+            results.append({"index": index, "sequence": reading.sequence, "status": "conflict",
+                            "detail": exc.detail})
+    stored = sum(r["status"] in ("stored", "duplicate") for r in results)
+    return {"received": len(records), "stored": stored, "results": results}
 
 
 @app.get("/api/v1/devices/{device_id}/latest")
