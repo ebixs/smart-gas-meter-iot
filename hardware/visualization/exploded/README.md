@@ -44,3 +44,14 @@ node capture.mjs ../media/sgm-exploded-tour.mp4 --lang both   # guided tour, 192
 
 `capture.mjs` and `print.mjs` drive the built page through `window.__sgm` (`render`, `snapshot`), so the video, the
 sheets and the live page always show the same model and the same notes.
+
+## Audit status (last full run)
+
+The kit audit passes. The full orbit audit (70 min: 360° turn, explode clip, turn while apart) reports no
+interpenetration, no unseparated pairs, no painter cycles and no forced picks. It still lists 61 small findings,
+none visible in the page or the videos:
+
+- 20 depth disagreements of 0.5–2.6 px², almost all between neighbouring chunks of the pulse cable at its bend;
+- 40 continuity lines: faces of the thin case and enclosure walls born at 12–17 px² at the four angles where they
+  turn edge-on (128°, 218°, 308°, 38°); a 0.1° frame-difference check around them shows no pop;
+- 1 swap of 1.25 px² between the two flag rods at 291.6°.
