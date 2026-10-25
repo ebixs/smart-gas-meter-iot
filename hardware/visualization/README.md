@@ -6,6 +6,10 @@ Reference: https://github.com/wheresryan22/anatomy
 
 ## Deliverables in this folder
 
+- `index.html`: the project site's front page (film, one-pulse walkthrough, links to the console, verifier and hardware).
+- `anatomy/pulse-anatomy*.html`: interactive figure, rebuilt with `node hardware/visualization/anatomy/build.mjs [--light]`.
+- `media/`: the 30 s project film, its poster and page thumbnails (film source in `media/film/`).
+
 - `smart-gas-meter-exploded.html`: standalone interactive isometric concept illustration. Open locally in a browser; no build step, framework, or network connection required.
 - The drawing is an **illustrative concept model**, not a mechanical CAD model, KiCad 3D render, enclosure drawing, or fabrication reference.
 - Controls let the viewer rotate the presentation slightly, toggle the exploded view, and pause motion. Respect for reduced-motion preferences is built in.
@@ -24,4 +28,4 @@ This illustration is for design communication only. It does not replace the pin-
 
 ## Source skill licence
 
-Anatomy is MIT-licensed. This project's illustration is an independent implementation inspired by its documented approach; it does not copy Anatomy example artwork or source files.
+Anatomy is MIT-licensed. The v0.1 concept views are independent implementations inspired by its approach. The v0.2 figure in `anatomy/` (one pulse = 0.01 m³) is built with the Anatomy kit itself, vendored with its licence in `anatomy/kit/`; the drawing is this project's own.

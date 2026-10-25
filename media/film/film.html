@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SGM launch film</title>
+<!-- 30 s, 1920x1080. Every visual state is a pure function of t: render(t) sets it.
+     Capture: node capture.mjs (seeks each frame) -> ffmpeg. Data: film-data.js (from docs/analytics). -->
+<style>
+@font-face{font-family:"Bricolage";src:url(fonts/bricolage-grotesque-latin-700-normal.woff2) format("woff2");font-weight:700}
+@font-face{font-family:"Bricolage";src:url(fonts/bricolage-grotesque-latin-800-normal.woff2) format("woff2");font-weight:800}
+@font-face{font-family:"Plex Sans";src:url(fonts/ibm-plex-sans-latin-400-normal.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"Plex Sans";src:url(fonts/ibm-plex-sans-latin-500-normal.woff2) format("woff2");font-weight:500}
+@font-face{font-family:"Plex Sans";src:url(fonts/ibm-plex-sans-latin-600-normal.woff2) format("woff2");font-weight:600}
+@font-face{font-family:"Plex Mono";src:url(fonts/ibm-plex-mono-latin-400-normal.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"Plex Mono";src:url(fonts/ibm-plex-mono-latin-600-normal.woff2) format("woff2");font-weight:600}
+@font-face{font-family:"Vazir";src:url(fonts/vazirmatn-arabic-400-normal.woff2) format("woff2");font-weight:400}
+@font-face{font-family:"Vazir";src:url(fonts/vazirmatn-arabic-700-normal.woff2) format("woff2");font-weight:700}
+:root{--bg:#f2f3ef;--paper:#fbfbf8;--ink:#15181b;--ink2:#4b5157;--muted:#7b8187;--line:#dfe1db;--line2:#c9ccc4;
+  --pipe:#f2b200;--pipe-d:#c99300;--blue:#2a78d6;--blue-l:#86b6ef;--red:#c9352f;--drum:#15181b;--lcd:#c9d6c4;--lcd-ink:#1d2b1f;
+  --serious:#ec835a;--good:#0ca30c}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Plex Sans",Inter,sans-serif;-webkit-font-smoothing:antialiased}
+.scene{position:absolute;inset:0;overflow:hidden;opacity:0;transform-origin:50% 50%}
+svg{position:absolute;inset:0;width:1920px;height:1080px;overflow:visible}
+.h{position:absolute;font-family:"Bricolage",Inter,sans-serif;font-weight:800;letter-spacing:-0.035em;line-height:.98;color:var(--ink)}
+.sub{position:absolute;font-size:30px;line-height:1.35;color:var(--ink2);max-width:760px}
+.mono{font-family:"Plex Mono",monospace}
+.fa{font-family:"Vazir",sans-serif;direction:rtl}
+.chip{position:absolute;display:inline-flex;align-items:center;gap:12px;font:600 24px "Plex Sans";padding:10px 18px 10px 14px;border-radius:999px;background:var(--paper);border:2px solid var(--line2);white-space:nowrap}
+.chip i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.label{position:absolute;font:600 20px "Plex Sans";letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rule{position:absolute;left:0;right:0;height:10px;background:var(--pipe)}
+#honest{position:absolute;right:56px;bottom:36px;font:500 26px "Plex Mono";color:#5b6066;letter-spacing:.01em}
+</style>
+</head>
+<body>
+<!-- S1 hook: index drums -->
+<div class="scene" id="s1">
+  <div class="label" style="left:120px;top:150px">G4 gas meter · index</div>
+  <div class="h" id="s1h" style="left:118px;top:196px;font-size:118px">Every 0.01 m³ counts.</div>
+  <svg id="s1svg"></svg>
+  <div class="sub" id="s1s" style="left:120px;top:800px;max-width:1300px;font-size:34px">The last red drum moves one litre per digit. One full turn is one hundredth of a cubic metre.</div>
+</div>
+<!-- S2 + S3: one continuous canvas, panned -->
+<div class="scene" id="s2">
+  <svg id="s2svg"></svg>
+  <div class="h" id="s2h" style="left:1040px;top:200px;font-size:96px">One magnet.<br>One pulse.</div>
+  <div class="sub" id="s2s" style="left:1044px;top:420px;max-width:720px">A magnet on the last drum closes a reed contact once per turn. 0.01 m³ in, one pulse out.</div>
+  <div class="h" id="s3h" style="left:120px;top:150px;font-size:96px">Counted at the edge.</div>
+  <div class="sub" id="s3s" style="left:122px;top:270px;max-width:820px">ESP32-S3 firmware debounces every pulse and saves the counter to flash on each one: two slots, CRC-32, nothing lost on a power cut.</div>
+</div>
+<!-- S4 self-reading -->
+<div class="scene" id="s4" style="background:var(--lcd)">
+  <svg id="s4svg"></svg>
+  <div class="label" style="left:120px;top:120px;color:#4c5e4f">Tehran time · UTC+03:30</div>
+  <div class="fa" id="s4fa" style="position:absolute;left:120px;top:150px;width:900px;text-align:left;font-size:120px;font-weight:700;color:var(--lcd-ink)"></div>
+  <div class="mono" id="s4en" style="position:absolute;left:124px;top:330px;font-size:44px;color:#3c4d3f"></div>
+  <div class="mono" id="s4clock" style="position:absolute;left:118px;top:420px;font-size:160px;font-weight:600;color:var(--lcd-ink);letter-spacing:-.02em"></div>
+  <div class="h" id="s4h" style="left:120px;top:720px;font-size:88px;color:var(--lcd-ink)">It reads itself.</div>
+  <div class="sub" id="s4s" style="left:124px;top:830px;max-width:820px;color:#3c4d3f">At 00:00 on the first day of each billing period, monthly or seasonal, the meter freezes its own reading. No visit, no estimate.</div>
+  <div id="s4card" style="position:absolute;left:1080px;top:170px;width:740px;height:720px;background:#f7faf5;border-radius:22px;box-shadow:0 30px 60px #1d2b1f33;padding:40px 44px;overflow:hidden">
+    <div class="label" style="position:static;color:#5d6f60">record · telemetry v2</div>
+    <pre class="mono" id="s4json" style="margin:22px 0 0;font-size:25px;line-height:1.55;color:#1d2b1f;white-space:pre"></pre>
+  </div>
+</div>
+<!-- S5 delivery -->
+<div class="scene" id="s5"><svg id="s5svg"></svg>
+  <div class="h" style="left:120px;top:150px;font-size:96px">Stored. Forwarded.<br>Or texted.</div>
+  <div class="sub" style="left:124px;top:380px;max-width:700px">Records queue on the device until the backend confirms them. A billing reading still unsent after 24&nbsp;h also goes out as one SMS.</div>
+  <div id="s5sms" style="position:absolute;left:124px;top:600px;width:940px;background:var(--paper);border:2px solid var(--line2);border-radius:28px 28px 28px 8px;padding:28px 34px;box-shadow:0 20px 40px #0001">
+    <div class="label" style="position:static">SMS fallback</div>
+    <div class="mono" id="s5text" style="margin-top:12px;font-size:31px;line-height:1.4;overflow-wrap:anywhere;min-height:88px"></div>
+  </div>
+</div>
+<!-- S6 fleet -->
+<div class="scene" id="s6"><svg id="s6svg"></svg>
+  <div class="h" style="left:120px;top:120px;font-size:96px">240 meters. One console.</div>
+  <div class="sub" style="left:124px;top:230px;max-width:1100px">A synthetic fleet across six Iranian cities: hourly pulses, daily use, a full year of seasons.</div>
+  <div class="label" id="s6lab" style="left:124px;top:330px">fleet gas use · m³ per day</div>
+  <div id="s6sms" style="position:absolute;left:124px;top:600px;width:940px;background:var(--paper);border:2px solid var(--line2);border-radius:28px 28px 28px 8px;box-shadow:0 20px 40px #0001;transform-origin:50% 50%;padding:28px 34px;overflow:hidden"><div class="label" style="position:static">SMS fallback</div><div class="mono" style="margin-top:12px;font-size:31px;line-height:1.4;overflow-wrap:anywhere">SGM1 sgm-bench-01 P=1405/04x3 C=44 S=4 T=20260922T2030Z</div></div>
+</div>
+<!-- S7 forecast -->
+<div class="scene" id="s7"><svg id="s7svg"></svg>
+  <div class="h" style="left:120px;top:120px;font-size:96px">Next month, forecast.</div>
+  <div class="label" style="left:124px;top:250px">meter sgm-0101 · backtest by Jalali month</div>
+  <div style="position:absolute;left:1340px;top:330px">
+    <div class="h" id="s7num" style="position:static;font-size:220px;color:var(--blue)">9.5%</div>
+    <div class="sub" style="position:static;margin-top:10px;max-width:470px">next-month error (WAPE) on held-out months</div>
+    <div class="sub" id="s7cov" style="position:static;margin-top:28px;max-width:520px;font-size:42px;line-height:1.2;color:var(--ink);font-weight:600"></div>
+  </div>
+</div>
+<!-- S8 alert -->
+<div class="scene" id="s8"><svg id="s8svg"></svg>
+  <div class="h" style="left:120px;top:120px;font-size:96px">Something off? Flag it.</div>
+  <div class="label" style="left:124px;top:250px">meter sgm-0239 · daily gas use, winter</div>
+  <div class="chip" id="s8chip" style="left:0;top:0;font-size:30px;color:var(--ink);padding:12px 22px 12px 16px"><i style="background:var(--serious);width:16px;height:16px"></i>Flagged for a look · never proof of a leak</div>
+  <div class="sub" id="s8s" style="left:124px;top:900px;max-width:1500px;font-size:32px;color:var(--ink2)">No pulses for 23 days while the weather says the heating should be on: a stuck or disconnected sensor.</div>
+</div>
+<!-- S9 invoice -->
+<div class="scene" id="s9"><svg id="s9svg"><line id="s9link" x1="1222" y1="850" x2="1222" y2="850" stroke="var(--good)" stroke-width="4" stroke-dasharray="10 8"/></svg>
+  <div class="h" style="left:120px;top:120px;font-size:96px">A bill anyone can check.</div>
+  <div class="sub" style="left:124px;top:232px;max-width:1300px">Jalali billing period, stepped tariff, and a signed QR token that opens the issuer's own record.</div>
+  <div id="s9card" style="position:absolute;left:220px;top:330px;width:1000px;height:640px;background:var(--paper);border:2px solid var(--line);border-radius:20px;box-shadow:0 30px 70px #0002;padding:40px 46px;overflow:hidden"></div>
+  <div id="s9ok" style="position:absolute;left:1290px;top:780px;white-space:nowrap;background:#e7f5e5;color:#0a7d0a;border-radius:18px;padding:22px 26px;font:600 30px 'Plex Sans';display:flex;gap:18px;align-items:center">
+    <svg viewBox="0 0 22 22" style="position:static;width:44px;height:44px;flex:none"><circle cx="11" cy="11" r="10" fill="currentColor"/><path d="M6.5 11.5l3 3 6-6.5" fill="none" stroke="#e7f5e5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Issued by the meter operator</span></div>
+</div>
+<!-- S10 end card -->
+<div class="scene" id="s10"><svg id="s10svg"></svg>
+  <div class="label" id="e0" style="left:0;width:1920px;text-align:center;top:380px;font-size:24px">Open-source bench prototype</div>
+  <div class="h" id="e1" style="left:0;width:1920px;text-align:center;top:420px;font-size:150px">Smart Gas Meter</div>
+  <div class="fa" id="e2" style="position:absolute;left:0;width:1920px;text-align:center;top:590px;font-size:64px;font-weight:700;color:var(--ink2);direction:rtl">کنتور هوشمند گاز</div>
+  <div class="mono" id="e3" style="position:absolute;left:0;width:1920px;text-align:center;top:712px;font-size:50px;font-weight:600;color:var(--ink)">github.com/ebixs/smart-gas-meter-iot</div>
+  <div id="e3u" style="position:absolute;left:400px;width:1120px;top:782px;height:8px;background:var(--pipe);transform-origin:left;transform:scaleX(0)"></div>
+  <div id="e4" style="position:absolute;left:0;width:1920px;text-align:center;top:820px;font-size:28px;color:var(--ink2)">ESP32-S3 firmware · Jalali self-reading · forecasts · anomaly detection · verifiable invoices</div>
+  <div class="mono" id="e5" style="position:absolute;left:0;width:1920px;text-align:center;top:950px;font-size:28px;color:var(--ink2)">Bench prototype · synthetic fleet · illustrative prices · never connected to gas</div>
+</div>
+<div id="honest">Bench prototype · synthetic fleet · illustrative prices</div>
+<script src="film-data.js"></script>
+<script>
+"use strict";
+const DUR = 30, W = 1920, H = 1080, F = window.FILM_DATA;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const sm = (x) => { x = clamp(x); return x * x * x * (x * (x * 6 - 15) + 10); };   // smootherstep
+const out = (x) => 1 - Math.pow(1 - clamp(x), 3);
+const inn = (x) => Math.pow(clamp(x), 3);
+const win = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const fmt = (v, d = 0) => Number(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const faNum = (s) => String(s).replace(/[0-9]/g, (c) => "۰۱۲۳۴۵۶۷۸۹"[c]);
+const SCENES = [["s1", 0, 3], ["s2", 3, 9], ["s4", 9, 12.5], ["s5", 12.5, 15], ["s6", 15, 18.5], ["s7", 18.5, 21.5], ["s8", 21.5, 24.5], ["s9", 24.5, 27.5], ["s10", 27.5, 30.01]];
+const enter = (t, t0, d = 0.45) => out((t - t0) / d);                       // 0 -> 1 arrival
+const rise = (node, k, dy = 40) => { node.style.opacity = k; node.style.transform = `translateY(${(1 - k) * dy}px)`; };
+
+/* ---------------------------------------------------------------- odometer (S1) */
+const DR = { x0: 152, y: 380, w: 190, h: 330, gap: 12, n: 8 };
+const s1svg = $("s1svg");
+const s1world = el("g", {}, s1svg);
+el("rect", { x: DR.x0 - 40, y: DR.y - 40, width: DR.n * (DR.w + DR.gap) - DR.gap + 80, height: DR.h + 80, rx: 26, fill: "#e6e8e2", stroke: "#c9ccc4", "stroke-width": 3 }, s1world);
+el("rect", { x: DR.x0 - 14, y: DR.y - 14, width: DR.n * (DR.w + DR.gap) - DR.gap + 28, height: DR.h + 28, rx: 14, fill: "#0b0c0d" }, s1world);
+const drumCols = [];
+for (let c = 0; c < DR.n; c++) {
+  const x = DR.x0 + c * (DR.w + DR.gap), red = c >= 5;
+  const clip = el("clipPath", { id: "dc" + c }, s1world); el("rect", { x, y: DR.y, width: DR.w, height: DR.h, rx: 8 }, clip);
+  const g = el("g", { "clip-path": `url(#dc${c})` }, s1world);
+  el("rect", { x, y: DR.y, width: DR.w, height: DR.h, fill: red ? "var(--red)" : "var(--drum)" }, g);
+  const col = el("g", {}, g);
+  for (let n = -1; n <= 10; n++) {
+    const tx = el("text", { x: x + DR.w / 2, y: DR.y + DR.h / 2 + 80 + n * DR.h, "text-anchor": "middle", fill: "#f4f4ef", "font-family": "Plex Mono", "font-weight": 600, "font-size": 224 }, col);
+    tx.textContent = (n + 10) % 10;
+  }
+  // cylinder shading
+  const gr = el("linearGradient", { id: "sh" + c, x1: 0, y1: 0, x2: 0, y2: 1 }, s1world);
+  [[0, .55], [.22, 0], [.78, 0], [1, .55]].forEach(([o, a]) => el("stop", { offset: o, "stop-color": "#000", "stop-opacity": a }, gr));
+  el("rect", { x, y: DR.y, width: DR.w, height: DR.h, fill: `url(#sh${c})` }, g);
+  drumCols.push(col);
+}
+el("circle", { cx: DR.x0 + 5 * (DR.w + DR.gap) - DR.gap / 2, cy: DR.y + DR.h - 30, r: 9, fill: "#f4f4ef" }, s1world); // decimal comma
+const LITRES0 = 13505272;
+const litresAt = (t) => LITRES0 + 24 * sm(t / 2.9) + 0.0;                 // continuous litres
+function drumValues(L) {
+  const whole = Math.floor(L), frac = L - whole, vals = [];
+  let carry = frac, rest = whole;
+  for (let c = DR.n - 1; c >= 0; c--) { const d = rest % 10; vals[c] = d + carry; carry = d === 9 ? carry : 0; rest = Math.floor(rest / 10); }
+  return vals;
+}
+const lastDrumX = DR.x0 + 7 * (DR.w + DR.gap) + DR.w / 2, lastDrumY = DR.y + DR.h / 2;
+
+/* ---------------------------------------------------------------- S2/S3 world */
+const s2svg = $("s2svg"), world = el("g", {}, s2svg);
+const WH = { cx: 560, cy: 470, r: 250 };            // drum wheel, seen end-on
+const REED = { x0: 330, x1: 790, y: 800 };          // reed capsule under the wheel
+const PIPE_Y = REED.y, DEV = { x: 1980, y: 380, w: 760, h: 560 };
+// yellow pipe: from reed to device gland
+el("path", { d: `M${REED.x1} ${PIPE_Y}H${DEV.x}`, stroke: "var(--pipe-d)", "stroke-width": 26, "stroke-linecap": "round", fill: "none" }, world);
+el("path", { d: `M${REED.x1} ${PIPE_Y}H${DEV.x}`, stroke: "var(--pipe)", "stroke-width": 18, fill: "none" }, world);
+el("path", { d: `M${REED.x1} ${PIPE_Y - 4}H${DEV.x}`, stroke: "#ffe08a", "stroke-width": 3, fill: "none", opacity: .9 }, world);
+for (let x = 1100; x < DEV.x; x += 300) {   // pipe clamps
+  el("rect", { x: x - 10, y: PIPE_Y - 22, width: 20, height: 44, rx: 4, fill: "#d8dad3", stroke: "#9da29c", "stroke-width": 2 }, world);
+}
+// wheel
+el("circle", { cx: WH.cx, cy: WH.cy, r: WH.r + 26, fill: "#e6e8e2", stroke: "#c9ccc4", "stroke-width": 3 }, world);
+const wheel = el("g", {}, world);
+el("circle", { cx: WH.cx, cy: WH.cy, r: WH.r, fill: "var(--red)" }, wheel);
+el("circle", { cx: WH.cx, cy: WH.cy, r: WH.r - 70, fill: "#a82a25" }, wheel);
+for (let n = 0; n < 10; n++) {
+  const a = n / 10 * Math.PI * 2 - Math.PI / 2;
+  const tx = el("text", { x: WH.cx + Math.cos(a) * (WH.r - 36), y: WH.cy + Math.sin(a) * (WH.r - 36) + 16, "text-anchor": "middle", fill: "#fff", "font-family": "Plex Mono", "font-weight": 600, "font-size": 44, transform: `rotate(${n * 36} ${WH.cx + Math.cos(a) * (WH.r - 36)} ${WH.cy + Math.sin(a) * (WH.r - 36)})` }, wheel);
+  tx.textContent = n;
+  if (n === 6 || n === 9) {   // underline 6 and 9 so they read the same at any angle
+    const ux = WH.cx + Math.cos(a) * (WH.r - 36), uy = WH.cy + Math.sin(a) * (WH.r - 36);
+    el("rect", { x: ux - 14, y: uy + 22, width: 28, height: 5, rx: 2, fill: "#fff", transform: `rotate(${n * 36} ${ux} ${uy})` }, wheel);
+  }
+}
+el("rect", { x: WH.cx - 34, y: WH.cy + WH.r - 64, width: 68, height: 40, rx: 6, fill: "#2a2d31" }, wheel);   // magnet at "bottom" when angle 0
+el("rect", { x: WH.cx - 34, y: WH.cy + WH.r - 64, width: 34, height: 40, rx: 6, fill: "#d03b3b" }, wheel);
+el("circle", { cx: WH.cx, cy: WH.cy, r: 34, fill: "#e6e8e2", stroke: "#9da29c", "stroke-width": 3 }, world);
+el("circle", { cx: WH.cx, cy: WH.cy, r: 10, fill: "#9da29c" }, world);
+// reed capsule
+el("rect", { x: REED.x0, y: REED.y - 40, width: REED.x1 - REED.x0, height: 80, rx: 40, fill: "#eef3f6", stroke: "#9fb3bf", "stroke-width": 3 }, world);
+el("path", { d: `M${REED.x0 - 40} ${REED.y}H${REED.x0 + 40}`, stroke: "#6b6f74", "stroke-width": 8, "stroke-linecap": "round" }, world);
+const bladeL = el("path", { stroke: "#5b6066", "stroke-width": 9, "stroke-linecap": "round", fill: "none" }, world);
+const bladeR = el("path", { stroke: "#5b6066", "stroke-width": 9, "stroke-linecap": "round", fill: "none" }, world);
+const spark = el("circle", { cx: (REED.x0 + REED.x1) / 2, cy: REED.y, r: 26, fill: "var(--pipe)", opacity: 0 }, world);
+// device
+const dv = el("g", {}, world);
+el("rect", { x: DEV.x + 16, y: DEV.y + 22, width: DEV.w, height: DEV.h, rx: 40, fill: "#00000014" }, dv);
+el("rect", { x: DEV.x, y: DEV.y, width: DEV.w, height: DEV.h, rx: 36, fill: "#fbfbf8", stroke: "#9da29c", "stroke-width": 3 }, dv);
+el("rect", { x: DEV.x + 30, y: DEV.y + 30, width: DEV.w - 60, height: DEV.h - 60, rx: 22, fill: "none", stroke: "#dfe1db", "stroke-width": 3 }, dv);
+for (const [x, y] of [[44, 44], [DEV.w - 44, 44], [44, DEV.h - 44], [DEV.w - 44, DEV.h - 44]]) el("circle", { cx: DEV.x + x, cy: DEV.y + y, r: 8, fill: "#9da29c" }, dv);
+const LCDR = { x: DEV.x + 90, y: DEV.y + 110, w: DEV.w - 180, h: 230 };
+el("rect", { x: LCDR.x - 8, y: LCDR.y - 8, width: LCDR.w + 16, height: LCDR.h + 16, rx: 16, fill: "#9da29c" }, dv);
+el("rect", { x: LCDR.x, y: LCDR.y, width: LCDR.w, height: LCDR.h, rx: 10, fill: "var(--lcd)" }, dv);
+const lcdTop = el("text", { x: LCDR.x + 28, y: LCDR.y + 52, fill: "#3c4d3f", "font-family": "Plex Mono", "font-size": 30 }, dv); lcdTop.textContent = "sgm-bench-01 · P 1405/07";
+const lcdVal = el("text", { x: LCDR.x + LCDR.w - 30, y: LCDR.y + 182, "text-anchor": "end", fill: "var(--lcd-ink)", "font-family": "Plex Mono", "font-weight": 600, "font-size": 112 }, dv);
+const lcdUnit = el("text", { x: LCDR.x + LCDR.w - 30, y: LCDR.y + 52, "text-anchor": "end", fill: "#3c4d3f", "font-family": "Plex Mono", "font-size": 30 }, dv); lcdUnit.textContent = "m³";
+const led = el("circle", { cx: DEV.x + DEV.w - 100, cy: DEV.y + 400, r: 14, fill: "#c9ccc4" }, dv);
+el("rect", { x: DEV.x + 90, y: DEV.y + 386, width: 90, height: 34, rx: 17, fill: "none", stroke: "#9da29c", "stroke-width": 3 }, dv);
+el("rect", { x: DEV.x + 200, y: DEV.y + 386, width: 90, height: 34, rx: 17, fill: "none", stroke: "#9da29c", "stroke-width": 3 }, dv);
+el("rect", { x: DEV.x - 34, y: PIPE_Y - 26, width: 40, height: 52, rx: 6, fill: "#d8dad3", stroke: "#9da29c", "stroke-width": 3 }, dv);  // cable gland
+el("rect", { x: DEV.x + DEV.w - 150, y: DEV.y - 120, width: 22, height: 124, rx: 11, fill: "#d8dad3", stroke: "#9da29c", "stroke-width": 3 }, dv); // antenna
+const pulseHalos = [0, 1, 2, 3, 4, 5].map(() => el("circle", { r: 40, fill: "var(--pipe)", opacity: 0 }, world));
+const pulseDots = [0, 1, 2, 3, 4, 5].map(() => el("circle", { r: 24, fill: "var(--pipe)", stroke: "#fff", "stroke-width": 6, opacity: 0 }, world));
+// wheel angle: rev(t) turns; a pulse fires when the magnet passes the reed (integer turns)
+const revAt = (t) => 0.62 * (t - 3) + 0.35 * sm((t - 3) / 6) - 0.18;      // S2-S3 local, starts just before a pass
+const PULSE_V = 1300;                                                      // px/s along the pipe
+function pulsesUpTo(t) { const r = revAt(t), out = []; for (let k = Math.ceil(revAt(3)); k <= Math.floor(r); k++) { // time of pass k
+    let lo = 3, hi = t; for (let i = 0; i < 30; i++) { const m = (lo + hi) / 2; if (revAt(m) < k) lo = m; else hi = m; } out.push(hi); } return out; }
+const PULSE_TRAVEL = (DEV.x - REED.x1) / PULSE_V;
+
+/* ---------------------------------------------------------------- S4 */
+const JSON_LINES = [
+  "{", '  "schema_version": 2,', '  "device_id": "sgm-bench-01",', '  "sequence": 4,', '  "timestamp": "2026-09-22T20:30:00.000Z",',
+  '  "pulse_count_total": 44,', '  "record_type": "period_close",', '  "period": {', '    "calendar": "jalali",', '    "start": "1405/04",',
+  '    "months": 3', "  },", '  "time_source": "network",', '  "rssi_dbm": -79', "}",
+];
+
+/* ---------------------------------------------------------------- S5 */
+const s5svg = $("s5svg");
+const tower = el("g", { transform: "translate(1300 780) scale(1.45) translate(-1240 -560)" }, s5svg);
+el("path", { d: "M1180 560 L1240 230 L1300 560 Z", fill: "none", stroke: "var(--ink2)", "stroke-width": 6, "stroke-linejoin": "round" }, tower);
+el("path", { d: "M1205 420H1275M1220 330H1262", stroke: "var(--ink2)", "stroke-width": 5 }, tower);
+el("circle", { cx: 1240, cy: 226, r: 14, fill: "var(--ink)" }, tower);
+const waves = [0, 1, 2].map((i) => el("path", { d: `M${1200 - i * 34} ${190 - i * 30} A ${60 + i * 46} ${60 + i * 46} 0 0 1 ${1280 + i * 34} ${190 - i * 30}`, stroke: "var(--blue)", "stroke-width": 7, fill: "none", "stroke-linecap": "round" }, tower));
+const bars = [0, 1, 2, 3].map((i) => el("rect", { x: 1560 + i * 50, y: 760 - (i + 1) * 46, width: 30, height: (i + 1) * 46, rx: 5 }, s5svg));
+const s5label = el("text", { x: 1560, y: 812, "font-family": "Plex Mono", "font-size": 28, fill: "var(--ink2)" }, s5svg);
+const packet = el("g", {}, s5svg);
+el("rect", { x: -70, y: -46, width: 140, height: 92, rx: 16, fill: "#f7faf5", stroke: "var(--pipe)", "stroke-width": 6 }, packet);
+el("path", { d: "M-40 -16H40M-40 4H24M-40 24H32", stroke: "#1d2b1f", "stroke-width": 6, "stroke-linecap": "round" }, packet);
+const SMS = "SGM1 sgm-bench-01 P=1405/04x3 C=44 S=4 T=20260922T2030Z";
+
+/* ---------------------------------------------------------------- S6 fleet */
+const s6svg = $("s6svg");
+const CH = { x: 140, y: 380, w: 1640, h: 560 };
+const fleet = F.fleet, fmax = Math.max(...fleet) * 1.08;
+const fx = (i) => CH.x + i / (fleet.length - 1) * CH.w, fy = (v) => CH.y + CH.h - v / fmax * CH.h;
+for (const v of [0, 1000, 2000, 3000, 4000, 5000]) {
+  el("line", { x1: CH.x, x2: CH.x + CH.w, y1: fy(v), y2: fy(v), stroke: "var(--line)", "stroke-width": 2 }, s6svg);
+  const tx = el("text", { x: CH.x - 14, y: fy(v) + 9, "text-anchor": "end", "font-family": "Plex Mono", "font-size": 24, fill: "var(--muted)" }, s6svg); tx.textContent = fmt(v);
+}
+const fleetArea = el("path", { fill: "var(--blue)", opacity: .12 }, s6svg);
+const fleetLine = el("path", { fill: "none", stroke: "var(--blue)", "stroke-width": 5, "stroke-linejoin": "round" }, s6svg);
+const fleetPts = fleet.map((v, i) => [fx(i), fy(v)]);
+const fleetD = "M" + fleetPts.map((p) => p.map((n) => n.toFixed(1)).join(" ")).join("L");
+fleetLine.setAttribute("d", fleetD);
+fleetArea.setAttribute("d", fleetD + `L${CH.x + CH.w} ${CH.y + CH.h}L${CH.x} ${CH.y + CH.h}Z`);
+const fleetClip = el("clipPath", { id: "fclip" }, s6svg); const fclipR = el("rect", { x: CH.x - 10, y: 0, height: H, width: 0 }, fleetClip);
+fleetLine.setAttribute("clip-path", "url(#fclip)"); fleetArea.setAttribute("clip-path", "url(#fclip)");
+const months = [["Mehr", 34], ["Dey", 125], ["Farvardin", 213], ["Tir", 307]];
+for (const [m, i] of months) { const tx = el("text", { x: fx(i), y: CH.y + CH.h + 44, "font-family": "Plex Sans", "font-size": 24, fill: "var(--muted)", "text-anchor": "middle" }, s6svg); tx.textContent = m; }
+const dots = []; for (let i = 0; i < 240; i++) dots.push(el("circle", { r: 9, fill: "var(--blue)" }, s6svg));
+const grid = (i) => [1060 + (i % 24) * 30, 470 + Math.floor(i / 24) * 30];
+const ORIGIN = [594, 675];   // centre of the SMS card
+const target = (i) => { const k = Math.round(i / 239 * (fleet.length - 1)); return fleetPts[k]; };
+
+/* ---------------------------------------------------------------- S7 forecast */
+const s7svg = $("s7svg"), FC = F.forecast;
+const C7 = { x: 160, y: 330, w: 1060, h: 560 };
+const fcMax = Math.max(...FC.map((r) => Math.max(r.hi, r.m3))) * 1.1;
+const cx7 = (i) => C7.x + 40 + i / (FC.length - 1) * (C7.w - 80), cy7 = (v) => C7.y + C7.h - v / fcMax * C7.h;
+for (const v of [0, 100, 200, 300, 400]) {
+  el("line", { x1: C7.x, x2: C7.x + C7.w, y1: cy7(v), y2: cy7(v), stroke: "var(--line)", "stroke-width": 2 }, s7svg);
+  const tx = el("text", { x: C7.x - 14, y: cy7(v) + 9, "text-anchor": "end", "font-family": "Plex Mono", "font-size": 24, fill: "var(--muted)" }, s7svg); tx.textContent = v;
+}
+FC.forEach((r, i) => { const tx = el("text", { x: cx7(i), y: C7.y + C7.h + 44, "text-anchor": "middle", "font-family": "Plex Mono", "font-size": 24, fill: "var(--muted)" }, s7svg); tx.textContent = String(r.jm).padStart(2, "0"); });
+const bandD = "M" + FC.map((r, i) => `${cx7(i)} ${cy7(r.hi)}`).join("L") + "L" + FC.slice().reverse().map((r, j) => `${cx7(FC.length - 1 - j)} ${cy7(r.lo)}`).join("L") + "Z";
+const band = el("path", { d: bandD, fill: "var(--blue-l)", opacity: .55 }, s7svg);
+const p50 = el("path", { d: "M" + FC.map((r, i) => `${cx7(i)} ${cy7(r.p50)}`).join("L"), fill: "none", stroke: "var(--blue)", "stroke-width": 6, "stroke-linejoin": "round" }, s7svg);
+const p50len = p50.getTotalLength ? 2400 : 2400;
+const act = FC.map((r, i) => el("circle", { cx: cx7(i), cy: cy7(r.m3), r: 12, fill: "var(--ink)", stroke: "var(--paper)", "stroke-width": 4 }, s7svg));
+const bandClip = el("clipPath", { id: "bclip" }, s7svg); const bclipR = el("rect", { x: 0, y: 0, height: H, width: 0 }, bandClip); band.setAttribute("clip-path", "url(#bclip)");
+const leg = el("g", {}, s7svg);
+el("rect", { x: C7.x + C7.w - 330, y: C7.y - 6, width: 34, height: 18, fill: "var(--blue-l)" }, leg);
+const lt1 = el("text", { x: C7.x + C7.w - 286, y: C7.y + 10, "font-family": "Plex Sans", "font-size": 24, fill: "var(--ink2)" }, leg); lt1.textContent = "80% interval";
+el("circle", { cx: C7.x + C7.w - 120, cy: C7.y + 3, r: 9, fill: "var(--ink)" }, leg);
+const lt2 = el("text", { x: C7.x + C7.w - 100, y: C7.y + 10, "font-family": "Plex Sans", "font-size": 24, fill: "var(--ink2)" }, leg); lt2.textContent = "actual";
+
+/* ---------------------------------------------------------------- S8 alert */
+const s8svg = $("s8svg"), AS = F.alert.series;
+const C8 = { x: 160, y: 330, w: 1600, h: 480 };
+const aMax = Math.max(...AS.map((r) => r[1])) * 1.12;
+const ax = (i) => C8.x + i / (AS.length - 1) * C8.w, ay = (v) => C8.y + C8.h - v / aMax * C8.h;
+for (const v of [0, 10, 20, 30, 40]) if (v < aMax) {
+  el("line", { x1: C8.x, x2: C8.x + C8.w, y1: ay(v), y2: ay(v), stroke: "var(--line)", "stroke-width": 2 }, s8svg);
+  const tx = el("text", { x: C8.x - 14, y: ay(v) + 9, "text-anchor": "end", "font-family": "Plex Mono", "font-size": 24, fill: "var(--muted)" }, s8svg); tx.textContent = v;
+}
+const i0 = AS.findIndex((r) => r[0] >= F.alert.start), i1 = AS.findIndex((r) => r[0] >= F.alert.end);
+const alertBand = el("rect", { x: ax(i0), y: C8.y, width: ax(i1) - ax(i0), height: C8.h, fill: "var(--serious)", opacity: 0 }, s8svg);
+const alertTop = el("rect", { x: ax(i0), y: C8.y - 8, width: ax(i1) - ax(i0), height: 8, fill: "var(--serious)", opacity: 0 }, s8svg);
+const aLine = el("path", { d: "M" + AS.map((r, i) => `${ax(i).toFixed(1)} ${ay(r[1]).toFixed(1)}`).join("L"), fill: "none", stroke: "var(--blue)", "stroke-width": 5, "stroke-linejoin": "round" }, s8svg);
+const aClip = el("clipPath", { id: "aclip" }, s8svg); const aclipR = el("rect", { x: 0, y: 0, height: H, width: 0 }, aClip); aLine.setAttribute("clip-path", "url(#aclip)");
+const scan = el("line", { y1: C8.y - 20, y2: C8.y + C8.h + 10, stroke: "var(--ink)", "stroke-width": 3, "stroke-dasharray": "8 8" }, s8svg);
+for (const [lab, d] of [["Azar", "2025-11-22"], ["Dey", "2025-12-22"], ["Bahman", "2026-01-21"], ["Esfand", "2026-02-20"]]) {
+  const i = AS.findIndex((r) => r[0] >= d); const tx = el("text", { x: ax(i), y: C8.y + C8.h + 44, "text-anchor": "middle", "font-family": "Plex Sans", "font-size": 24, fill: "var(--muted)" }, s8svg); tx.textContent = lab;
+}
+
+/* ---------------------------------------------------------------- S9 invoice */
+const INV = F.invoice;
+const tierCol = ["#86b6ef", "#3987e5", "#1c5cab", "#0d366b"];
+const qmax = Math.max(...INV.lines.map((l) => l.quantity_m3));
+$("s9card").innerHTML = `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <div><div class="label" style="position:static">monthly invoice · ${INV.period} · ${INV.city}</div>
+      <div class="mono" style="font-size:30px;margin-top:8px">${INV.id}</div></div>
+    <div style="font:600 20px 'Plex Sans';letter-spacing:.12em;color:#7a5b00;border:3px solid var(--pipe);border-radius:6px;padding:8px 12px">ILLUSTRATIVE TARIFF</div>
+  </div>
+  <div id="tiers" style="margin-top:30px;display:grid;gap:16px">${INV.lines.map((l, i) => `
+    <div class="tier" style="display:grid;grid-template-columns:120px 1fr 220px;gap:18px;align-items:center;font-size:26px">
+      <span style="color:var(--ink2)">Step ${l.tier}</span>
+      <span style="height:30px;background:#eef0ea;border-radius:4px;position:relative;overflow:hidden"><span class="fill" style="position:absolute;inset:0 auto 0 0;width:${l.quantity_m3 / qmax * 100}%;background:${tierCol[i]}"></span></span>
+      <span class="mono" style="text-align:right">${fmt(l.quantity_m3, 1)} m³</span></div>`).join("")}</div>
+  <div style="position:absolute;left:46px;bottom:44px">
+    <div class="label" style="position:static">total payable</div>
+    <div class="mono" id="s9total" style="font-size:70px;font-weight:600;margin-top:6px"></div>
+    <div class="fa" style="font-size:30px;color:var(--ink2);direction:rtl;text-align:left">${faNum(fmt(INV.total / 10))} تومان</div>
+  </div>
+  <svg id="s9qr" viewBox="0 0 ${F.qr.n} ${F.qr.n}" style="position:absolute;left:auto;right:46px;bottom:44px;top:auto;width:240px;height:240px;background:#fff;padding:0;inset:auto 46px 44px auto"><path d="${F.qr.d}" fill="#15181b"/></svg>`;
+const tiers = [...document.querySelectorAll("#tiers .tier")];
+
+/* ---------------------------------------------------------------- S10 mark */
+const s10svg = $("s10svg"), mark = el("g", {}, s10svg);
+el("rect", { x: 900, y: 230, width: 120, height: 120, rx: 30, fill: "var(--ink)" }, mark);
+const markPipe = el("path", { d: "M930 320 V280 a20 20 0 0 1 20 -20 H990", fill: "none", stroke: "var(--pipe)", "stroke-width": 15, "stroke-linecap": "round" }, mark);
+el("circle", { cx: 975, cy: 305, r: 17, fill: "none", stroke: "var(--bg)", "stroke-width": 8 }, mark);
+el("path", { d: "M975 305 L984 296", stroke: "var(--bg)", "stroke-width": 7, "stroke-linecap": "round" }, mark);
+
+/* ---------------------------------------------------------------- render(t) */
+function render(t) {
+  for (const [id, a, b] of SCENES) {
+    const on = t >= a && t < b; $(id).style.opacity = on ? 1 : 0;
+    // slow camera push on every scene: no settled frame is ever dead still
+    if (on) $(id).style.transform = `scale(${1 + 0.06 * (t - a) / (b - a)}) translateX(${-10 * (t - a) / (b - a)}px)`;
+  }
+  $("honest").style.opacity = t < 27.5 ? 1 : 0;
+
+  // S1
+  if (t < 3) {
+    const vals = drumValues(litresAt(t));
+    drumCols.forEach((g, c) => g.setAttribute("transform", `translate(0 ${(-vals[c] * DR.h).toFixed(2)})`));
+    const push = inn(win(t, 2.3, 3.0));
+    const s = 1 + push * 7;
+    s1world.setAttribute("transform", `translate(${lastDrumX} ${lastDrumY}) scale(${s}) translate(${-lastDrumX} ${-lastDrumY})`);
+    const fade = 1 - win(t, 2.15, 2.5);
+    for (const id of ["s1h", "s1s"]) $(id).style.opacity = fade;
+    document.querySelector("#s1 .label").style.opacity = fade;
+  }
+
+  // S2 + S3 (one canvas)
+  if (t >= 3 && t < 9) {
+    const zoomIn = 1 - out(win(t, 3, 3.55));                // red drum face settles from the S1 push
+    const pan = sm(win(t, 5.3, 6.2)) * 1240;                // pan along the pipe to the device
+    const push = inn(win(t, 8.45, 9.0));                    // push into the display
+    const s = 1 + zoomIn * 2.2 + push * 6;
+    const fx0 = push > 0 ? LCDR.x + LCDR.w / 2 : WH.cx, fy0 = push > 0 ? LCDR.y + LCDR.h / 2 : WH.cy;
+    world.setAttribute("transform", `translate(${-pan} 0) translate(${fx0} ${fy0}) scale(${s}) translate(${-fx0} ${-fy0})`);
+    const rev = revAt(t);
+    wheel.setAttribute("transform", `rotate(${(rev * 360) % 360} ${WH.cx} ${WH.cy})`);
+    const phase = ((rev % 1) + 1) % 1, near = Math.min(phase, 1 - phase);        // 0 when the magnet is over the reed
+    const close = clamp(1 - near / 0.07);
+    const mid = (REED.x0 + REED.x1) / 2, gap = 14 * (1 - close);
+    bladeL.setAttribute("d", `M${REED.x0 + 40} ${REED.y} L${mid + 30} ${REED.y - gap}`);
+    bladeR.setAttribute("d", `M${REED.x1 - 40} ${REED.y} L${mid - 30} ${REED.y + gap}`);
+    spark.setAttribute("opacity", (close * 0.85).toFixed(3)); spark.setAttribute("r", 18 + 14 * close);
+    const fired = pulsesUpTo(t);
+    pulseDots.forEach((d, k) => {
+      const tf = fired[k];
+      if (tf === undefined) { d.setAttribute("opacity", 0); return; }
+      const x = REED.x1 + (t - tf) * PULSE_V;
+      d.setAttribute("opacity", x <= DEV.x ? 1 : 0); d.setAttribute("cx", Math.min(x, DEV.x)); d.setAttribute("cy", PIPE_Y);
+      const h = pulseHalos[k]; h.setAttribute("opacity", x <= DEV.x ? 0.3 : 0); h.setAttribute("cx", Math.min(x, DEV.x)); h.setAttribute("cy", PIPE_Y);
+    });
+    const arrived = fired.filter((tf) => t - tf >= PULSE_TRAVEL).length;
+    lcdVal.textContent = ((1350527 + arrived) * 0.01).toFixed(2);
+    const lastArr = fired.filter((tf) => t - tf >= PULSE_TRAVEL).map((tf) => t - tf - PULSE_TRAVEL).sort((a, b) => a - b)[0];
+    led.setAttribute("fill", lastArr !== undefined && lastArr < 0.18 ? "var(--good)" : "#c9ccc4");
+    const a2 = enter(t, 3.35), o2 = 1 - win(t, 5.15, 5.45);
+    rise($("s2h"), a2 * o2); rise($("s2s"), enter(t, 3.55) * o2);
+    const a3 = enter(t, 6.05) * (1 - win(t, 8.3, 8.55));
+    rise($("s3h"), a3); rise($("s3s"), enter(t, 6.25) * (1 - win(t, 8.3, 8.55)));
+  }
+
+  // S4 Jalali boundary
+  if (t >= 9 && t < 12.5) {
+    const tick = Math.floor(win(t, 9.25, 10.55) * 3);         // 23:59:58 -> 00:00:00 at 10.55
+    const after = t >= 10.55;
+    const sec = after ? 0 : 58 + tick;
+    $("s4clock").textContent = after ? "00:00:00" : `23:59:${String(Math.min(59, sec)).padStart(2, "0")}`;
+    $("s4fa").textContent = after ? "۱ مهر ۱۴۰۵" : "۳۱ شهریور ۱۴۰۵";
+    $("s4en").textContent = after ? "1 Mehr 1405 · first day of autumn" : "31 Shahrivar 1405";
+    const flip = clamp(1 - Math.abs(t - 10.55) / 0.12);
+    $("s4clock").style.transform = `scaleY(${1 - 0.25 * flip})`;
+    const card = enter(t, 10.65, 0.5);
+    $("s4card").style.opacity = card; $("s4card").style.transform = `translateX(${(1 - card) * 120}px)`;
+    const nLines = Math.floor(clamp((t - 10.75) / 1.15) * JSON_LINES.length);
+    $("s4json").innerHTML = JSON_LINES.slice(0, nLines).map((l) => /period|period_close|1405\/04|months/.test(l) ? `<span style="background:#f2b20055">${l}</span>` : l).join("\n");
+    const intro = 1 - out(win(t, 9, 9.4));                    // the display grows out of the S3 push
+    $("s4").style.transform = `scale(${(1 + intro * 0.25) * (1 + 0.06 * (t - 9) / 3.5)})`;
+    rise($("s4h"), enter(t, 9.35)); rise($("s4s"), enter(t, 9.55));
+    $("s4card").style.transform += ` scale(${1 - 0.55 * inn(win(t, 12.15, 12.5))})`;
+  }
+
+  // S5 delivery
+  if (t >= 12.5 && t < 15) {
+    // the record card from S4 (shrunk to 45 % at x 1450, y 530) becomes the packet and flies to the antenna
+    const k = sm(win(t, 12.5, 12.95));
+    const px = lerp(1450, 1300, k), py = lerp(530, 296, k) - Math.sin(k * Math.PI) * 120;
+    packet.setAttribute("transform", `translate(${px} ${py}) scale(${lerp(2.4, 0.5, k)})`);
+    packet.setAttribute("opacity", 1 - win(t, 12.9, 13.02));
+    const outage = t > 13.0;
+    const signal = outage ? 0 : 4;
+    bars.forEach((b, i) => b.setAttribute("fill", i < signal ? "var(--blue)" : "var(--line2)"));
+    s5label.textContent = outage ? "no service" : "LTE · -79 dBm";
+    waves.forEach((w, i) => w.setAttribute("opacity", outage ? 0.15 : clamp(Math.sin((t * 3 - i * 0.35) * Math.PI) * 0.5 + 0.5)));
+    const sms = enter(t, 13.05, 0.35);
+    $("s5sms").style.opacity = sms; $("s5sms").style.transform = `translateY(${(1 - sms) * 40}px)`;
+    const n = Math.floor(clamp((t - 13.25) / 1.0) * SMS.length);
+    $("s5text").textContent = SMS.slice(0, n);
+  }
+
+  // S6 fleet
+  if (t >= 15 && t < 18.5) {
+    const k = sm(win(t, 15.7, 16.9));
+    dots.forEach((d, i) => {
+      const [gx0, gy0] = grid(i), [tx, ty] = target(i);
+      const burst = out(win(t, 15.28 + ((i * 37) % 240) / 240 * 0.12, 15.75 + ((i * 37) % 240) / 240 * 0.12));
+      const gx = lerp(ORIGIN[0], gx0, burst), gy = lerp(ORIGIN[1], gy0, burst);
+      const kk = sm(win(t, 15.75 + (i % 24) * 0.012, 16.9 + (i % 24) * 0.012));
+      d.setAttribute("cx", lerp(gx, tx, kk)); d.setAttribute("cy", lerp(gy, ty, kk));
+      d.setAttribute("r", lerp(9, 4, kk) * clamp(burst * 3)); d.setAttribute("opacity", (1 - win(t, 17.1, 17.5)) * (t >= 15.28 ? 1 : 0));
+    });
+    fclipR.setAttribute("width", CH.w * sm(win(t, 16.6, 17.6)) + 20);
+    const col = inn(win(t, 15.0, 15.33));
+    $("s6sms").style.transform = `scale(${1 - col}, ${1 - col * 0.9})`; $("s6sms").style.opacity = 1 - win(t, 15.25, 15.35);
+    $("s6lab").style.opacity = k;
+  }
+
+  // S7 forecast
+  if (t >= 18.5 && t < 21.5) {
+    bclipR.setAttribute("width", C7.x + (C7.w + 40) * lerp(0.4, 1, sm(win(t, 18.5, 19.4))));
+    p50.setAttribute("stroke-dasharray", `${p50len}`); p50.setAttribute("stroke-dashoffset", `${p50len * (1 - lerp(0.35, 1, sm(win(t, 18.5, 19.5))))}`);
+    act.forEach((c, i) => { const kk = out(win(t, 18.6 + i * 0.09, 18.9 + i * 0.09)); c.setAttribute("opacity", kk); c.setAttribute("r", 12 * kk); });
+    // one backtest result: shown as a fixed number, never counted down
+    $("s7num").textContent = (F.wape * 100).toFixed(1) + "%";
+    const nk = enter(t, 18.3, 0.4); $("s7num").style.opacity = nk; $("s7num").style.transform = `scale(${0.92 + 0.08 * nk})`;
+    $("s7num").style.transformOrigin = "left bottom";
+    $("s7cov").textContent = `${Math.round(F.coverage * 100)}% of actual months land inside the 80% interval`;
+    rise($("s7cov"), enter(t, 18.9));
+  }
+
+  // S8 alert
+  if (t >= 21.5 && t < 24.5) {
+    const sx = C8.x + C8.w * lerp(0.16, 1, sm(win(t, 21.5, 23.0)));
+    aclipR.setAttribute("width", sx); scan.setAttribute("x1", sx); scan.setAttribute("x2", sx);
+    scan.setAttribute("opacity", 1 - win(t, 23.0, 23.2));
+    const flagged = clamp((sx - ax(i0)) / 40);
+    alertBand.setAttribute("opacity", 0.18 * flagged); alertTop.setAttribute("opacity", flagged);
+    const chip = $("s8chip"); const ck = enter(t, 21.85, 0.35);
+    chip.style.left = (ax(i1) + 24) + "px"; chip.style.top = (C8.y - 74 + (1 - ck) * 20) + "px"; chip.style.opacity = ck;
+    rise($("s8s"), enter(t, 22.4));
+  }
+
+  // S9 invoice
+  if (t >= 24.5 && t < 27.5) {
+    const c = lerp(0.6, 1, enter(t, 24.5, 0.4));
+    $("s9card").style.opacity = c; $("s9card").style.transform = `translateY(${(1 - c) * 60}px)`;
+    tiers.forEach((r, i) => { const kk = i === 0 ? 1 : out(win(t, 24.55 + i * 0.16, 24.9 + i * 0.16)); r.style.opacity = kk; r.querySelector(".fill").style.transform = `scaleX(${kk})`; r.querySelector(".fill").style.transformOrigin = "left"; });
+    $("s9total").textContent = fmt(Math.round(INV.total * lerp(0.25, 1, sm(win(t, 24.5, 25.5))) / 1000) * 1000) + " IRR";
+    const q = enter(t, 24.8, 0.35); $("s9qr").style.opacity = q; $("s9qr").style.transform = `scale(${0.85 + 0.15 * q})`;
+    const ok = enter(t, 25.3, 0.4); $("s9ok").style.opacity = ok; $("s9ok").style.transform = `translateX(${(1 - ok) * 60}px)`;
+    const ln = sm(win(t, 25.0, 25.35)); $("s9link").setAttribute("x2", lerp(1222, 1290, ln)); $("s9link").setAttribute("opacity", ln > 0 ? 1 : 0);
+  }
+
+  // S10 end card
+  if (t >= 27.5) {
+    // composed from its first frame; only the pipe glyph draws and the URL underline sweeps
+    markPipe.setAttribute("stroke-dasharray", "140"); markPipe.setAttribute("stroke-dashoffset", 140 * (1 - sm(win(t, 27.5, 28.0))));
+    for (const id of ["e0", "e1", "e2", "e3", "e4", "e5"]) rise($(id), lerp(0.75, 1, enter(t, 27.5, 0.35)), 12);
+    $("e3u").style.transform = `scaleX(${sm(win(t, 27.8, 28.5))})`;
+    $("s10").style.transform = `scale(${1 + 0.07 * win(t, 27.5, 30)})`;
+  }
+}
+window.render = render;
+window.DURATION = DUR;
+window.filmReady = Promise.all(["700 10px Bricolage", "800 10px Bricolage", "400 10px 'Plex Sans'", "500 10px 'Plex Sans'", "600 10px 'Plex Sans'",
+  "400 10px 'Plex Mono'", "600 10px 'Plex Mono'", "400 10px Vazir", "700 10px Vazir"].map((f) => document.fonts.load(f, f.includes("Vazir") ? "کنتور" : "Ag")))
+  .then(() => document.fonts.ready).then(() => { render(0); return true; });
+</script>
+</body>
+</html>
