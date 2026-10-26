@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "hardware/kicad/**"
+      - "hardware/kicad-modem/**"
       - ".github/workflows/hardware-cad-check.yml"
   pull_request:
     paths:
       - "hardware/kicad/**"
+      - "hardware/kicad-modem/**"
       - ".github/workflows/hardware-cad-check.yml"
   workflow_dispatch:
 
@@ -121,6 +123,23 @@ jobs:
             echo "::error::One or more CAD checks/exports/netlist invariants failed. Review uploaded reports; ERC/DRC violations are not suppressed."
             exit 1
           fi
+      - name: Modem daughterboard v0.1 (draft) ERC, DRC and netlist
+        if: steps.detect.outputs.present == 'true'
+        shell: bash
+        run: |
+          set +e
+          set -uo pipefail
+          failed=0
+          sch=hardware/kicad-modem/sgm_modem.kicad_sch
+          pcb=hardware/kicad-modem/sgm_modem.kicad_pcb
+          kicad-cli sch erc --exit-code-violations --output /tmp/cad-reports/sgm_modem-erc.rpt "$sch" || { echo "::error title=Modem ERC::ERC failed"; failed=1; }
+          grep -E "^\*\* Found|^\[[a-z_]+\]" /tmp/cad-reports/sgm_modem-erc.rpt | sed -E 's/\(.*//' | sort | uniq -c | head -8 | while read -r l; do echo "::notice title=Modem ERC::$l"; done
+          kicad-cli sch export netlist "$sch" --output /tmp/netlists/sgm_modem.net || failed=1
+          python3 hardware/kicad-modem/check_netlist_matches_design.py /tmp/netlists/sgm_modem.net || { echo "::error title=Modem netlist::netlist does not match design_modem_v01.py"; failed=1; }
+          python3 hardware/kicad-modem/tools/generate_schematic.py --kicad-share /nonexistent --check || { echo "::error title=Modem schematic sync::schematic out of date"; failed=1; }
+          kicad-cli pcb drc --schematic-parity --severity-error --exit-code-violations --output /tmp/cad-reports/sgm_modem-drc.rpt "$pcb" || { echo "::error title=Modem DRC::DRC errors"; failed=1; }
+          grep -E "^\*\* Found|^\[[a-z_]+\]" /tmp/cad-reports/sgm_modem-drc.rpt | sed -E 's/\(.*//' | sort | uniq -c | head -8 | while read -r l; do echo "::notice title=Modem DRC::$l"; done
+          exit $failed
       - name: Upload CAD reports and exports
         if: always() && steps.detect.outputs.present == 'true'
         uses: actions/upload-artifact@v4

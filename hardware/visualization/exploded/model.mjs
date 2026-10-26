@@ -231,7 +231,7 @@ const baseWalls = shell("device.base", spin, E, FLOOR_TOP, WALL_TOP, 2.4, { tone
 rightPlane(baseWalls[3], E.x + E.w, E.y + E.d - 8, 86, text("SGM · bench prototype", 3.4, { tone: "mid", anchor: "start", weight: 700 }) + `<g transform="translate(0 5)">${text("not for live gas", 3, { tone: "lo", anchor: "start", weight: 500 })}</g>`);
 dcylY("device.gland", spin, GLAND_X, CABLE_Z, 3.4, EL.y + EL.d, EL.y + EL.d + 6, { tone: "mid", material: "gunmetal", details: { seams: [EL.y + EL.d + 3.8 + DY] } });
 
-// main board and its parts (v0.2 board: U1 ESP32-S3, U2 AP63203 buck + L1, J1 USB-C, U3 ESD, J2 pulse, J3 header, SW1/SW2, D1)
+// main board and its parts (v0.2 board: U1 ESP32-S3, U3 AP63203 buck + L1, J1 USB-C, U2 USBLC6 ESD, J2 pulse, J3-J5 lab headers, SW1/SW2, D2 LED)
 const PCB = { x: 36, y: -2, w: 30, d: 54, r: 1.5 };
 const PCB_Z = 68;
 const PCB_TOP = 69.6;

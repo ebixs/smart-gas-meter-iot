@@ -25,3 +25,14 @@ media/explainer/*.video.mp4
 media/explainer/audio/*.raw
 media/explainer/explainer.html
 hardware/visualization/media/*.video.mp4
+# boards / modem build leftovers
+hardware/visualization/boards/test-*.html
+hardware/visualization/media/*-tour.video.mp4
+hardware/kicad-modem/*.dsn
+hardware/kicad-modem/*.ses
+hardware/kicad-modem/*-backups/
+hardware/kicad-modem/fp-info-cache
+hardware/kicad-modem/m-routed.kicad_pcb
+hardware/visualization/media/sgm-boards-sheets-a4-p*.png
+!hardware/visualization/boards/data/
+!hardware/visualization/schematic/data/

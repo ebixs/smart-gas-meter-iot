@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -v
           python -m unittest discover -s hardware/kicad/tests -v
+          python -m unittest discover -s hardware/kicad-modem/tests -v
       - name: Smoke-test simulator and validate telemetry
         run: |
           python simulator/pulse_simulator.py --device-id ci-lab --pulses 3 --interval-ms 250 > /tmp/readings.jsonl
