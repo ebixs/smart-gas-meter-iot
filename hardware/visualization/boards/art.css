@@ -1,0 +1,20 @@
+/* board artwork on the layer slabs (planes) and paints for board parts */
+.art .t{fill:none!important}
+.art-cu{fill:#c9873f;stroke:#c9873f;stroke-linecap:round;stroke-linejoin:round}
+.art-pad{fill:#d9a25a}
+.art-silk{fill:none;stroke:#f4f4ee;stroke-linecap:round}
+.art-silk text{fill:#f4f4ee;stroke:none;font-family:"Plex Mono",ui-monospace,monospace}
+.art-silk .s{fill:#f4f4ee}
+.art-hole{fill:#15181b}
+.iso-live [data-name^="layer.topmask"],.iso-live [data-name^="layer.botmask"]{--anatomy-paper:#1b5a38;--anatomy-face:#22704a;--anatomy-top:#1f6a44;--anatomy-shade-0:#123b26;--anatomy-shade-1:#174a30;--anatomy-shade-2:#1d5b3a;--anatomy-shade-3:#236b45;--anatomy-hi:#0b2416;--anatomy-mid:#5fae84;--anatomy-lo:#3c8a61;--anatomy-faint:#2f7a52}
+.iso-live [data-name^="layer.fcu"],.iso-live [data-name^="layer.in1"],.iso-live [data-name^="layer.in2"],.iso-live [data-name^="layer.bcu"]{--anatomy-paper:#6f6a43;--anatomy-face:#8a8455;--anatomy-top:#9d9762;--anatomy-shade-0:#4f4b30;--anatomy-shade-1:#5d5938;--anatomy-shade-2:#6f6a43;--anatomy-shade-3:#7f7a4d;--anatomy-hi:#2a2818;--anatomy-mid:#b9b27c;--anatomy-lo:#8a8455;--anatomy-faint:#7f7a4d}
+.iso-live [data-name^="cmp.C"][data-name$=".body"]{--anatomy-paper:#a8865a;--anatomy-face:#c4a06e;--anatomy-top:#d4b27f;--anatomy-shade-0:#7e6342;--anatomy-shade-1:#8f714c;--anatomy-shade-2:#a8865a;--anatomy-shade-3:#b8956a;--anatomy-hi:#3a2c1a;--anatomy-mid:#5a4529;--anatomy-lo:#7e6342;--anatomy-faint:#a8865a}
+.iso-live [data-name^="cmp.F"][data-name$=".body"]{--anatomy-paper:#3a3f45;--anatomy-face:#4b5158;--anatomy-top:#5a6168}
+.iso-live [data-name^="cmp.D"][data-name$=".body"][data-lit]{--anatomy-lit-top:#ff8f87;--anatomy-lit-shade:#e0453d;--anatomy-face:#e0453d}
+/* block diagram: one tint per voltage domain */
+.iso-live [data-name^="block.power."]{--anatomy-paper:#e9d9b4;--anatomy-face:#f3e6c7;--anatomy-top:#f8eed6;--anatomy-shade-0:#c9b68c;--anatomy-shade-1:#d6c49c;--anatomy-shade-2:#e2d1ab;--anatomy-shade-3:#ecdcb9}
+.iso-live [data-name^="block.logic."]:not([data-name="block.logic.esp32"]){--anatomy-paper:#c9d8ea;--anatomy-face:#d9e5f3;--anatomy-top:#e4edf8;--anatomy-shade-0:#a2b6cf;--anatomy-shade-1:#b1c4db;--anatomy-shade-2:#c0d1e5;--anatomy-shade-3:#ccdcee}
+.iso-live [data-name^="block.modem."]:not([data-name="block.modem.ec200u"]){--anatomy-paper:#c8e2cf;--anatomy-face:#d8eedd;--anatomy-top:#e3f4e7;--anatomy-shade-0:#9fc5a9;--anatomy-shade-1:#afd2b8;--anatomy-shade-2:#bedcc6;--anatomy-shade-3:#cbe5d1}
+.iso-live [data-name^="block."] .iso-face-text{fill:#1d2733!important}
+.iso-live [data-name^="block."] .iso-face-text[data-tone="mid"]{fill:#4a5562!important}
+.art-cu .z{fill:#c9873f;stroke:none;opacity:.5}

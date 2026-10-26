@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "SGMM")(type "KiCad")(uri "${KIPRJMOD}/lib/SGMM.pretty")(options "")(descr "Modem daughterboard footprints: KiCad 7.0.11 stock copies + PROVISIONAL EC200U"))
+)

@@ -165,9 +165,9 @@ export const ITEMS = [
   },
   {
     id: "pcb", sec: "device", match: ["board.pcb", "board.standoff", "board.modem.post"], x: 0.7, spin: 40,
-    en: { name: "Main board", does: "Two-layer board that joins everything: power, the pulse input, the modem header and the test points." },
-    fa: { name: "بُرد اصلی", does: "بُرد دولایه‌ای که همه‌چیز را به هم وصل می‌کند: تغذیه، ورودی پالس، اتصال مودم و نقاط آزمون." },
-    facts: [{ en: "Board v0.2 · KiCad", fa: "بُرد نسخهٔ ۰٫۲ · KiCad" }],
+    en: { name: "Main board", does: "Four-layer board that joins everything: power, the pulse input, the modem header and the test points. The inner layers are a solid ground plane (In1) and a 3.3 V pour (In2)." },
+    fa: { name: "بُرد اصلی", does: "بُرد چهارلایه‌ای که همه‌چیز را به هم وصل می‌کند: تغذیه، ورودی پالس، اتصال مودم و نقاط آزمون. لایه‌های داخلی یک صفحهٔ زمین یکپارچه (In1) و یک سطح مسی ۳٫۳ ولت (In2) هستند." },
+    facts: [{ en: "Board v0.2 · KiCad · 100 × 70 mm, 4 layers", fa: "بُرد نسخهٔ ۰٫۲ · KiCad · ۱۰۰ × ۷۰ میلی‌متر، چهار لایه" }],
   },
   {
     id: "power", sec: "device", match: ["board.buck"], x: 0.7, spin: 40,
@@ -179,7 +179,7 @@ export const ITEMS = [
     id: "usb", sec: "device", match: ["board.usb", "board.esd"], x: 0.7, spin: 40,
     en: { name: "USB-C and ESD guard", does: "Bench power, flashing and logs over the ESP32's native USB. A protection chip guards the data lines." },
     fa: { name: "درگاه USB-C و محافظ ESD", does: "برای تغذیه روی میز آزمایش، بارگذاری فِرم‌ور و دیدن گزارش‌ها از طریق USB داخلی ESP32. یک تراشهٔ محافظ از خطوط داده محافظت می‌کند." },
-    facts: [],
+    facts: [{ en: "J1 USB-C · U2 USBLC6-2SC6 · F1 PTC fuse · D1 SMAJ6.5CA TVS", fa: "J1 USB-C · U2 USBLC6-2SC6 · فیوز PTC F1 · دیود TVS D1 (SMAJ6.5CA)" }],
   },
   {
     id: "j2", sec: "device", match: ["board.j2"], x: 0.7, spin: 40,
@@ -189,8 +189,8 @@ export const ITEMS = [
   },
   {
     id: "j3", sec: "device", match: ["board.j3"], x: 0.7, spin: 40,
-    en: { name: "Expansion header J3", does: "Spare 3.3 V, ground, I²C and a reserved UART for later sensors or a debug probe." },
-    fa: { name: "اتصال توسعهٔ J3", does: "ولتاژ ۳٫۳، زمین، I²C و یک UART رزرو برای حسگرهای بعدی یا ابزار عیب‌یابی." },
+    en: { name: "Lab headers J3–J5", does: "Three bench headers on the board edge: J3 takes the enclosure tamper switch (GPIO15), J4 is an I²C expansion port with 3.3 V, ground and 4.7 kΩ pull-ups (R10, R11), and J5 is the 3.3 V debug UART0 (TX, RX, ground; no power pin, so nothing back-feeds the board)." },
+    fa: { name: "اتصال‌های آزمایشگاهی J3 تا J5", does: "سه اتصال کنار بُرد برای کار روی میز آزمایش: J3 کلید ضددستکاری محفظه را می‌گیرد (GPIO15)، J4 درگاه توسعهٔ I²C با ۳٫۳ ولت، زمین و مقاومت‌های بالاکش ۴٫۷ کیلواهم (R10 و R11) است و J5 درگاه سریال عیب‌یابی UART0 با سطح ۳٫۳ ولت (TX، RX و زمین؛ بدون پایهٔ تغذیه تا چیزی از بیرون بُرد را تغذیه نکند)." },
     facts: [],
   },
   {
@@ -203,7 +203,7 @@ export const ITEMS = [
     id: "led", sec: "device", match: ["board.led"], x: 0.7, spin: 40,
     en: { name: "Status LED", does: "Blinks to show pulses and connection state while testing." },
     fa: { name: "چراغ وضعیت", does: "هنگام آزمایش با چشمک زدن، پالس‌ها و وضعیت اتصال را نشان می‌دهد." },
-    facts: [{ en: "D1 · GPIO5", fa: "D1 · GPIO5" }],
+    facts: [{ en: "D2 · GPIO5 (LED_DRV, active high)", fa: "D2 · GPIO5 (خط LED_DRV، فعال با سطح بالا)" }],
   },
   {
     id: "battery", sec: "device", match: ["battery.cell", "battery.terminal", "battery.cradle"], x: 1, spin: 40,
