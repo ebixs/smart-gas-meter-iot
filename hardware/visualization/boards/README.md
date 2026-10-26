@@ -17,7 +17,10 @@ Not-fitted (DNP) parts are left off. Every note (`parts-*.mjs`) is taken from th
 python3 tools/pcb_extract.py ../../kicad/smart_gas_meter_iot.kicad_pcb data/carrier.json
 python3 tools/pcb_extract.py ../../kicad-modem/sgm_modem.kicad_pcb data/modem.json
 node page.mjs carrier && node page.mjs modem && node page.mjs blocks      # → <name>.html
-node build.mjs carrier --audit                                            # optional kit audit
 node print.mjs                                                            # → ../media/sgm-boards-sheets-a4.pdf (16 A4 pages)
 node capture.mjs carrier ../media/sgm-carrier-tour.video.mp4              # per-page tour; joined into ../media/sgm-boards-tour.mp4
 ```
+
+**Audit status:** the pages build with the kit's strict painter-order proof. The slower turn audit (`node build.mjs modem --audit --quick`)
+still reports order flips between a few small neighbouring parts at some angles when exploded (49 on the modem board),
+which can show as a brief flicker of a resistor or capacitor while turning; the layers themselves are unaffected.

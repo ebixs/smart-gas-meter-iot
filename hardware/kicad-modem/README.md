@@ -62,8 +62,10 @@ on its underside, pin for pin: `1 MODEM_VIN · 2 GND · 3 MODEM_TXD · 4 MODEM_R
 | Netlist vs. design (`check_netlist_matches_design.py`) | 55 parts, 35 nets, 190 pin connections match; J1 = carrier J6 |
 | Schematic ↔ design sync (`generate_schematic.py --check`) | committed file matches a fresh generation |
 | Design invariants (`python3 -m unittest discover -s hardware/kicad-modem/tests`) | pass |
-| DRC (KiCad 7 `pcbnew`, see `exports/drc-kicad-7.rpt`) | see the report; the layout depends on the provisional footprint |
-| ERC | KiCad 7's CLI has no ERC; run in CI (`hardware-cad-check.yml`) with KiCad 9 |
+| DRC (KiCad 7 `pcbnew`, `exports/drc-kicad-7.rpt`) | 0 violations, 0 unconnected pads |
+| ERC + DRC with schematic parity, KiCad 9 (CI `hardware-cad-check.yml`, PR #8) | ERC pass; DRC 0 violations, 0 unconnected, 0 footprint errors |
+
+A clean DRC here only proves the layout is consistent with the **provisional** footprint; it says nothing about the real module pads.
 
 ## Regenerate
 
